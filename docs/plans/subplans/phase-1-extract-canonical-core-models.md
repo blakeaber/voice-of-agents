@@ -358,17 +358,17 @@ def save_capability_registry(registry: CapabilityRegistry, path: Path) -> None:
 - `test_core_backlog.py`: test add_item, materialize_backlog replay, update_score accumulation, source field enforcement
 
 ## Acceptance Criteria
-- [ ] `src/voice_of_agents/core/enums.py` exists with all 7 enum classes
-- [ ] `src/voice_of_agents/core/pain.py` exists with `PainPoint` and `PainTheme`
-- [ ] `src/voice_of_agents/core/persona.py` exists with `VoiceProfile`, `PersonaMetadata`, `Persona`
-- [ ] `src/voice_of_agents/core/capability.py` exists with `TestResult`, `Capability`, `CapabilityRegistry`
-- [ ] `src/voice_of_agents/core/backlog.py` exists with `BacklogItem`, `BacklogEvent`, and JSONL functions
-- [ ] `src/voice_of_agents/core/io.py` exists with all 5 I/O functions
-- [ ] `VoiceProfile` instantiates with no arguments and all fields have defaults: `python -c "from voice_of_agents.core.persona import VoiceProfile; v = VoiceProfile(); assert v.skepticism == 'moderate'"`
-- [ ] `Persona` instantiates without providing `voice`: `python -c "from voice_of_agents.core.persona import Persona; p = Persona(id=1, name='Test', role='Dev', industry='Tech', segment='b2c', tier='FREE'); assert p.voice.motivation == 'efficiency'"`
-- [ ] `BacklogItem` requires `source` field: `python -c "from voice_of_agents.core.backlog import BacklogItem; BacklogItem(id='B-001', title='T', description='D', source='eval')"` succeeds; omitting `source` raises `ValidationError`
-- [ ] Existing `src/voice_of_agents/contracts/personas.py` is untouched and still importable
-- [ ] `pytest tests/unit/test_core_persona.py tests/unit/test_core_capability.py tests/unit/test_core_backlog.py -v` passes
+- [x] `src/voice_of_agents/core/enums.py` exists with all 7 enum classes
+- [x] `src/voice_of_agents/core/pain.py` exists with `PainPoint` and `PainTheme`
+- [x] `src/voice_of_agents/core/persona.py` exists with `VoiceProfile`, `PersonaMetadata`, `Persona`
+- [x] `src/voice_of_agents/core/capability.py` exists with `TestResult`, `Capability`, `CapabilityRegistry`
+- [x] `src/voice_of_agents/core/backlog.py` exists with `BacklogItem`, `BacklogEvent`, and JSONL functions
+- [x] `src/voice_of_agents/core/io.py` exists with all 5 I/O functions
+- [x] `VoiceProfile` instantiates with no arguments and all fields have defaults: `python -c "from voice_of_agents.core.persona import VoiceProfile; v = VoiceProfile(); assert v.skepticism == 'moderate'"`
+- [x] `Persona` instantiates without providing `voice`: `python -c "from voice_of_agents.core.persona import Persona; p = Persona(id=1, name='Test', role='Dev', industry='Tech', segment='b2c', tier='FREE'); assert p.voice.motivation == 'efficiency'"`
+- [x] `BacklogItem` requires `source` field: `python -c "from voice_of_agents.core.backlog import BacklogItem; BacklogItem(id='B-001', title='T', description='D', source='eval')"` succeeds; omitting `source` raises `ValidationError`
+- [x] Existing `src/voice_of_agents/contracts/personas.py` is untouched and still importable
+- [x] `pytest tests/unit/test_core_persona.py tests/unit/test_core_capability.py tests/unit/test_core_backlog.py -v` passes (56 tests, 0 failures)
 
 ## Verification Steps
 ```bash
@@ -382,4 +382,4 @@ pytest tests/unit/test_core_persona.py tests/unit/test_core_capability.py tests/
 ```
 
 ## Status
-PENDING
+COMPLETE
