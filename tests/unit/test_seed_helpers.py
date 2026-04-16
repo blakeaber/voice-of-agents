@@ -1,7 +1,7 @@
 """Tests for _derive_goals() seed helper."""
 
 from voice_of_agents.contracts.personas import Objective, PainPoint, Persona, Voice
-from voice_of_agents.explorer.seed import _derive_goals
+from voice_of_agents.eval.seed import _derive_goals
 
 
 def _make_persona(

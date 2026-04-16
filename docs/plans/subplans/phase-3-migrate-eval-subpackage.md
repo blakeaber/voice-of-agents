@@ -110,21 +110,21 @@ voa = "voice_of_agents.cli.main:cli"
 8. Delete `src/voice_of_agents/config.py`
 
 ## Acceptance Criteria
-- [ ] `src/voice_of_agents/eval/config.py` exists
-- [ ] `src/voice_of_agents/eval/phase2_explore.py` exists
-- [ ] `src/voice_of_agents/eval/phase3_evaluate.py` exists
-- [ ] `src/voice_of_agents/eval/phase5_prioritize.py` exists
-- [ ] `src/voice_of_agents/cli/eval_cli.py` exists with `eval_cli` Click group
-- [ ] `src/voice_of_agents/cli/main.py` exists with `cli` group containing `design` and `eval` subgroups
-- [ ] `pyproject.toml` entry point is `voice_of_agents.cli.main:cli`
-- [ ] `src/voice_of_agents/explorer/` directory does NOT exist
-- [ ] `src/voice_of_agents/phases/` directory does NOT exist
-- [ ] `src/voice_of_agents/reporting/` directory does NOT exist
-- [ ] `src/voice_of_agents/cli.py` does NOT exist
-- [ ] `python -c "from voice_of_agents.cli.main import cli; print('ok')"` succeeds
-- [ ] `voa --help` shows `design` and `eval` subgroups (after `pip install -e .`)
-- [ ] `voa eval status` runs without ImportError (may fail on missing data — that's OK)
-- [ ] `voa design --help` shows persona/workflow/analyze subgroups
+- [x] `src/voice_of_agents/eval/config.py` exists
+- [x] `src/voice_of_agents/eval/phase2_explore.py` exists
+- [x] `src/voice_of_agents/eval/phase3_evaluate.py` exists
+- [x] `src/voice_of_agents/eval/phase5_prioritize.py` exists
+- [x] `src/voice_of_agents/cli/eval_cli.py` exists with `eval_cli` Click group
+- [x] `src/voice_of_agents/cli/main.py` exists with `cli` group containing `design` and `eval` subgroups
+- [x] `pyproject.toml` entry point is `voice_of_agents.cli.main:cli`
+- [x] `src/voice_of_agents/explorer/` directory does NOT exist
+- [x] `src/voice_of_agents/phases/` directory does NOT exist
+- [x] `src/voice_of_agents/reporting/` directory does NOT exist
+- [x] `src/voice_of_agents/cli.py` does NOT exist (cli/ package __init__.py re-exports)
+- [x] `python -c "from voice_of_agents.cli.main import cli; print('ok')"` succeeds
+- [x] `voa --help` shows `design` and `eval` subgroups
+- [x] `voa eval status` runs without ImportError — shows 35 personas loaded
+- [x] `voa design --help` shows persona/workflow/analyze subgroups
 
 ## Verification Steps
 ```bash
@@ -142,4 +142,4 @@ ls src/voice_of_agents/cli.py 2>/dev/null && echo "FAIL" || echo "PASS: cli.py d
 ```
 
 ## Status
-PENDING
+COMPLETE

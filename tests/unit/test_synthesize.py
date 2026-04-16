@@ -2,7 +2,7 @@
 
 import pytest
 
-from voice_of_agents.phases.phase4_synthesize import (
+from voice_of_agents.eval.phase4_synthesize import (
     _cluster_key,
     _classify_segment,
 )
