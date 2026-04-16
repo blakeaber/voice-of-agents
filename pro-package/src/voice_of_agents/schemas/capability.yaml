@@ -1,0 +1,53 @@
+# Voice of Agents — Capability Schema
+# Defines a single platform capability that workflows can reference.
+# Product teams populate a capability registry from their FEATURES doc.
+
+type: object
+required: [id, name, status, feature_area]
+properties:
+  id:
+    type: string
+    pattern: "^CAP-[A-Z]+-[A-Z]+$"
+    description: Unique capability ID (e.g., CAP-LEARN-SEARCH)
+
+  name:
+    type: string
+    description: Human-readable capability name
+
+  description:
+    type: string
+    description: What this capability does
+
+  status:
+    type: string
+    enum: [complete, partial, planned, future]
+    description: Implementation status
+
+  api_endpoint:
+    type: string
+    description: Primary API endpoint (e.g., GET /api/learnings/search)
+
+  ui_page:
+    type: string
+    description: Primary UI page path (e.g., /pro/learnings)
+
+  feature_area:
+    type: string
+    description: Parent feature area from product docs
+
+  dependencies:
+    type: array
+    items:
+      type: string
+    description: Other capability IDs this depends on
+
+  metadata:
+    type: object
+    properties:
+      implemented_in:
+        type: string
+        description: Version or phase when implemented
+      test_coverage:
+        type: boolean
+      notes:
+        type: string

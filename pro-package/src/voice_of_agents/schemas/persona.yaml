@@ -1,0 +1,122 @@
+# Voice of Agents — Persona Schema
+# Defines the structure for market-grounded user personas.
+# All persona YAML files must conform to this schema.
+
+type: object
+required: [id, name, role, segment, industry, tier]
+properties:
+  id:
+    type: integer
+    description: Unique persona identifier (1-based sequential)
+
+  name:
+    type: string
+    description: Full name of the persona
+
+  role:
+    type: string
+    description: Job title / professional role
+
+  segment:
+    type: string
+    enum: [b2c, b2b]
+    description: Whether this is an individual (b2c) or team/enterprise (b2b) persona
+
+  industry:
+    type: string
+    description: Industry or professional domain
+
+  tier:
+    type: string
+    enum: [FREE, DEVELOPER, TEAM, ENTERPRISE]
+    description: Expected subscription tier based on persona economics
+
+  age:
+    type: integer
+    minimum: 18
+    maximum: 80
+
+  income:
+    type: integer
+    description: Annual income in USD
+
+  org_size:
+    type: integer
+    minimum: 1
+    description: Organization size (1 for solo practitioners)
+
+  experience_years:
+    type: integer
+    minimum: 0
+
+  # Behavioral profile
+  ai_history:
+    type: string
+    description: Prior AI tools tried and why they failed
+
+  mindset:
+    type: string
+    description: Attitude toward AI, in their own voice (quoted)
+
+  pain_points:
+    type: array
+    items:
+      type: object
+      required: [description, impact]
+      properties:
+        description:
+          type: string
+        impact:
+          type: string
+          description: Quantified impact (hours, dollars, error rate)
+        current_workaround:
+          type: string
+          description: What they do today to cope
+
+  unmet_need:
+    type: string
+    description: The single capability that would transform their work
+
+  proof_point:
+    type: string
+    description: What the product must demonstrate to earn trust
+
+  # Pain theme classification
+  pain_themes:
+    type: array
+    items:
+      type: object
+      required: [theme, intensity]
+      properties:
+        theme:
+          type: string
+          enum: [A, B, C, D, E, F]
+          description: >
+            A=knowledge retrieval failure, B=bus factor/SPOF,
+            C=contextual failure of generic AI, D=trust deficit,
+            E=governance vacuum, F=integration failure
+        intensity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+
+  # Persona metadata for automation
+  metadata:
+    type: object
+    properties:
+      source:
+        type: string
+        description: How this persona was created (manual, generated, hybrid)
+      created_at:
+        type: string
+        format: date
+      updated_at:
+        type: string
+        format: date
+      research_basis:
+        type: array
+        items:
+          type: string
+        description: Market research sources grounding this persona
+      validation_status:
+        type: string
+        enum: [draft, validated, stale]

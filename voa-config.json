@@ -1,0 +1,18 @@
+{
+  "target_url": "http://localhost:3000",
+  "api_url": "http://localhost:8420",
+  "data_dir": "./data",
+  "batch_size": 5,
+  "weight_coverage": 0.3,
+  "weight_pain": 0.25,
+  "weight_revenue": 0.25,
+  "weight_effort": 0.2,
+  "pain_themes": {
+    "A": "Knowledge Retrieval Failure",
+    "B": "Single Point of Failure / Bus Factor",
+    "C": "Contextual Failure",
+    "D": "Trust Deficit",
+    "E": "Governance Vacuum",
+    "F": "Integration Failure"
+  }
+}

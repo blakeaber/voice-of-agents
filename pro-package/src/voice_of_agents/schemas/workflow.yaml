@@ -1,0 +1,156 @@
+# Voice of Agents — Workflow Schema
+# Defines persona-specific goals and their composable workflow sequences.
+# Each workflow maps persona goals to platform capabilities.
+
+type: object
+required: [persona_id, persona_name, goals]
+properties:
+  persona_id:
+    type: integer
+    description: References persona.id
+
+  persona_name:
+    type: string
+
+  persona_tier:
+    type: string
+    enum: [FREE, DEVELOPER, TEAM, ENTERPRISE]
+
+  goals:
+    type: array
+    items:
+      type: object
+      required: [id, title, category, priority, workflows]
+      properties:
+        id:
+          type: string
+          pattern: "^G-\\d+-\\d+$"
+          description: Goal ID (e.g., G-01-1)
+
+        title:
+          type: string
+
+        category:
+          type: string
+          enum:
+            - knowledge         # Search, capture, retrieve knowledge
+            - delegation        # Route tasks, delegate to agents
+            - governance        # Monitor, audit, enforce policies
+            - marketplace       # Discover, publish, monetize agents
+            - automation        # Skills, templates, recurring workflows
+            - collaboration     # Workspaces, teams, federation
+
+        priority:
+          type: string
+          enum: [primary, secondary, aspirational]
+          description: >
+            primary=day-1 value, secondary=month-1 expansion,
+            aspirational=quarter-1 advanced usage
+
+        trigger:
+          type: string
+          description: What event causes this goal to activate
+
+        success_statement:
+          type: string
+          description: Success in the persona's own words
+
+        value_metrics:
+          type: object
+          properties:
+            time_saved:
+              type: string
+              description: "e.g., 45 min → 30 sec"
+            error_reduction:
+              type: string
+            cost_impact:
+              type: string
+
+        workflows:
+          type: array
+          items:
+            type: object
+            required: [id, title, steps]
+            properties:
+              id:
+                type: string
+                pattern: "^W-\\d+-\\d+-[a-z]$"
+                description: Workflow ID (e.g., W-01-1-a)
+
+              title:
+                type: string
+
+              preconditions:
+                type: array
+                items:
+                  type: string
+
+              steps:
+                type: array
+                items:
+                  type: object
+                  required: [seq, action, capability_id]
+                  properties:
+                    seq:
+                      type: integer
+                    action:
+                      type: string
+                      description: What the user does
+                    capability_id:
+                      type: string
+                      description: References capability registry ID
+                    api_endpoint:
+                      type: string
+                    ui_page:
+                      type: string
+                    success_criteria:
+                      type: string
+                    friction_risk:
+                      type: string
+
+              capabilities_used:
+                type: array
+                items:
+                  type: string
+                description: All capability IDs exercised by this workflow
+
+              capabilities_missing:
+                type: array
+                items:
+                  type: string
+                description: Gaps — capabilities needed but not available
+
+  feature_recommendations:
+    type: array
+    items:
+      type: object
+      required: [id, title, complexity]
+      properties:
+        id:
+          type: string
+          pattern: "^FR-\\d+-\\d+$"
+          description: Feature recommendation ID (e.g., FR-01-1)
+
+        title:
+          type: string
+
+        description:
+          type: string
+
+        complexity:
+          type: string
+          enum: [trivial, small, medium]
+
+        extends_capability:
+          type: string
+          description: Capability ID this extends (if any)
+
+        personas_benefited:
+          type: array
+          items:
+            type: integer
+          description: Other persona IDs who would benefit
+
+        value_statement:
+          type: string
+          description: Why this matters, in the persona's voice
