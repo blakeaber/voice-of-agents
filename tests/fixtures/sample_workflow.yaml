@@ -28,11 +28,6 @@ goals:
             ui_page: "/pro/workspace"
             success_criteria: "Sidebar shows prior H-1B learnings ranked by relevance"
             friction_risk: "Sidebar empty if not enough learnings captured"
-          - seq: 3
-            action: "Click a relevant learning to expand it"
-            capability_id: "CAP-LEARN-SIDEBAR"
-            ui_page: "/pro/workspace"
-            success_criteria: "Full learning text visible with keywords"
         capabilities_used:
           - "CAP-LEARN-SIDEBAR"
           - "CAP-LEARN-SEARCH"
@@ -65,36 +60,15 @@ goals:
           - "CAP-LEARN-CREATE"
         capabilities_missing: []
 
-  - id: "G-01-3"
-    title: "Detect contradictory filing strategies"
-    category: "knowledge"
-    priority: "secondary"
-    trigger: "Contradiction badge appears in Knowledge Library"
-    success_statement: "It caught that my old strategy conflicts with the recent case."
-    workflows:
-      - id: "W-01-3-a"
-        title: "Review and resolve contradictory learnings"
-        steps:
-          - seq: 1
-            action: "Open Knowledge Library"
-            capability_id: "CAP-LEARN-SEARCH"
-            ui_page: "/pro/learnings"
-            success_criteria: "Contradiction badges visible"
-          - seq: 2
-            action: "Review both contradictory learnings"
-            capability_id: "CAP-LEARN-CONTRA"
-            ui_page: "/pro/learnings"
-            success_criteria: "Both conflicting learnings identified"
-        capabilities_used:
-          - "CAP-LEARN-SEARCH"
-          - "CAP-LEARN-CONTRA"
-        capabilities_missing: []
-
 feature_recommendations:
   - id: "FR-01-1"
     title: "Learning templates for regulatory requirements"
     description: "Structured fields for source citation, effective date, and affected policies"
-    complexity: "trivial"
+    source: "design"
+    effort: "trivial"
     extends_capability: "CAP-LEARN-CREATE"
-    personas_benefited: [1, 6, 14, 22, 34]
+    personas:
+      - 1
+      - 6
+      - 14
     value_statement: "I need to capture not just what changed, but where it came from and when it takes effect."

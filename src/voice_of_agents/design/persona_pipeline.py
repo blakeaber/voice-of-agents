@@ -11,15 +11,13 @@ import yaml
 from jinja2 import Template
 from pydantic import ValidationError
 
-from voice_of_agents.models.persona import Persona, PersonaMetadata
-from voice_of_agents.pipelines.prompts import PERSONA_GENERATION_PROMPT
-from voice_of_agents.validators.io import load_personas_dir, save_persona
+from voice_of_agents.core.persona import Persona, PersonaMetadata
+from voice_of_agents.core.io import load_personas_dir, save_persona
+from voice_of_agents.design.prompts import PERSONA_GENERATION_PROMPT
 
 
 @dataclass
 class PersonaGenerationRequest:
-    """Input parameters for persona generation."""
-
     product_name: str
     product_description: str
     industry: str
@@ -31,8 +29,6 @@ class PersonaGenerationRequest:
 
 @dataclass
 class PersonaGenerationResult:
-    """Output from persona generation pipeline."""
-
     personas: list[Persona] = field(default_factory=list)
     prompt_used: str = ""
     raw_response: str = ""
@@ -66,7 +62,6 @@ class PersonaPipeline:
         return max(p.id for p in self.existing_personas) + 1
 
     def build_prompt(self, request: PersonaGenerationRequest) -> str:
-        """Render the persona generation prompt with context."""
         template = Template(PERSONA_GENERATION_PROMPT)
         return template.render(
             product_name=request.product_name,
@@ -82,13 +77,10 @@ class PersonaPipeline:
         )
 
     def parse_response(self, raw_yaml: str) -> PersonaGenerationResult:
-        """Parse LLM response into validated Persona objects."""
         result = PersonaGenerationResult(raw_response=raw_yaml)
 
-        # Extract YAML blocks from markdown-fenced response
         yaml_blocks = _extract_yaml_blocks(raw_yaml)
         if not yaml_blocks:
-            # Try parsing the whole thing as YAML
             yaml_blocks = [raw_yaml]
 
         for block in yaml_blocks:
@@ -98,7 +90,6 @@ class PersonaPipeline:
                 result.errors.append(f"YAML parse error: {e}")
                 continue
 
-            # Handle both single persona and list of personas
             items = data if isinstance(data, list) else [data]
             for item in items:
                 if not isinstance(item, dict):
@@ -113,28 +104,23 @@ class PersonaPipeline:
         return result
 
     def save_personas(self, personas: list[Persona]) -> list[Path]:
-        """Save generated personas to YAML files."""
         paths = []
         for persona in personas:
             if persona.metadata.source != "generated":
                 persona.metadata = PersonaMetadata(
                     source="generated",
-                    created_at=date.today(),
-                    validation_status="draft",
+                    created_at=date.today().isoformat(),
                 )
             path = save_persona(persona, self.personas_dir)
             paths.append(path)
-        # Invalidate cache
         self._existing = None
         return paths
 
     def generate_prompt_only(self, request: PersonaGenerationRequest) -> str:
-        """Generate the prompt without calling an LLM (for manual use)."""
         return self.build_prompt(request)
 
 
 def _extract_yaml_blocks(text: str) -> list[str]:
-    """Extract YAML code blocks from markdown-fenced text."""
     blocks = []
     in_block = False
     current: list[str] = []

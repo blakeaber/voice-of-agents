@@ -1,4 +1,4 @@
-"""Voice of Agents CLI — persona management and workflow generation."""
+"""Voice of Agents design-time CLI — `voa design *` commands."""
 
 from __future__ import annotations
 
@@ -8,20 +8,14 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from voice_of_agents import __version__
-
 console = Console()
 
-# Default project layout
 DEFAULT_PERSONAS_DIR = "personas"
 DEFAULT_WORKFLOWS_DIR = "workflows"
 DEFAULT_REGISTRY_FILE = "capabilities.yaml"
 
 
-def _resolve_paths(
-    project_dir: str,
-) -> tuple[Path, Path, Path]:
-    """Resolve standard project paths."""
+def _resolve_paths(project_dir: str) -> tuple[Path, Path, Path]:
     root = Path(project_dir)
     return (
         root / DEFAULT_PERSONAS_DIR,
@@ -30,21 +24,20 @@ def _resolve_paths(
     )
 
 
-@click.group()
-@click.version_option(version=__version__)
-def cli():
-    """Voice of Agents — Persona management and workflow generation."""
+@click.group("design")
+def design_cli():
+    """Design-time commands: personas, workflows, gap analysis."""
     pass
 
 
-# ─── Init ───────────────────────────────────────────────────────────────
-
-
-@cli.command()
+@design_cli.command("init")
 @click.argument("project_dir", default=".")
 @click.option("--product", prompt="Product name", help="Name of the product")
 def init(project_dir: str, product: str):
-    """Initialize a new VoA project directory."""
+    """Initialize a new VoA design project directory."""
+    import yaml
+    from voice_of_agents.core.capability import CapabilityRegistry
+
     root = Path(project_dir)
     personas_dir = root / DEFAULT_PERSONAS_DIR
     workflows_dir = root / DEFAULT_WORKFLOWS_DIR
@@ -54,30 +47,18 @@ def init(project_dir: str, product: str):
     workflows_dir.mkdir(parents=True, exist_ok=True)
 
     if not registry_path.exists():
-        import yaml
-
-        from voice_of_agents.models.capability import CapabilityRegistry
-
-        registry = CapabilityRegistry(product=product, capabilities=[])
+        registry = CapabilityRegistry(product=product, version="0.1.0", capabilities=[])
         with open(registry_path, "w") as f:
-            yaml.dump(
-                registry.model_dump(mode="json", exclude_none=True),
-                f,
-                default_flow_style=False,
-                sort_keys=False,
-            )
+            yaml.dump(registry.model_dump(mode="json", exclude_none=True), f,
+                      default_flow_style=False, sort_keys=False)
         console.print(f"[green]Created[/] {registry_path}")
 
-    console.print(f"[green]Initialized VoA project[/] at {root.absolute()}")
-    console.print(f"  personas/       — persona YAML files")
-    console.print(f"  workflows/      — workflow mapping files")
-    console.print(f"  capabilities.yaml — capability registry")
+    console.print(f"[green]Initialized VoA design project[/] at {root.absolute()}")
 
 
 # ─── Persona commands ───────────────────────────────────────────────────
 
-
-@cli.group()
+@design_cli.group("persona")
 def persona():
     """Manage personas."""
     pass
@@ -88,8 +69,7 @@ def persona():
 def persona_list(project_dir: str):
     """List all personas."""
     personas_dir, _, _ = _resolve_paths(project_dir)
-
-    from voice_of_agents.validators.io import load_personas_dir
+    from voice_of_agents.core.io import load_personas_dir
 
     if not personas_dir.exists():
         console.print("[yellow]No personas directory found.[/]")
@@ -111,12 +91,8 @@ def persona_list(project_dir: str):
 
     for p in personas:
         table.add_row(
-            str(p.id),
-            p.name,
-            p.role,
-            p.segment.value.upper(),
-            p.tier.value,
-            p.industry,
+            str(p.id), p.name, p.role,
+            p.segment.value.upper(), p.tier.value, p.industry,
             p.metadata.validation_status.value,
         )
 
@@ -128,8 +104,7 @@ def persona_list(project_dir: str):
 def persona_validate(project_dir: str):
     """Validate all persona files."""
     personas_dir, _, _ = _resolve_paths(project_dir)
-
-    from voice_of_agents.validators.io import LoadError, load_persona
+    from voice_of_agents.core.io import load_persona, LoadError
 
     errors = 0
     valid = 0
@@ -148,41 +123,24 @@ def persona_validate(project_dir: str):
 
 @persona.command("generate-prompt")
 @click.option("--dir", "project_dir", default=".", help="Project directory")
-@click.option("--product", required=True, help="Product name")
-@click.option("--description", required=True, help="Product description")
-@click.option("--industry", required=True, help="Target industry")
-@click.option("--roles", required=True, help="Comma-separated roles to explore")
-@click.option("--segment", default="b2c", help="b2c or b2b")
-@click.option("--count", default=3, help="Number of personas to generate")
-@click.option("--output", "-o", default=None, help="Write prompt to file")
-def persona_generate_prompt(
-    project_dir: str,
-    product: str,
-    description: str,
-    industry: str,
-    roles: str,
-    segment: str,
-    count: int,
-    output: str | None,
-):
+@click.option("--product", required=True)
+@click.option("--description", required=True)
+@click.option("--industry", required=True)
+@click.option("--roles", required=True, help="Comma-separated roles")
+@click.option("--segment", default="b2c")
+@click.option("--count", default=3)
+@click.option("--output", "-o", default=None)
+def persona_generate_prompt(project_dir, product, description, industry, roles, segment, count, output):
     """Generate an LLM prompt for creating new personas."""
     personas_dir, _, _ = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.persona_pipeline import (
-        PersonaGenerationRequest,
-        PersonaPipeline,
-    )
+    from voice_of_agents.design.persona_pipeline import PersonaGenerationRequest, PersonaPipeline
 
     pipeline = PersonaPipeline(personas_dir)
     request = PersonaGenerationRequest(
-        product_name=product,
-        product_description=description,
-        industry=industry,
-        roles=[r.strip() for r in roles.split(",")],
-        segment=segment,
-        count=count,
+        product_name=product, product_description=description,
+        industry=industry, roles=[r.strip() for r in roles.split(",")],
+        segment=segment, count=count,
     )
-
     prompt = pipeline.build_prompt(request)
 
     if output:
@@ -198,16 +156,14 @@ def persona_generate_prompt(
 def persona_import(yaml_file: str, project_dir: str):
     """Import personas from an LLM response YAML file."""
     personas_dir, _, _ = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.persona_pipeline import PersonaPipeline
+    from voice_of_agents.design.persona_pipeline import PersonaPipeline
 
     pipeline = PersonaPipeline(personas_dir)
     raw = Path(yaml_file).read_text()
     result = pipeline.parse_response(raw)
 
-    if result.errors:
-        for err in result.errors:
-            console.print(f"[red]ERROR[/] {err}")
+    for err in result.errors:
+        console.print(f"[red]ERROR[/] {err}")
 
     if result.personas:
         paths = pipeline.save_personas(result.personas)
@@ -220,8 +176,7 @@ def persona_import(yaml_file: str, project_dir: str):
 
 # ─── Workflow commands ──────────────────────────────────────────────────
 
-
-@cli.group()
+@design_cli.group("workflow")
 def workflow():
     """Manage workflow mappings."""
     pass
@@ -232,8 +187,7 @@ def workflow():
 def workflow_list(project_dir: str):
     """List all workflow mappings."""
     _, workflows_dir, _ = _resolve_paths(project_dir)
-
-    from voice_of_agents.validators.io import load_workflow_mappings_dir
+    from voice_of_agents.design.io import load_workflow_mappings_dir
 
     if not workflows_dir.exists():
         console.print("[yellow]No workflows directory found.[/]")
@@ -260,12 +214,8 @@ def workflow_list(project_dir: str):
         gap_style = "red" if gaps > 0 else "green"
 
         table.add_row(
-            str(m.persona_id),
-            m.persona_name,
-            m.persona_tier.value,
-            str(len(m.goals)),
-            str(primary),
-            str(caps),
+            str(m.persona_id), m.persona_name, m.persona_tier.value,
+            str(len(m.goals)), str(primary), str(caps),
             f"[{gap_style}]{gaps}[/{gap_style}]",
         )
 
@@ -275,14 +225,13 @@ def workflow_list(project_dir: str):
 @workflow.command("generate-prompt")
 @click.argument("persona_id", type=int)
 @click.option("--dir", "project_dir", default=".", help="Project directory")
-@click.option("--goals", default=2, help="Number of new goals to generate")
-@click.option("--output", "-o", default=None, help="Write prompt to file")
+@click.option("--goals", default=2)
+@click.option("--output", "-o", default=None)
 def workflow_generate_prompt(persona_id: int, project_dir: str, goals: int, output: str | None):
     """Generate an LLM prompt for creating workflows for a persona."""
     personas_dir, workflows_dir, registry_path = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.workflow_pipeline import WorkflowPipeline
-    from voice_of_agents.validators.io import load_personas_dir
+    from voice_of_agents.core.io import load_personas_dir
+    from voice_of_agents.design.workflow_pipeline import WorkflowPipeline
 
     personas = load_personas_dir(personas_dir)
     persona = next((p for p in personas if p.id == persona_id), None)
@@ -308,9 +257,8 @@ def workflow_generate_prompt(persona_id: int, project_dir: str, goals: int, outp
 def workflow_import(yaml_file: str, persona_id: int, project_dir: str):
     """Import workflow goals from an LLM response YAML file."""
     personas_dir, workflows_dir, registry_path = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.workflow_pipeline import WorkflowPipeline
-    from voice_of_agents.validators.io import load_personas_dir
+    from voice_of_agents.core.io import load_personas_dir
+    from voice_of_agents.design.workflow_pipeline import WorkflowPipeline
 
     personas = load_personas_dir(personas_dir)
     persona = next((p for p in personas if p.id == persona_id), None)
@@ -320,13 +268,11 @@ def workflow_import(yaml_file: str, persona_id: int, project_dir: str):
 
     pipeline = WorkflowPipeline(registry_path, workflows_dir)
     existing = pipeline.load_existing_mapping(persona)
-
     raw = Path(yaml_file).read_text()
     result = pipeline.parse_response(raw, persona, existing)
 
-    if result.errors:
-        for err in result.errors:
-            console.print(f"[red]ERROR[/] {err}")
+    for err in result.errors:
+        console.print(f"[red]ERROR[/] {err}")
 
     if result.mapping:
         path = pipeline.save_mapping(result.mapping)
@@ -337,8 +283,7 @@ def workflow_import(yaml_file: str, persona_id: int, project_dir: str):
 
 # ─── Analysis commands ──────────────────────────────────────────────────
 
-
-@cli.group()
+@design_cli.group("analyze")
 def analyze():
     """Run analysis across personas and workflows."""
     pass
@@ -349,12 +294,9 @@ def analyze():
 def analyze_gaps(project_dir: str):
     """Analyze capability gaps across all workflow mappings."""
     _, workflows_dir, registry_path = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.gap_analysis import GapAnalyzer
-    from voice_of_agents.validators.io import (
-        load_capability_registry,
-        load_workflow_mappings_dir,
-    )
+    from voice_of_agents.core.io import load_capability_registry
+    from voice_of_agents.design.gap_analysis import GapAnalyzer
+    from voice_of_agents.design.io import load_workflow_mappings_dir
 
     registry = load_capability_registry(registry_path)
     mappings = load_workflow_mappings_dir(workflows_dir)
@@ -369,7 +311,6 @@ def analyze_gaps(project_dir: str):
     console.print(f"\n[bold]Gap Analysis Report[/bold]\n")
     console.print(report.summary())
 
-    # Coverage by feature area
     coverage = analyzer.coverage_by_feature_area(mappings)
     if coverage:
         console.print(f"\n[bold]Coverage by Feature Area[/bold]")
@@ -382,12 +323,8 @@ def analyze_gaps(project_dir: str):
         for area, data in sorted(coverage.items()):
             rate = data["used"] / data["total"] if data["total"] else 0
             style = "green" if rate >= 0.7 else ("yellow" if rate >= 0.3 else "red")
-            table.add_row(
-                area,
-                str(data["used"]),
-                str(data["total"]),
-                f"[{style}]{rate:.0%}[/{style}]",
-            )
+            table.add_row(area, str(data["used"]), str(data["total"]),
+                          f"[{style}]{rate:.0%}[/{style}]")
 
         console.print(table)
 
@@ -397,12 +334,9 @@ def analyze_gaps(project_dir: str):
 def analyze_coverage(project_dir: str):
     """Show which capabilities are used by which personas."""
     _, workflows_dir, registry_path = _resolve_paths(project_dir)
-
-    from voice_of_agents.pipelines.gap_analysis import GapAnalyzer
-    from voice_of_agents.validators.io import (
-        load_capability_registry,
-        load_workflow_mappings_dir,
-    )
+    from voice_of_agents.core.io import load_capability_registry
+    from voice_of_agents.design.gap_analysis import GapAnalyzer
+    from voice_of_agents.design.io import load_workflow_mappings_dir
 
     registry = load_capability_registry(registry_path)
     mappings = load_workflow_mappings_dir(workflows_dir)
@@ -423,38 +357,25 @@ def analyze_coverage(project_dir: str):
     for cap in registry.capabilities:
         cov = report.coverage.get(cap.id)
         if cov:
-            table.add_row(
-                f"{cap.id}\n  {cap.name}",
-                cap.status.value,
-                str(cov.persona_count),
-                str(cov.workflow_count),
-            )
+            table.add_row(f"{cap.id}\n  {cap.name}", cap.status,
+                          str(cov.persona_count), str(cov.workflow_count))
         else:
-            table.add_row(
-                f"{cap.id}\n  {cap.name}",
-                cap.status.value,
-                "[dim]0[/dim]",
-                "[dim]0[/dim]",
-            )
+            table.add_row(f"{cap.id}\n  {cap.name}", cap.status,
+                          "[dim]0[/dim]", "[dim]0[/dim]")
 
     console.print(table)
 
 
 # ─── Validate command ───────────────────────────────────────────────────
 
-
-@cli.command()
+@design_cli.command("validate")
 @click.option("--dir", "project_dir", default=".", help="Project directory")
 def validate(project_dir: str):
     """Validate all personas, workflows, and cross-references."""
     personas_dir, workflows_dir, registry_path = _resolve_paths(project_dir)
-
-    from voice_of_agents.validators.io import (
-        load_capability_registry,
-        load_personas_dir,
-        load_workflow_mappings_dir,
-    )
-    from voice_of_agents.validators.validate import validate_all
+    from voice_of_agents.core.io import load_capability_registry, load_personas_dir
+    from voice_of_agents.design.io import load_workflow_mappings_dir
+    from voice_of_agents.design.validators import validate_all
 
     personas = load_personas_dir(personas_dir) if personas_dir.exists() else []
     mappings = load_workflow_mappings_dir(workflows_dir) if workflows_dir.exists() else []
@@ -470,7 +391,3 @@ def validate(project_dir: str):
 
     if not result.ok:
         raise SystemExit(1)
-
-
-if __name__ == "__main__":
-    cli()
