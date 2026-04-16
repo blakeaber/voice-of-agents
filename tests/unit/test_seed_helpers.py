@@ -1,29 +1,29 @@
 """Tests for _derive_goals() seed helper."""
 
-from voice_of_agents.contracts.personas import Objective, PainPoint, Persona, Voice
+from voice_of_agents.core.pain import PainTheme
+from voice_of_agents.core.persona import Persona, VoiceProfile
 from voice_of_agents.eval.seed import _derive_goals
 
 
 def _make_persona(
-    team_size=1,
+    org_size=1,
     income=60000,
     price_sensitivity="moderate",
     pain_themes=None,
 ):
-    """Helper to build a minimal persona with controllable attributes."""
-    pain_points = []
-    for theme in (pain_themes or ["A"]):
-        pain_points.append(PainPoint(description=f"Pain {theme}", theme=theme))
-
+    """Build a minimal canonical Persona with controllable attributes."""
+    themes = [PainTheme(theme=code, intensity="MEDIUM") for code in (pain_themes or ["A"])]
     return Persona(
-        id="TEST-01",
+        id=99,
         name="Test User",
         role="Tester",
-        team_size=team_size,
+        industry="General",
+        segment="b2c" if org_size <= 1 else "b2b",
+        tier="DEVELOPER",
+        org_size=org_size,
         income=income,
-        objectives=[Objective(id="O1", goal="Test goal")],
-        pain_points=pain_points,
-        voice=Voice(price_sensitivity=price_sensitivity),
+        pain_themes=themes,
+        voice=VoiceProfile(price_sensitivity=price_sensitivity),
     )
 
 
@@ -32,13 +32,13 @@ class TestDeriveGoals:
 
     def test_solo_knowledge_user(self):
         """Solo user with no special attributes gets only 'knowledge'."""
-        persona = _make_persona(team_size=1, income=80000, price_sensitivity="low", pain_themes=["A"])
+        persona = _make_persona(org_size=1, income=80000, price_sensitivity="low", pain_themes=["A"])
         goals = _derive_goals(persona)
         assert goals == ["knowledge"]
 
     def test_team_user_includes_delegation(self):
-        """Team user (team_size=8) gets 'delegation' added."""
-        persona = _make_persona(team_size=8, income=130000, price_sensitivity="low", pain_themes=["B"])
+        """Team user (org_size=8) gets 'delegation' added."""
+        persona = _make_persona(org_size=8, income=130000, price_sensitivity="low", pain_themes=["B"])
         goals = _derive_goals(persona)
         assert "knowledge" in goals
         assert "delegation" in goals
@@ -57,7 +57,7 @@ class TestDeriveGoals:
 
     def test_governance_pain_theme_adds_delegation(self):
         """Pain theme E (Governance) adds 'delegation' even for solo users."""
-        persona = _make_persona(team_size=1, pain_themes=["E"])
+        persona = _make_persona(org_size=1, pain_themes=["E"])
         goals = _derive_goals(persona)
         assert "delegation" in goals
 
@@ -69,7 +69,7 @@ class TestDeriveGoals:
 
     def test_no_duplicate_delegation_from_team_and_governance(self):
         """Team user with governance pain should have delegation only once."""
-        persona = _make_persona(team_size=5, pain_themes=["E"])
+        persona = _make_persona(org_size=5, pain_themes=["E"])
         goals = _derive_goals(persona)
         assert goals.count("delegation") == 1
 
@@ -80,7 +80,7 @@ class TestDeriveGoals:
         assert "cost" in goals
 
     def test_rachel_fixture_gets_delegation(self, rachel):
-        """Rachel (team_size=8) should get 'delegation'."""
+        """Rachel (org_size=8) should get 'delegation'."""
         goals = _derive_goals(rachel)
         assert "knowledge" in goals
         assert "delegation" in goals
@@ -89,5 +89,4 @@ class TestDeriveGoals:
         """Maria (solo, income=52000) should get 'knowledge' and 'cost'."""
         goals = _derive_goals(maria)
         assert "knowledge" in goals
-        # Maria's income is 52000 which is < 60000, so cost is added
         assert "cost" in goals

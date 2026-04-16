@@ -2,7 +2,7 @@
 
 import pytest
 
-from voice_of_agents.phases.phase3_evaluate import (
+from voice_of_agents.eval.phase3_evaluate import (
     _template_generate_evaluation,
     _validate_evaluation,
 )

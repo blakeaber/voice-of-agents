@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import time
 
-from voice_of_agents.contracts.personas import Persona
+from voice_of_agents.core.persona import Persona
 from voice_of_agents.eval.api import TargetAPI
 
 logger = logging.getLogger(__name__)
@@ -16,10 +16,9 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
 
     Returns a dict with session info and any created resources.
     """
-    email = f"{persona.id.lower()}@voa-test.dev"
+    email = f"{persona.id:02d}@voa-test.dev"
     result: dict = {"email": email, "persona_id": persona.id}
 
-    # Signup
     try:
         signup_data = api.signup(
             email=email,
@@ -31,11 +30,9 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
         result["session_token"] = signup_data.get("session_token")
         logger.info("Signed up %s (%s)", persona.name, persona.id)
     except Exception as e:
-        # May already exist — try login with stored API key
-        logger.info("Signup failed for %s (%s), attempting login...", persona.id, e)
+        logger.info("Signup failed for %s (%s), attempting alternate...", persona.id, e)
         try:
-            # Try to get session via a fresh signup with a different email suffix
-            alt_email = f"{persona.id.lower()}-{int(time.time()) % 10000}@voa-test.dev"
+            alt_email = f"{persona.id:02d}-{int(time.time()) % 10000}@voa-test.dev"
             signup_data = api.signup(
                 email=alt_email,
                 org_name=f"{persona.name}'s Org",
@@ -50,7 +47,6 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
             logger.warning("Could not create account for %s: %s", persona.id, e2)
             return result
 
-    # Set onboarding goals based on persona pain themes
     goals = _derive_goals(persona)
     if goals:
         try:
@@ -59,7 +55,6 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
         except Exception as e:
             logger.warning("Failed to set goals for %s: %s", persona.id, e)
 
-    # Complete onboarding
     try:
         api.save_onboarding_step("complete", {})
     except Exception:
@@ -70,26 +65,19 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
 
 def _derive_goals(persona: Persona) -> list[str]:
     """Map persona attributes to onboarding goals."""
-    goals = []
+    goals = ["knowledge"]
 
-    # All personas benefit from knowledge management
-    goals.append("knowledge")
-
-    # Team users need delegation
-    if persona.team_size > 1:
+    if persona.org_size > 1:
         goals.append("delegation")
 
-    # Cost-sensitive personas want cost control
-    if persona.voice.price_sensitivity == "high" or persona.income < 60000:
+    income = persona.income or 0
+    if persona.voice.price_sensitivity == "high" or income < 60000:
         goals.append("cost")
 
-    # Check pain themes for workflow needs
-    for pp in persona.pain_points:
-        if pp.theme == "E":  # Governance
-            if "delegation" not in goals:
-                goals.append("delegation")
-        elif pp.theme == "F":  # Integration
-            if "workflows" not in goals:
-                goals.append("workflows")
+    for pt in persona.pain_themes:
+        if pt.theme.value == "E" and "delegation" not in goals:
+            goals.append("delegation")
+        elif pt.theme.value == "F" and "workflows" not in goals:
+            goals.append("workflows")
 
     return goals

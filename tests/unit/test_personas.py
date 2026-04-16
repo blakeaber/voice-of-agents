@@ -1,137 +1,112 @@
-"""Tests for Persona contract."""
+"""Tests for canonical Persona model (core/persona.py)."""
 
-from voice_of_agents.contracts.personas import (
-    Objective,
-    PainPoint,
-    Persona,
-    Voice,
-    validate_persona,
-)
+import pytest
+
+from voice_of_agents.core.pain import PainPoint, PainTheme
+from voice_of_agents.core.persona import Persona, PersonaMetadata, VoiceProfile
 
 
 class TestPersonaSlug:
     """Persona.slug generates correct URL-safe string."""
 
     def test_slug_from_maria(self, maria):
-        assert maria.slug == "UXW-01-maria-gutierrez"
+        assert maria.slug == "01-maria-gutierrez"
 
     def test_slug_from_rachel(self, rachel):
-        assert rachel.slug == "UXW-20-rachel-okafor"
+        assert rachel.slug == "20-rachel-okafor"
 
     def test_slug_strips_special_chars(self):
-        p = Persona(id="UXW-99", name="Jean-Luc O'Brien III", role="Tester")
-        # Special chars replaced with hyphens, consecutive hyphens collapsed
+        p = Persona(id=99, name="Jean-Luc O'Brien III", role="Tester", industry="Tech",
+                    segment="b2c", tier="FREE")
         slug = p.slug
-        assert slug.startswith("UXW-99-")
+        assert slug.startswith("99-")
         assert "'" not in slug
-        assert slug == "UXW-99-jean-luc-o-brien-iii"
+        assert slug == "99-jean-luc-o-brien-iii"
 
     def test_slug_lowercases(self):
-        p = Persona(id="UXW-05", name="ALICE SMITH", role="Dev")
+        p = Persona(id=5, name="ALICE SMITH", role="Dev", industry="Tech",
+                    segment="b2c", tier="FREE")
         assert "alice-smith" in p.slug
 
 
-class TestPersonaToDict:
-    """to_dict() returns all fields."""
+class TestPersonaModelDump:
+    """model_dump() returns all canonical fields."""
 
-    def test_to_dict_has_all_top_level_keys(self, maria):
-        d = maria.to_dict()
-        expected_keys = {
-            "id", "name", "role", "industry", "experience_years",
-            "income", "team_size", "tier", "objectives", "pain_points",
-            "trust_requirements", "voice",
-        }
-        assert set(d.keys()) == expected_keys
+    def test_dump_has_core_keys(self, maria):
+        d = maria.model_dump()
+        for key in ("id", "name", "role", "industry", "segment", "tier", "org_size",
+                    "pain_points", "pain_themes", "voice", "metadata"):
+            assert key in d, f"Missing key: {key}"
 
-    def test_to_dict_objectives_serialized(self, maria):
-        d = maria.to_dict()
-        assert len(d["objectives"]) == 2
-        assert d["objectives"][0]["id"] == "OBJ-01"
-        assert "goal" in d["objectives"][0]
-
-    def test_to_dict_pain_points_serialized(self, maria):
-        d = maria.to_dict()
-        assert len(d["pain_points"]) == 2
-        assert d["pain_points"][0]["severity"] == 9
-
-    def test_to_dict_voice_is_flat_dict(self, maria):
-        d = maria.to_dict()
+    def test_dump_voice_is_flat_dict(self, maria):
+        d = maria.model_dump()
         assert isinstance(d["voice"], dict)
         assert d["voice"]["skepticism"] == "high"
         assert d["voice"]["vocabulary"] == "legal"
 
-
-class TestValidatePersona:
-    """validate_persona() checks for required fields."""
-
-    def test_valid_persona_returns_empty(self, maria):
-        issues = validate_persona(maria)
-        assert issues == []
-
-    def test_valid_rachel_returns_empty(self, rachel):
-        assert validate_persona(rachel) == []
-
-    def test_missing_id(self):
-        p = Persona(
-            id="", name="Test", role="Tester",
-            objectives=[Objective(id="O1", goal="Do something")],
-            pain_points=[PainPoint(description="Ouch")],
-        )
-        issues = validate_persona(p)
-        assert "Missing id" in issues
-
-    def test_missing_objectives(self):
-        p = Persona(id="X-01", name="Test", role="Tester",
-                    pain_points=[PainPoint(description="Ouch")])
-        issues = validate_persona(p)
-        assert "No objectives defined" in issues
-
-    def test_invalid_tier(self):
-        p = Persona(
-            id="X-01", name="Test", role="Tester", tier="PLATINUM",
-            objectives=[Objective(id="O1", goal="Do something")],
-            pain_points=[PainPoint(description="Ouch")],
-        )
-        issues = validate_persona(p)
-        assert any("Invalid tier" in i for i in issues)
-
-    def test_missing_name_and_role(self):
-        p = Persona(
-            id="X-01", name="", role="",
-            objectives=[Objective(id="O1", goal="G")],
-            pain_points=[PainPoint(description="P")],
-        )
-        issues = validate_persona(p)
-        assert "Missing name" in issues
-        assert "Missing role" in issues
-
-    def test_objective_without_goal(self):
-        p = Persona(
-            id="X-01", name="Test", role="Tester",
-            objectives=[Objective(id="O1", goal="")],
-            pain_points=[PainPoint(description="Ouch")],
-        )
-        issues = validate_persona(p)
-        assert any("no goal" in i for i in issues)
+    def test_dump_pain_themes_serialized(self, maria):
+        d = maria.model_dump()
+        assert len(d["pain_themes"]) == 2
 
 
-class TestObjectiveDefaults:
-    """Objective defaults are correct."""
+class TestPersonaValidation:
+    """Pydantic validation catches bad input."""
+
+    def test_id_must_be_positive(self):
+        with pytest.raises(Exception):
+            Persona(id=0, name="X", role="Y", industry="Z", segment="b2c", tier="FREE")
+
+    def test_org_size_must_be_positive(self):
+        with pytest.raises(Exception):
+            Persona(id=1, name="X", role="Y", industry="Z", segment="b2c", tier="FREE",
+                    org_size=0)
+
+    def test_valid_persona_constructs(self, maria):
+        assert maria.id == 1
+        assert maria.name == "Maria Gutierrez"
+
+    def test_valid_rachel_constructs(self, rachel):
+        assert rachel.id == 20
+        assert rachel.name == "Rachel Okafor"
+
+
+class TestVoiceProfileDefaults:
+    """VoiceProfile defaults are correct."""
 
     def test_defaults(self):
-        o = Objective(id="O1", goal="Test goal")
-        assert o.trigger == ""
-        assert o.success_definition == ""
-        assert o.efficiency_baseline == ""
-        assert o.target_efficiency == ""
-
-
-class TestVoiceDefaults:
-    """Voice defaults are correct."""
-
-    def test_defaults(self):
-        v = Voice()
+        v = VoiceProfile()
         assert v.skepticism == "moderate"
         assert v.vocabulary == "general"
         assert v.motivation == "efficiency"
         assert v.price_sensitivity == "moderate"
+
+    def test_override_single_field(self):
+        v = VoiceProfile(skepticism="high")
+        assert v.skepticism == "high"
+        assert v.motivation == "efficiency"
+
+
+class TestPersonaMetadata:
+    """PersonaMetadata preserves legacy_id for migration tracing."""
+
+    def test_legacy_id_stored(self):
+        meta = PersonaMetadata(legacy_id="UXW-01")
+        assert meta.legacy_id == "UXW-01"
+
+    def test_legacy_id_defaults_to_none(self):
+        meta = PersonaMetadata()
+        assert meta.legacy_id is None
+
+    def test_maria_legacy_id_if_set(self, maria):
+        assert maria.metadata.legacy_id is None  # conftest doesn't set it
+
+
+class TestThemeIntensity:
+    """Persona.theme_intensity() looks up pain theme by code."""
+
+    def test_returns_intensity_for_present_theme(self, maria):
+        assert maria.theme_intensity("A") == "CRITICAL"
+        assert maria.theme_intensity("D") == "HIGH"
+
+    def test_returns_none_for_absent_theme(self, maria):
+        assert maria.theme_intensity("F") is None

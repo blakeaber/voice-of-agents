@@ -314,17 +314,17 @@ def migrate_cmd(dry_run, no_backup):
 ```
 
 ## Acceptance Criteria
-- [ ] `src/voice_of_agents/eval/migrate.py` exists with `migrate_persona_yaml`, `migrate_objectives_to_workflow`, `migrate_feature_inventory`, `migrate_all`
-- [ ] `voa eval migrate --dry-run` runs without error and prints a summary of planned changes
-- [ ] `voa eval migrate` converts all `UXW-*.yaml` to `P-*.yaml` in `data/personas/`
-- [ ] `data/personas/_legacy/UXW-*.yaml` files exist (originals backed up)
-- [ ] `data/capabilities.yaml` exists (migrated from feature-inventory.yaml if present)
-- [ ] No `UXW-*.yaml` files remain in `data/personas/` after migration
-- [ ] `src/voice_of_agents/contracts/personas.py` is deleted
-- [ ] `src/voice_of_agents/contracts/` directory is deleted
-- [ ] `voa eval status` runs without ImportError after migration
-- [ ] `python -c "from voice_of_agents.core.persona import Persona; from voice_of_agents.core.io import load_personas_dir; from pathlib import Path; ps = load_personas_dir(Path('data/personas')); print(len(ps), 'personas loaded')"` succeeds
-- [ ] `pytest tests/unit/test_eval_migrate.py -v` passes
+- [x] `src/voice_of_agents/eval/migrate.py` exists with `migrate_persona_yaml`, `migrate_objectives_to_workflow`, `migrate_feature_inventory`, `migrate_all`
+- [x] `voa eval migrate --dry-run` runs without error and prints a summary of planned changes
+- [x] `voa eval migrate` converts all `UXW-*.yaml` to `P-*.yaml` in `data/personas/`
+- [x] `data/personas/_legacy/UXW-*.yaml` files exist (originals backed up)
+- [x] `data/capabilities.yaml` exists (migrated from feature-inventory.yaml if present) — skipped (no feature-inventory.yaml in repo)
+- [x] No `UXW-*.yaml` files remain in `data/personas/` after migration
+- [x] `src/voice_of_agents/contracts/personas.py` is deleted
+- [x] `src/voice_of_agents/contracts/` directory is deleted
+- [x] `voa eval status` runs without ImportError after migration — shows 35 personas loaded
+- [x] `python -c "from voice_of_agents.core.persona import Persona; from voice_of_agents.core.io import load_personas_dir; from pathlib import Path; ps = load_personas_dir(Path('data/personas')); print(len(ps), 'personas loaded')"` succeeds
+- [x] `pytest tests/unit/test_eval_migrate.py -v` passes — 14 tests pass
 
 ## Verification Steps
 ```bash
@@ -358,4 +358,4 @@ pytest tests/unit/test_eval_migrate.py -v
 ```
 
 ## Status
-PENDING
+COMPLETE

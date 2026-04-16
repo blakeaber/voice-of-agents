@@ -70,6 +70,31 @@ class VoAConfig:
     def diff_report_path(self) -> Path:
         return self.data_path / "006-diff-report.md"
 
+    @property
+    def capabilities_path(self) -> Path:
+        return self.data_path / "capabilities.yaml"
+
+    @property
+    def workflows_path(self) -> Path:
+        return self.data_path / "workflows"
+
+    def resolve_result_slug(self, persona) -> str:
+        """Return the best matching result directory slug for a persona.
+
+        Checks new format (01-maria-gutierrez) first, then legacy UXW format.
+        Returns the new-format slug regardless — callers use this to write new runs.
+        """
+        new_slug = persona.slug
+        results = self.results_path
+        if (results / new_slug).exists():
+            return new_slug
+        legacy_id = getattr(getattr(persona, "metadata", None), "legacy_id", None)
+        if legacy_id:
+            legacy_slug = f"{legacy_id.lower()}-{new_slug.split('-', 1)[1]}"
+            if (results / legacy_slug).exists():
+                return legacy_slug
+        return new_slug
+
     def save(self, path: Path | None = None) -> None:
         """Save config to JSON file."""
         p = path or Path(CONFIG_FILE)

@@ -48,6 +48,68 @@ def init(target: str, api: str, data: str):
     click.echo("\nConfig saved to voa-config.json")
 
 
+# ── Migrate ────────────────────────────────────────────────────────────
+
+@eval_cli.command("migrate")
+@click.option("--dry-run", is_flag=True, help="Show planned changes without writing")
+@click.option("--no-backup", is_flag=True, help="Skip backing up original files")
+def migrate_cmd(dry_run: bool, no_backup: bool):
+    """Migrate UXW-format persona YAMLs and feature-inventory to canonical format."""
+    from voice_of_agents.eval.migrate import migrate_persona_yaml, migrate_feature_inventory
+
+    config = VoAConfig.load()
+    personas_dir = config.personas_path
+    data_dir = config.data_path
+
+    uxw_files = sorted(personas_dir.glob("UXW-*.yaml"))
+    inventory_path = data_dir / "feature-inventory.yaml"
+
+    if not uxw_files and not inventory_path.exists():
+        click.echo("Nothing to migrate — no UXW-*.yaml files and no feature-inventory.yaml found.")
+        return
+
+    click.echo(f"Found {len(uxw_files)} persona file(s) to migrate:")
+    for path in uxw_files:
+        try:
+            canonical, objectives = migrate_persona_yaml(path)
+            click.echo(
+                f"  {path.name} → P-{canonical['id']:02d}-*.yaml "
+                f"(id={canonical['id']}, {len(objectives)} objectives)"
+            )
+        except Exception as e:
+            click.echo(f"  {path.name}: ERROR — {e}", err=True)
+
+    if inventory_path.exists():
+        click.echo(f"\nFeature inventory: {inventory_path} → capabilities.yaml")
+
+    if dry_run:
+        click.echo("\nDry run — no files written.")
+        return
+
+    from voice_of_agents.eval.migrate import migrate_all
+
+    results = migrate_all(
+        personas_dir=personas_dir,
+        workflows_dir=config.workflows_path,
+        data_dir=data_dir,
+        backup=not no_backup,
+    )
+
+    click.echo(f"\nMigrated {len(results['personas'])} personas:")
+    for p in results["personas"]:
+        click.echo(f"  {p}")
+
+    click.echo(f"Created {len(results['workflows'])} workflow mapping(s).")
+
+    if results["capabilities"]:
+        click.echo(f"Capabilities: {results['capabilities']}")
+
+    if results["errors"]:
+        click.echo("\nErrors:", err=True)
+        for e in results["errors"]:
+            click.echo(f"  {e}", err=True)
+
+
 # ── Import ─────────────────────────────────────────────────────────────
 
 @eval_cli.group("import")
@@ -59,15 +121,16 @@ def import_group():
 @import_group.command("personas")
 @click.argument("source_dir", type=click.Path(exists=True))
 def import_personas(source_dir: str):
-    """Import personas from markdown workflow files."""
+    """Copy UXW-format persona YAMLs into the personas directory for migration."""
+    import shutil
     config = _load_config()
-    from voice_of_agents.contracts.personas import import_from_markdown
-
     source = Path(source_dir)
-    personas = import_from_markdown(source, config.personas_path)
-    click.echo(f"Imported {len(personas)} personas to {config.personas_path}")
-    for p in personas:
-        click.echo(f"  {p.id}: {p.name} — {p.role} ({p.tier})")
+    copied = 0
+    for f in sorted(source.glob("UXW-*.yaml")):
+        shutil.copy2(f, config.personas_path / f.name)
+        copied += 1
+    click.echo(f"Copied {copied} persona file(s) to {config.personas_path}")
+    click.echo("Run 'voa eval migrate' to convert them to canonical format.")
 
 
 @import_group.command("inventory")
@@ -87,41 +150,37 @@ def import_inventory(source_file: str):
 def phase1(generate_personas: bool):
     """Phase 1: Generate or validate personas."""
     config = _load_config()
-    from voice_of_agents.contracts.personas import load_personas, validate_persona
+    from voice_of_agents.core.io import load_personas_dir
 
     if generate_personas:
         from voice_of_agents.eval.phase1_generate import generate_personas as gen
         personas = gen(config)
         click.echo(f"Generated {len(personas)} personas")
     else:
-        personas = load_personas(config.personas_path)
+        personas = load_personas_dir(config.personas_path)
         if not personas:
             raise click.ClickException(
                 f"No personas found in {config.personas_path}. "
-                "Use --generate-personas or 'voa eval import personas <dir>'"
+                "Use --generate-personas, 'voa eval migrate', or 'voa eval import personas <dir>'"
             )
-        click.echo(f"Validating {len(personas)} personas...")
+        click.echo(f"Loaded {len(personas)} personas:")
         for p in personas:
-            issues = validate_persona(p)
-            if issues:
-                click.echo(f"  {p.id} {p.name}: {', '.join(issues)}", err=True)
-            else:
-                click.echo(f"  {p.id} {p.name}: OK ({len(p.objectives)} objectives)")
+            click.echo(f"  {p.id} {p.name}: {p.role} ({p.tier.value})")
 
 
 @eval_cli.command("phase2")
-@click.option("--personas", default=None, help="Comma-separated persona IDs")
+@click.option("--personas", default=None, help="Comma-separated persona IDs (integers)")
 @click.option("--batch", default=None, type=int, help="Batch number (5 personas each)")
 @click.option("--all", "run_all", is_flag=True)
 def phase2(personas: str | None, batch: int | None, run_all: bool):
     """Phase 2: Adaptive persona exploration via browser."""
     config = _load_config()
-    from voice_of_agents.contracts.personas import load_personas
+    from voice_of_agents.core.io import load_personas_dir
     from voice_of_agents.eval.phase2_explore import explore_personas
 
-    all_personas = load_personas(config.personas_path)
+    all_personas = load_personas_dir(config.personas_path)
     if not all_personas:
-        raise click.ClickException("No personas loaded. Run 'voa eval import personas' first.")
+        raise click.ClickException("No personas loaded. Run 'voa eval migrate' first.")
 
     selected = _select_personas(all_personas, personas, batch, run_all)
     click.echo(f"Exploring as {len(selected)} personas against {config.target_url}")
@@ -135,10 +194,10 @@ def phase2(personas: str | None, batch: int | None, run_all: bool):
 def phase3(personas: str | None, batch: int | None, run_all: bool):
     """Phase 3: Generate synthetic focus group evaluations."""
     config = _load_config()
-    from voice_of_agents.contracts.personas import load_personas
+    from voice_of_agents.core.io import load_personas_dir
     from voice_of_agents.eval.phase3_evaluate import evaluate_personas
 
-    all_personas = load_personas(config.personas_path)
+    all_personas = load_personas_dir(config.personas_path)
     selected = _select_personas(all_personas, personas, batch, run_all)
     click.echo(f"Generating evaluations for {len(selected)} personas")
     evaluate_personas(selected, config)
@@ -175,14 +234,14 @@ def phase5():
 def run(personas: str | None, batch: int | None, run_all: bool):
     """Run full pipeline (Phases 2-5) for selected personas."""
     config = _load_config()
-    from voice_of_agents.contracts.personas import load_personas
+    from voice_of_agents.core.io import load_personas_dir
     from voice_of_agents.eval.phase2_explore import explore_personas
     from voice_of_agents.eval.phase3_evaluate import evaluate_personas
     from voice_of_agents.eval.phase4_synthesize import synthesize_findings
     from voice_of_agents.eval.phase5_prioritize import prioritize_backlog
     from voice_of_agents.core.backlog import save_backlog_markdown
 
-    all_personas = load_personas(config.personas_path)
+    all_personas = load_personas_dir(config.personas_path)
     selected = _select_personas(all_personas, personas, batch, run_all)
     click.echo(f"Running full pipeline for {len(selected)} personas\n")
 
@@ -207,15 +266,20 @@ def run(personas: str | None, batch: int | None, run_all: bool):
 @eval_cli.command("status")
 def status():
     """Show evaluation status — what's been run, what's pending."""
-    config = _load_config()
-    from voice_of_agents.contracts.personas import load_personas
+    config = VoAConfig.load()
+    from voice_of_agents.core.io import load_personas_dir
 
-    all_personas = load_personas(config.personas_path)
+    all_personas = load_personas_dir(config.personas_path)
     click.echo(f"Personas: {len(all_personas)} loaded")
 
     completed = 0
     for p in all_personas:
         persona_dir = config.results_path / p.slug
+        if not persona_dir.exists():
+            legacy_id = getattr(p.metadata, "legacy_id", None)
+            if legacy_id:
+                legacy_slug = f"{legacy_id.lower()}-{p.slug.split('-', 1)[1]}"
+                persona_dir = config.results_path / legacy_slug
         runs = sorted(persona_dir.glob("*")) if persona_dir.exists() else []
         if runs:
             latest = runs[-1].name
@@ -248,15 +312,13 @@ def backlog():
 def capabilities():
     """Pretty-print the capability registry."""
     config = _load_config()
-    # capabilities.yaml (Phase 4 migrates feature-inventory.yaml → capabilities.yaml)
-    cap_path = config.data_path / "capabilities.yaml"
+    cap_path = config.capabilities_path
     if not cap_path.exists():
-        cap_path = config.inventory_path  # fall back to legacy path
+        cap_path = config.inventory_path
     if not cap_path.exists():
-        raise click.ClickException(f"No capabilities file found at {cap_path}")
+        raise click.ClickException(f"No capabilities file found. Run 'voa eval migrate' first.")
 
-    from voice_of_agents.core.io import load_capability_registry
-    from voice_of_agents.core.io import LoadError
+    from voice_of_agents.core.io import load_capability_registry, LoadError
     try:
         registry = load_capability_registry(cap_path)
         click.echo(f"Capabilities: {len(registry.capabilities)} entries")
@@ -266,17 +328,8 @@ def capabilities():
                 latest = cap.latest_test()
                 test_info = f" (tested {latest.run_date}: {latest.status})" if latest else ""
                 click.echo(f"  {cap.id}  {cap.name} [{cap.status}]{test_info}")
-    except LoadError:
-        # Fall back to legacy format if canonical registry not available yet
-        from voice_of_agents.contracts.inventory import load_inventory
-        inv = load_inventory(config.inventory_path)
-        click.echo(f"Feature Inventory (legacy): {len(inv.features)} features")
-        for area, features in inv.features_by_area().items():
-            click.echo(f"\n[{area}]")
-            for f in features:
-                latest = f.latest_test
-                test_info = f" (tested {latest.run}: {latest.status})" if latest else ""
-                click.echo(f"  {f.id}  {f.name} [{f.status}]{test_info}")
+    except LoadError as e:
+        raise click.ClickException(f"Failed to load capabilities: {e}")
 
 
 @eval_cli.command("diff")
@@ -295,7 +348,10 @@ def _select_personas(all_personas, persona_ids: str | None, batch: int | None, r
         return all_personas
 
     if persona_ids:
-        ids = {p.strip() for p in persona_ids.split(",")}
+        try:
+            ids = {int(p.strip()) for p in persona_ids.split(",")}
+        except ValueError:
+            raise click.ClickException("Persona IDs must be integers (e.g. --personas 1,2,3)")
         return [p for p in all_personas if p.id in ids]
 
     if batch:

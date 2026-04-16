@@ -147,19 +147,17 @@ def test_monthly_price_team(rachel):
 
 def test_monthly_price_enterprise():
     """ENTERPRISE tier should return 299."""
-    from voice_of_agents.contracts.personas import Persona, Voice, Objective, PainPoint
+    from voice_of_agents.core.persona import Persona, VoiceProfile
     persona = Persona(
-        id="UXW-ENT",
+        id=99,
         name="Enterprise User",
         role="CTO",
         industry="Tech",
-        experience_years=20,
-        income=250000,
-        team_size=50,
+        segment="b2b",
         tier="ENTERPRISE",
-        objectives=[Objective(id="OBJ-01", goal="Scale", trigger="Growth", success_definition="Done")],
-        pain_points=[PainPoint(description="Scale issues", severity=8, theme="F")],
-        trust_requirements=[],
-        voice=Voice(skepticism="low", vocabulary="technical", motivation="ambition", price_sensitivity="low"),
+        org_size=50,
+        income=250000,
+        voice=VoiceProfile(skepticism="low", vocabulary="technical", motivation="ambition",
+                           price_sensitivity="low"),
     )
     assert _monthly_price(persona) == 299

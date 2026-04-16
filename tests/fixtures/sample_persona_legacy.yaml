@@ -1,0 +1,37 @@
+id: "UXW-01"
+name: "Maria Gutierrez"
+role: "Immigration Paralegal"
+industry: "Legal"
+experience_years: 15
+income: 52000
+team_size: 1
+tier: "DEVELOPER"
+objectives:
+  - id: "OBJ-01"
+    goal: "Retrieve Past Visa Strategy for Similar Case"
+    trigger: "New client intake with a case type handled before"
+    success_definition: "Found prior petition strategy in under 60 seconds"
+    efficiency_baseline: "45 min searching Google Drive"
+    target_efficiency: "30 seconds via search"
+  - id: "OBJ-02"
+    goal: "Capture New USCIS Requirement Change as Learning"
+    trigger: "Unexpected RFE reveals a policy change"
+    success_definition: "Policy change auto-surfaces on future similar cases"
+    efficiency_baseline: "Sticky note, lost in 2 weeks"
+    target_efficiency: ""
+pain_points:
+  - description: "800 files in Google Drive, can't find anything"
+    severity: 9
+    frequency: "daily"
+    theme: "A"
+  - description: "Policy changes discovered via rejections"
+    severity: 8
+    frequency: "monthly"
+    theme: "D"
+trust_requirements:
+  - "Must surface MY prior work, not generic AI answers"
+voice:
+  skepticism: "high"
+  vocabulary: "legal"
+  motivation: "fear"
+  price_sensitivity: "moderate"
