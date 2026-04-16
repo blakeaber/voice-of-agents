@@ -6,7 +6,7 @@ import logging
 import time
 
 from voice_of_agents.contracts.personas import Persona
-from voice_of_agents.explorer.api import TargetAPI
+from voice_of_agents.eval.api import TargetAPI
 
 logger = logging.getLogger(__name__)
 

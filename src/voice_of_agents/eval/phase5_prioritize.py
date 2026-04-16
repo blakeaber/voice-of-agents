@@ -9,8 +9,8 @@ from pathlib import Path
 
 import yaml
 
-from voice_of_agents.config import VoAConfig
-from voice_of_agents.contracts.backlog import (
+from voice_of_agents.eval.config import VoAConfig
+from voice_of_agents.core.backlog import (
     BacklogItem,
     add_item,
     materialize_backlog,

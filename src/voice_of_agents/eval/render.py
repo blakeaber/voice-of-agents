@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from voice_of_agents.contracts.backlog import render_backlog_markdown
+from voice_of_agents.core.backlog import render_backlog_markdown
 
 
 def render_backlog(jsonl_path: Path) -> str:

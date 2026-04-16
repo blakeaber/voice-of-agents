@@ -9,11 +9,11 @@ from pathlib import Path
 
 import yaml
 
-from voice_of_agents.config import VoAConfig
+from voice_of_agents.eval.config import VoAConfig
 from voice_of_agents.contracts.personas import Persona
-from voice_of_agents.explorer.api import TargetAPI
-from voice_of_agents.explorer.browser import explore_as_persona
-from voice_of_agents.explorer.seed import seed_persona
+from voice_of_agents.eval.api import TargetAPI
+from voice_of_agents.eval.browser import explore_as_persona
+from voice_of_agents.eval.seed import seed_persona
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 
-from voice_of_agents.config import VoAConfig
+from voice_of_agents.eval.config import VoAConfig
 from voice_of_agents.contracts.personas import Persona, Objective, PainPoint, Voice, save_persona
 
 logger = logging.getLogger(__name__)

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import yaml
 
-from voice_of_agents.config import VoAConfig
+from voice_of_agents.eval.config import VoAConfig
 
 logger = logging.getLogger(__name__)
 

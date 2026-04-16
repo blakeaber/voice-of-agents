@@ -2,11 +2,10 @@
 
 import pytest
 
-from voice_of_agents.config import VoAConfig
+from voice_of_agents.eval.config import VoAConfig
 from voice_of_agents.contracts.personas import Persona, Objective, PainPoint, Voice
-from voice_of_agents.contracts.backlog import BacklogItem
-from voice_of_agents.contracts.inventory import Feature, FeatureInventory, TestResult
-from voice_of_agents.explorer.browser import NavLink
+from voice_of_agents.core.backlog import BacklogItem
+from voice_of_agents.eval.browser import NavLink
 
 
 @pytest.fixture
@@ -161,44 +160,13 @@ def sample_exploration():
                 "objective_success": "Found prior strategy in 30 seconds",
                 "outcome": "partial",
                 "pages_visited": ["http://localhost:3000/", "http://localhost:3000/pro/workspace"],
-                "journey": [
-                    {"action": "Open http://localhost:3000", "observation": "Landed on /pro/workspace",
-                     "reaction": "Good, workspace loaded.", "page_url": "http://localhost:3000/pro/workspace",
-                     "latency_ms": 800},
-                    {"action": "Navigate to 'Workspace'", "observation": "Headings: ['Workspace']. Input fields: ['e.g. H-1B visa petition']. Empty state: 'No learnings yet'",
-                     "reaction": "It's empty.", "page_url": "http://localhost:3000/pro/workspace",
-                     "latency_ms": 500},
-                    {"action": "Type 'H-1B petition for data scientist'", "observation": "After typing: still empty sidebar",
-                     "reaction": "Nothing came back.", "page_url": "http://localhost:3000/pro/workspace",
-                     "latency_ms": 2100},
-                ],
+                "journey": [],
                 "friction_points": [
-                    {"type": "empty_state", "description": "Workspace page is empty — No learnings yet",
+                    {"type": "empty_state", "description": "Workspace page is empty",
                      "severity": "medium", "persona_quote": "Everything is empty."},
                 ],
                 "surprises": [],
                 "missing_capabilities": [],
-            },
-            {
-                "persona_id": "UXW-01",
-                "persona_name": "Maria Gutierrez",
-                "run_timestamp": "20260402_120000",
-                "objective": "Capture New USCIS Requirement Change",
-                "objective_trigger": "Unexpected RFE reveals policy change",
-                "objective_success": "Policy change auto-surfaces on future cases",
-                "outcome": "blocked",
-                "pages_visited": ["http://localhost:3000/"],
-                "journey": [
-                    {"action": "Open http://localhost:3000", "observation": "Landed on /",
-                     "reaction": "Main page.", "page_url": "http://localhost:3000/",
-                     "latency_ms": 600},
-                ],
-                "friction_points": [
-                    {"type": "gap", "description": "No sidebar link matches objective",
-                     "severity": "high", "persona_quote": "I can't find where to capture learnings."},
-                ],
-                "surprises": [],
-                "missing_capabilities": ["Direct navigation for learning capture"],
             },
         ],
     }
@@ -211,13 +179,13 @@ def sample_backlog_item():
         id="B-001",
         title="Bulk knowledge import",
         description="Users need to import existing knowledge from files",
+        source="eval",
         score=78.0,
         finding_id="F-012",
-        personas=["UXW-01", "UXW-34"],
+        personas=[1, 34],
         pain_themes=["A", "F"],
         effort="large",
         status="open",
         acceptance_criteria=["Import from CSV", "Import from Google Drive"],
-        persona_quotes=[{"persona": "UXW-01", "quote": "I can't type 15 years of cases one by one"}],
-        type="new_feature",
+        persona_quotes=["I can't type 15 years of cases one by one"],
     )
