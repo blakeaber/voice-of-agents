@@ -172,14 +172,14 @@ cli.add_command(bridge_cli, name="bridge")
 `config.data_path` / `config.personas_path` / `config.results_path` / `config.backlog_jsonl_path` — these should already exist from the moved `eval/config.py`. Verify they're accessible.
 
 ## Acceptance Criteria
-- [ ] `src/voice_of_agents/eval/bridge.py` exists with `sync_gap_analysis_to_backlog` and `bridge_status`
-- [ ] `src/voice_of_agents/cli/bridge_cli.py` exists with `bridge_cli` group
-- [ ] `voa bridge --help` shows `status` and `sync-gaps` subcommands
-- [ ] `voa bridge status` runs without error (shows table, even if empty)
-- [ ] `voa eval phase2 --all` still works when NO workflow mappings exist (fall-back to empty objectives)
-- [ ] `voa eval phase2 --all` uses workflow goals when `data/workflows/PWM-*.yaml` files exist
-- [ ] `python -c "from voice_of_agents.eval.bridge import bridge_status; print('ok')"` succeeds
-- [ ] `python -c "from voice_of_agents.cli.bridge_cli import bridge_cli; print('ok')"` succeeds
+- [x] `src/voice_of_agents/eval/bridge.py` exists with `sync_gap_analysis_to_backlog` and `bridge_status`
+- [x] `src/voice_of_agents/cli/bridge_cli.py` exists with `bridge_cli` group
+- [x] `voa bridge --help` shows `status` and `sync-gaps` subcommands
+- [x] `voa bridge status` runs without error (shows table, even if empty)
+- [x] `voa eval phase2 --all` still works when NO workflow mappings exist (fall-back to empty objectives)
+- [x] `voa eval phase2 --all` uses workflow goals when `data/workflows/PWM-*.yaml` files exist
+- [x] `python -c "from voice_of_agents.eval.bridge import bridge_status; print('ok')"` succeeds
+- [x] `python -c "from voice_of_agents.cli.bridge_cli import bridge_cli; print('ok')"` succeeds
 
 ## Verification Steps
 ```bash
@@ -195,4 +195,4 @@ voa eval phase2 --all 2>&1 | grep -i "error" | grep -iv "connection" | head -5
 ```
 
 ## Status
-PENDING
+COMPLETE
