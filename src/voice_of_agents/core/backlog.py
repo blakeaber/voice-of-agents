@@ -1,7 +1,8 @@
-"""Unified BacklogItem — absorbs both Main's scored backlog and Pro's FeatureRecommendation.
+"""Unified BacklogItem with append-only JSONL event sourcing.
 
-Uses append-only JSONL event sourcing. Items are never edited in-place; all mutations
-are new events that are replayed via materialize_backlog() to produce current state.
+Items are never edited in-place; all mutations are new events replayed via
+materialize_backlog() to produce current state. source field distinguishes origin:
+eval (runtime), design (planning), or bridge (cross-layer integration).
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ class BacklogItem(BaseModel):
     persona_quotes: list[dict] = Field(default_factory=list)
     acceptance_criteria: list[str] = Field(default_factory=list)
 
-    # Design layer fields (from FeatureRecommendation)
+    # Design layer fields
     extends_capability: Optional[str] = None
     value_statement: Optional[str] = None
 

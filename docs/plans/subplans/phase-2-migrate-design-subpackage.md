@@ -96,15 +96,15 @@ Update all imports in ported tests from `voice_of_agents.models.*` / `voice_of_a
 After verifying tests pass, delete `pro-package/` with `rm -rf pro-package/`.
 
 ## Acceptance Criteria
-- [ ] `src/voice_of_agents/design/workflow.py` exists with `Goal`, `Workflow`, `WorkflowStep`, `PersonaWorkflowMapping` but NO `FeatureRecommendation`
-- [ ] `src/voice_of_agents/design/gap_analysis.py` imports `BacklogItem` from `voice_of_agents.core.backlog` and `GapAnalysisReport.feature_recommendations` is typed `list[BacklogItem]`
-- [ ] `src/voice_of_agents/design/persona_pipeline.py` imports `Persona` from `voice_of_agents.core.persona`
-- [ ] `src/voice_of_agents/cli/design_cli.py` exists with `design_cli` Click group
-- [ ] `pro-package/` directory no longer exists
-- [ ] `pytest tests/unit/test_design_workflow.py tests/unit/test_design_validators.py -v` passes
-- [ ] `python -c "from voice_of_agents.design.gap_analysis import GapAnalyzer; print('ok')"` succeeds
-- [ ] `python -c "from voice_of_agents.design.workflow import Goal, PersonaWorkflowMapping; print('ok')"` succeeds
-- [ ] No reference to `FeatureRecommendation` exists anywhere in `src/` (verify with grep)
+- [x] `src/voice_of_agents/design/workflow.py` exists with `Goal`, `Workflow`, `WorkflowStep`, `PersonaWorkflowMapping` but NO `FeatureRecommendation`
+- [x] `src/voice_of_agents/design/gap_analysis.py` imports `BacklogItem` from `voice_of_agents.core.backlog` and `GapAnalysisReport.feature_recommendations` is typed `list[BacklogItem]`
+- [x] `src/voice_of_agents/design/persona_pipeline.py` imports `Persona` from `voice_of_agents.core.persona`
+- [x] `src/voice_of_agents/cli/design_cli.py` exists with `design_cli` Click group
+- [x] `pro-package/` directory no longer exists
+- [x] `pytest tests/unit/test_design_workflow.py tests/unit/test_design_validators.py -v` passes (23 tests)
+- [x] `python -c "from voice_of_agents.design.gap_analysis import GapAnalyzer; print('ok')"` succeeds
+- [x] `python -c "from voice_of_agents.design.workflow import Goal, PersonaWorkflowMapping; print('ok')"` succeeds
+- [x] No reference to `FeatureRecommendation` exists anywhere in `src/` (verified with grep)
 
 ## Verification Steps
 ```bash
@@ -119,4 +119,4 @@ pytest tests/unit/test_design_workflow.py tests/unit/test_design_validators.py -
 ```
 
 ## Status
-PENDING
+COMPLETE

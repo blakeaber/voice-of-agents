@@ -10,21 +10,16 @@ import yaml
 from jinja2 import Template
 from pydantic import ValidationError
 
-from voice_of_agents.models.capability import CapabilityRegistry
-from voice_of_agents.models.persona import Persona
-from voice_of_agents.models.workflow import Goal, PersonaWorkflowMapping
-from voice_of_agents.pipelines.prompts import WORKFLOW_GENERATION_PROMPT
-from voice_of_agents.validators.io import (
-    load_capability_registry,
-    load_workflow_mapping,
-    save_workflow_mapping,
-)
+from voice_of_agents.core.capability import CapabilityRegistry
+from voice_of_agents.core.io import load_capability_registry
+from voice_of_agents.core.persona import Persona
+from voice_of_agents.design.workflow import Goal, PersonaWorkflowMapping
+from voice_of_agents.design.io import load_workflow_mapping, save_workflow_mapping
+from voice_of_agents.design.prompts import WORKFLOW_GENERATION_PROMPT
 
 
 @dataclass
 class WorkflowGenerationResult:
-    """Output from workflow generation."""
-
     mapping: Optional[PersonaWorkflowMapping] = None
     new_goals: list[Goal] = field(default_factory=list)
     prompt_used: str = ""
@@ -56,7 +51,6 @@ class WorkflowPipeline:
         existing_mapping: Optional[PersonaWorkflowMapping] = None,
         goal_count: int = 2,
     ) -> str:
-        """Render the workflow generation prompt."""
         persona_yaml = yaml.dump(
             persona.model_dump(mode="json", exclude_none=True),
             default_flow_style=False,
@@ -84,7 +78,6 @@ class WorkflowPipeline:
         persona: Persona,
         existing_mapping: Optional[PersonaWorkflowMapping] = None,
     ) -> WorkflowGenerationResult:
-        """Parse LLM response into validated Goal objects."""
         result = WorkflowGenerationResult(raw_response=raw_yaml)
 
         yaml_blocks = _extract_yaml_blocks(raw_yaml)
@@ -112,7 +105,6 @@ class WorkflowPipeline:
 
         result.new_goals = new_goals
 
-        # Merge with existing mapping
         if existing_mapping:
             all_goals = list(existing_mapping.goals) + new_goals
             result.mapping = PersonaWorkflowMapping(
@@ -133,7 +125,6 @@ class WorkflowPipeline:
         return result
 
     def load_existing_mapping(self, persona: Persona) -> Optional[PersonaWorkflowMapping]:
-        """Try to load an existing mapping for a persona."""
         slug = persona.name.lower().replace(" ", "-").replace(".", "")
         path = self.workflows_dir / f"PWM-{persona.id:02d}-{slug}.yaml"
         if path.exists():
@@ -141,12 +132,10 @@ class WorkflowPipeline:
         return None
 
     def save_mapping(self, mapping: PersonaWorkflowMapping) -> Path:
-        """Save a workflow mapping."""
         return save_workflow_mapping(mapping, self.workflows_dir)
 
 
 def _extract_yaml_blocks(text: str) -> list[str]:
-    """Extract YAML code blocks from markdown-fenced text."""
     blocks = []
     in_block = False
     current: list[str] = []

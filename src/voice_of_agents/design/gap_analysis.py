@@ -7,14 +7,11 @@ from dataclasses import dataclass, field
 
 from jinja2 import Template
 
-from voice_of_agents.models.capability import CapabilityRegistry, CapabilityStatus
-from voice_of_agents.models.persona import Persona
-from voice_of_agents.models.workflow import (
-    FeatureRecommendation,
-    GoalPriority,
-    PersonaWorkflowMapping,
-)
-from voice_of_agents.pipelines.prompts import GAP_ANALYSIS_PROMPT
+from voice_of_agents.core.backlog import BacklogItem
+from voice_of_agents.core.capability import CapabilityRegistry
+from voice_of_agents.core.persona import Persona
+from voice_of_agents.design.workflow import GoalPriority, PersonaWorkflowMapping
+from voice_of_agents.design.prompts import GAP_ANALYSIS_PROMPT
 
 
 @dataclass
@@ -40,7 +37,6 @@ class GapEntry:
 
     @property
     def severity(self) -> int:
-        """Higher = more personas affected."""
         return len(set(self.persona_ids))
 
 
@@ -51,7 +47,7 @@ class GapAnalysisReport:
     coverage: dict[str, CapabilityCoverage] = field(default_factory=dict)
     gaps: dict[str, GapEntry] = field(default_factory=dict)
     unused_capabilities: list[str] = field(default_factory=list)
-    feature_recommendations: list[FeatureRecommendation] = field(default_factory=list)
+    feature_recommendations: list[BacklogItem] = field(default_factory=list)
 
     @property
     def total_capabilities(self) -> int:
@@ -88,6 +84,9 @@ class GapAnalysisReport:
         return "\n".join(lines)
 
 
+_EFFORT_MAP = {"trivial": "trivial", "small": "small", "medium": "medium"}
+
+
 class GapAnalyzer:
     """Analyzes gaps between persona workflows and platform capabilities."""
 
@@ -99,10 +98,8 @@ class GapAnalyzer:
         mappings: list[PersonaWorkflowMapping],
         personas: list[Persona] | None = None,
     ) -> GapAnalysisReport:
-        """Run full gap analysis across all workflow mappings."""
         report = GapAnalysisReport()
 
-        # Track capability usage
         used_caps: defaultdict[str, CapabilityCoverage] = defaultdict(
             lambda: CapabilityCoverage(capability_id="")
         )
@@ -113,14 +110,12 @@ class GapAnalyzer:
         for mapping in mappings:
             for goal in mapping.goals:
                 for wf in goal.workflows:
-                    # Track used capabilities
                     for cap_id in wf.capabilities_used:
                         if cap_id not in used_caps:
                             used_caps[cap_id] = CapabilityCoverage(capability_id=cap_id)
                         used_caps[cap_id].persona_ids.append(mapping.persona_id)
                         used_caps[cap_id].workflow_count += 1
 
-                    # Track missing capabilities
                     for cap_id in wf.capabilities_missing:
                         if cap_id not in gap_caps:
                             gap_caps[cap_id] = GapEntry(capability_id=cap_id)
@@ -130,7 +125,6 @@ class GapAnalyzer:
         report.coverage = dict(used_caps)
         report.gaps = dict(gap_caps)
 
-        # Find unused capabilities
         all_cap_ids = {c.id for c in self.registry.capabilities if c.is_available()}
         used_cap_ids = set(used_caps.keys())
         report.unused_capabilities = sorted(all_cap_ids - used_cap_ids)
@@ -142,12 +136,10 @@ class GapAnalyzer:
         report: GapAnalysisReport,
         product_name: str,
     ) -> str:
-        """Build prompt for LLM-assisted feature recommendation generation."""
         gaps_dict = {
             gap_id: sorted(set(entry.persona_ids))
             for gap_id, entry in report.gaps.items()
         }
-
         template = Template(GAP_ANALYSIS_PROMPT)
         return template.render(
             product_name=product_name,
@@ -155,11 +147,46 @@ class GapAnalyzer:
             gaps=gaps_dict,
         )
 
+    def parse_recommendations(
+        self,
+        raw_yaml: str,
+        report: GapAnalysisReport,
+    ) -> list[BacklogItem]:
+        """Parse LLM-generated feature recommendations into BacklogItem objects."""
+        import yaml as _yaml
+
+        items: list[BacklogItem] = []
+        try:
+            data = _yaml.safe_load(raw_yaml)
+        except Exception:
+            return items
+
+        entries = data if isinstance(data, list) else [data]
+        for i, entry in enumerate(entries):
+            if not isinstance(entry, dict):
+                continue
+            complexity = entry.get("complexity", "medium")
+            effort = _EFFORT_MAP.get(complexity, "medium")
+            persona_ids = entry.get("personas_benefited", [])
+            item = BacklogItem(
+                id=entry.get("id", f"FR-{i+1:02d}"),
+                title=entry.get("title", "Untitled"),
+                description=entry.get("description", ""),
+                source="design",
+                effort=effort,
+                extends_capability=entry.get("extends_capability"),
+                value_statement=entry.get("value_statement"),
+                personas=persona_ids,
+            )
+            items.append(item)
+
+        report.feature_recommendations = items
+        return items
+
     def coverage_by_feature_area(
         self,
         mappings: list[PersonaWorkflowMapping],
     ) -> dict[str, dict]:
-        """Summarize capability coverage grouped by feature area."""
         report = self.analyze(mappings)
         areas: dict[str, dict] = {}
 
@@ -190,7 +217,6 @@ class GapAnalyzer:
         self,
         mappings: list[PersonaWorkflowMapping],
     ) -> dict[str, set[str]]:
-        """Which capabilities are used at each priority level."""
         result: dict[str, set[str]] = {
             "primary": set(),
             "secondary": set(),

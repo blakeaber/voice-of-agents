@@ -2,33 +2,12 @@
 
 from __future__ import annotations
 
-from enum import Enum
 from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from voice_of_agents.models.persona import Tier
-
-
-class GoalCategory(str, Enum):
-    KNOWLEDGE = "knowledge"
-    DELEGATION = "delegation"
-    GOVERNANCE = "governance"
-    MARKETPLACE = "marketplace"
-    AUTOMATION = "automation"
-    COLLABORATION = "collaboration"
-
-
-class GoalPriority(str, Enum):
-    PRIMARY = "primary"          # Day-1 value
-    SECONDARY = "secondary"      # Month-1 expansion
-    ASPIRATIONAL = "aspirational"  # Quarter-1 advanced usage
-
-
-class Complexity(str, Enum):
-    TRIVIAL = "trivial"
-    SMALL = "small"
-    MEDIUM = "medium"
+from voice_of_agents.core.enums import GoalCategory, GoalPriority, Tier
+from voice_of_agents.core.backlog import BacklogItem
 
 
 class WorkflowStep(BaseModel):
@@ -85,16 +64,6 @@ class Goal(BaseModel):
         return gaps
 
 
-class FeatureRecommendation(BaseModel):
-    id: str = Field(pattern=r"^FR-\d+-\d+$")
-    title: str
-    description: Optional[str] = None
-    complexity: Complexity
-    extends_capability: Optional[str] = None
-    personas_benefited: list[int] = Field(default_factory=list)
-    value_statement: Optional[str] = None
-
-
 class PersonaWorkflowMapping(BaseModel):
     """Complete workflow mapping for a single persona."""
 
@@ -102,7 +71,7 @@ class PersonaWorkflowMapping(BaseModel):
     persona_name: str
     persona_tier: Tier
     goals: list[Goal] = Field(default_factory=list)
-    feature_recommendations: list[FeatureRecommendation] = Field(default_factory=list)
+    feature_recommendations: list[BacklogItem] = Field(default_factory=list)
 
     def all_capabilities_used(self) -> set[str]:
         caps: set[str] = set()
