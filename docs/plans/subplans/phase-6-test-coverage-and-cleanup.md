@@ -171,21 +171,21 @@ ls pro-package/ 2>/dev/null
 ```
 
 ## Acceptance Criteria
-- [ ] `pytest tests/ -v --tb=short` passes with zero failures
-- [ ] `pytest tests/unit/test_eval_prioritize.py -v` passes
-- [ ] `pytest tests/unit/test_eval_evaluate.py -v` passes
-- [ ] `pytest tests/unit/test_core_backlog.py -v` passes (including source field tests)
-- [ ] `pytest tests/unit/test_eval_migrate.py -v` passes
-- [ ] All migrated Pro tests pass (`test_design_workflow.py`, `test_design_validators.py`)
-- [ ] `pytest --cov=voice_of_agents.core.backlog --cov-report=term-missing` shows ≥ 80% coverage
-- [ ] `pytest --cov=voice_of_agents.core.persona --cov-report=term-missing` shows ≥ 90% coverage
-- [ ] `src/voice_of_agents/contracts/` does NOT exist
-- [ ] `src/voice_of_agents/explorer/` does NOT exist
-- [ ] `src/voice_of_agents/phases/` does NOT exist
-- [ ] `src/voice_of_agents/reporting/` does NOT exist
-- [ ] `src/voice_of_agents/cli.py` does NOT exist
-- [ ] `pro-package/` does NOT exist
-- [ ] README contains `voa design`, `voa eval`, and `voa bridge` sections
+- [x] `pytest tests/ -v --tb=short` passes with zero failures — 224 tests pass
+- [x] `pytest tests/unit/test_eval_prioritize.py -v` passes — 20 tests pass
+- [x] `pytest tests/unit/test_eval_evaluate.py -v` passes — 28 tests pass
+- [x] `pytest tests/unit/test_core_backlog.py -v` passes (including source field tests)
+- [x] `pytest tests/unit/test_eval_migrate.py -v` passes
+- [x] All migrated Pro tests pass (`test_design_workflow.py`, `test_design_validators.py`)
+- [x] `pytest --cov=voice_of_agents.core.backlog --cov-report=term-missing` shows ≥ 80% — 83%
+- [x] `pytest --cov=voice_of_agents.core.persona --cov-report=term-missing` shows ≥ 90% — 100%
+- [x] `src/voice_of_agents/contracts/` does NOT exist
+- [x] `src/voice_of_agents/explorer/` does NOT exist
+- [x] `src/voice_of_agents/phases/` does NOT exist
+- [x] `src/voice_of_agents/reporting/` does NOT exist
+- [x] `src/voice_of_agents/cli.py` does NOT exist
+- [x] `pro-package/` does NOT exist
+- [x] README contains `voa design`, `voa eval`, and `voa bridge` sections
 
 ## Verification Steps
 ```bash
@@ -215,4 +215,4 @@ voa bridge status
 ```
 
 ## Status
-PENDING
+COMPLETE

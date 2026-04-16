@@ -1,0 +1,52 @@
+persona:
+  id: "1"
+  name: Maria Gutierrez
+  role: Immigration Paralegal
+  industry: Legal
+  tier: DEVELOPER
+run_date: "20260402_120000"
+generation_method: template
+scores:
+  overall: 4
+  goal_achievement: 2
+  efficiency: 4
+  trust: 5
+  learnability: 5
+  value_for_price: 3
+narrative:
+  first_impression: >-
+    As someone with 15 years in legal, I've seen many tools promise to solve my
+    problems. The interface is clean, but I need to see it work with my actual
+    legal data.
+  highlight_moment: >-
+    The onboarding asked about my goals and customized the interface accordingly.
+  frustration_moment: >-
+    Everything is empty. I have years of legal knowledge that needs to be here
+    before this tool becomes useful. There's no way to import what I already have.
+  feature_request: >-
+    I need a way to import knowledge from google drive. That's the difference
+    between a demo and something I'd actually use daily.
+  objection: >-
+    I need to be certain this won't give me wrong information. In legal, incorrect
+    guidance creates liability. I haven't seen enough to trust it with real cases yet.
+  would_recommend: >-
+    Not yet. I'd wait until it can handle my actual legal use case before
+    recommending it.
+verdict:
+  would_pay: false
+  would_recommend: false
+  retention_risk: high
+  upgrade_trigger: When core features work reliably end-to-end without workarounds
+  churn_trigger: >-
+    If it gives incorrect legal guidance, or if I can't import my existing data
+    within the trial period
+unmet_needs:
+  - need: Workspace page is empty — no prior work visible
+    pain_theme: A
+    severity: 5
+    persona_quote: Everything is empty.
+  - need: import knowledge from Google Drive
+    pain_theme: F
+    severity: 7
+    persona_quote: >-
+      I need a way to import knowledge from google drive so I'm not starting from zero.

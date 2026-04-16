@@ -1,0 +1,43 @@
+persona_id: 1
+persona_name: Maria Gutierrez
+run_timestamp: "20260402_120000"
+target_url: http://localhost:3000
+objectives_attempted: 2
+objectives:
+  - persona_id: "1"
+    persona_name: Maria Gutierrez
+    run_timestamp: "20260402_120000"
+    objective: Retrieve Past Visa Strategy for Similar Case
+    objective_trigger: New client intake
+    objective_success: Found prior strategy in 30 seconds
+    outcome: partial
+    pages_visited:
+      - http://localhost:3000/
+      - http://localhost:3000/pro/workspace
+    journey: []
+    friction_points:
+      - type: empty_state
+        description: Workspace page is empty — no prior work visible
+        severity: medium
+        persona_quote: Everything is empty.
+    surprises: []
+    missing_capabilities:
+      - import knowledge from Google Drive
+  - persona_id: "1"
+    persona_name: Maria Gutierrez
+    run_timestamp: "20260402_120000"
+    objective: Check for Policy Updates on H-1B Filing Requirements
+    objective_trigger: Client consult scheduled
+    objective_success: Found relevant regulatory update within 2 minutes
+    outcome: blocked
+    pages_visited:
+      - http://localhost:3000/pro/workspace
+    journey: []
+    friction_points:
+      - type: gap
+        description: No policy update feed or notification system
+        severity: high
+        persona_quote: I have no way to know when rules change.
+    surprises: []
+    missing_capabilities:
+      - receive automatic policy update alerts
