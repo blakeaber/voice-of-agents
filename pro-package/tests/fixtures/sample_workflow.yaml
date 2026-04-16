@@ -1,0 +1,100 @@
+persona_id: 1
+persona_name: "Maria Gutierrez"
+persona_tier: "DEVELOPER"
+goals:
+  - id: "G-01-1"
+    title: "Retrieve past visa strategy for similar case"
+    category: "knowledge"
+    priority: "primary"
+    trigger: "New client intake with a case type she has handled before"
+    success_statement: "I found exactly how I handled the Zhang petition — took 30 seconds instead of 45 minutes."
+    value_metrics:
+      time_saved: "45 min → 30 sec"
+    workflows:
+      - id: "W-01-1-a"
+        title: "Search and retrieve prior H-1B strategy"
+        preconditions:
+          - "Account tier: DEVELOPER"
+          - "15+ learnings from prior visa petitions captured"
+        steps:
+          - seq: 1
+            action: "Open workspace, type H-1B petition description"
+            capability_id: "CAP-LEARN-SIDEBAR"
+            ui_page: "/pro/workspace"
+            success_criteria: "Task input populated"
+          - seq: 2
+            action: "LearningSidebar auto-populates with relevant past learnings"
+            capability_id: "CAP-LEARN-SEARCH"
+            ui_page: "/pro/workspace"
+            success_criteria: "Sidebar shows prior H-1B learnings ranked by relevance"
+            friction_risk: "Sidebar empty if not enough learnings captured"
+          - seq: 3
+            action: "Click a relevant learning to expand it"
+            capability_id: "CAP-LEARN-SIDEBAR"
+            ui_page: "/pro/workspace"
+            success_criteria: "Full learning text visible with keywords"
+        capabilities_used:
+          - "CAP-LEARN-SIDEBAR"
+          - "CAP-LEARN-SEARCH"
+        capabilities_missing: []
+
+  - id: "G-01-2"
+    title: "Capture new USCIS requirement change as learning"
+    category: "knowledge"
+    priority: "primary"
+    trigger: "Unexpected RFE reveals a policy change"
+    success_statement: "Next time I file an H-1B with a Level 1 wage, this policy change will pop up automatically."
+    value_metrics:
+      error_reduction: "Discovers changes via rejection → proactive detection"
+    workflows:
+      - id: "W-01-2-a"
+        title: "Create learning from policy change"
+        steps:
+          - seq: 1
+            action: "Navigate to Knowledge Library"
+            capability_id: "CAP-LEARN-SEARCH"
+            ui_page: "/pro/learnings"
+            success_criteria: "Learning list displayed"
+          - seq: 2
+            action: "Create new learning with policy memo details"
+            capability_id: "CAP-LEARN-CREATE"
+            ui_page: "/pro/learnings"
+            success_criteria: "Learning created with auto-extracted keywords"
+        capabilities_used:
+          - "CAP-LEARN-SEARCH"
+          - "CAP-LEARN-CREATE"
+        capabilities_missing: []
+
+  - id: "G-01-3"
+    title: "Detect contradictory filing strategies"
+    category: "knowledge"
+    priority: "secondary"
+    trigger: "Contradiction badge appears in Knowledge Library"
+    success_statement: "It caught that my old strategy conflicts with the recent case."
+    workflows:
+      - id: "W-01-3-a"
+        title: "Review and resolve contradictory learnings"
+        steps:
+          - seq: 1
+            action: "Open Knowledge Library"
+            capability_id: "CAP-LEARN-SEARCH"
+            ui_page: "/pro/learnings"
+            success_criteria: "Contradiction badges visible"
+          - seq: 2
+            action: "Review both contradictory learnings"
+            capability_id: "CAP-LEARN-CONTRA"
+            ui_page: "/pro/learnings"
+            success_criteria: "Both conflicting learnings identified"
+        capabilities_used:
+          - "CAP-LEARN-SEARCH"
+          - "CAP-LEARN-CONTRA"
+        capabilities_missing: []
+
+feature_recommendations:
+  - id: "FR-01-1"
+    title: "Learning templates for regulatory requirements"
+    description: "Structured fields for source citation, effective date, and affected policies"
+    complexity: "trivial"
+    extends_capability: "CAP-LEARN-CREATE"
+    personas_benefited: [1, 6, 14, 22, 34]
+    value_statement: "I need to capture not just what changed, but where it came from and when it takes effect."

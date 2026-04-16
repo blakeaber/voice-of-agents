@@ -1,0 +1,35 @@
+id: 1
+name: "Maria Gutierrez"
+role: "Immigration Paralegal"
+segment: "b2c"
+industry: "Legal Services"
+tier: "DEVELOPER"
+age: 27
+income: 52000
+org_size: 1
+experience_years: 5
+ai_history: "ChatGPT for drafting cover letters and client emails. Found it useful for generic text but useless for USCIS-specific requirements."
+mindset: "I'm not afraid of AI — I'm afraid of using it wrong and getting a client deported."
+pain_points:
+  - description: "Prepares 15-20 visa applications per month against changing USCIS checklists"
+    impact: "Discovers requirement changes via rejections, 2-3 per quarter"
+    current_workaround: "800 files in shared Google Drive with no search"
+  - description: "Can't find prior case notes when handling similar petitions"
+    impact: "45 minutes searching Google Drive per case"
+    current_workaround: "Reconstructs strategy from memory"
+unmet_need: "A memory system that tracks every requirement change and every case outcome"
+proof_point: "Must catch errors she would have missed, not just generate text faster"
+pain_themes:
+  - theme: "A"
+    intensity: "HIGH"
+  - theme: "C"
+    intensity: "HIGH"
+  - theme: "D"
+    intensity: "CRITICAL"
+metadata:
+  source: "manual"
+  created_at: "2026-03-31"
+  research_basis:
+    - "US Census Bureau"
+    - "BLS Occupational Outlook"
+  validation_status: "validated"
