@@ -1,0 +1,38 @@
+id: 1
+name: Maria Gutierrez
+role: Immigration Paralegal
+industry: Legal
+segment: b2c
+tier: DEVELOPER
+age: 32
+income: 43500
+org_size: 1
+experience_years: 5
+ai_history: Has tried ChatGPT for drafting; skeptical of accuracy for legal work
+mindset: Detail-oriented, risk-averse, values precision over speed
+pain_points:
+  - description: 15-20 visa apps per month with USCIS changes discovered via rejections
+    impact: "severity 8/10, daily"
+    current_workaround: Manual cross-reference with printed USCIS bulletins
+  - description: Cannot retrieve past visa strategies for similar cases
+    impact: "45 min search time per case, weekly"
+    current_workaround: Google Drive search across unstructured folders
+pain_themes:
+  - theme: A
+    intensity: HIGH
+  - theme: D
+    intensity: MEDIUM
+unmet_need: Instant retrieval of past case strategies with full context
+proof_point: Must prove it catches errors she would miss before she trusts it
+trust_requirements:
+  - Must show it catches USCIS compliance errors
+  - Must cite source documents for any recommendation
+voice:
+  skepticism: moderate
+  vocabulary: legal
+  motivation: fear
+  price_sensitivity: high
+metadata:
+  source: manual
+  validation_status: validated
+  legacy_id: "UXW-01"
