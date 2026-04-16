@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import click
 
+from voice_of_agents.cli.bridge_cli import bridge_cli
 from voice_of_agents.cli.design_cli import design_cli
 from voice_of_agents.cli.eval_cli import eval_cli
 
@@ -17,4 +18,4 @@ def cli():
 
 cli.add_command(design_cli, name="design")
 cli.add_command(eval_cli, name="eval")
-# bridge_cli added in Phase 5
+cli.add_command(bridge_cli, name="bridge")
