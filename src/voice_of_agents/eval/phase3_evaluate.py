@@ -14,8 +14,8 @@ from pathlib import Path
 
 import yaml
 
+from voice_of_agents.core.persona import Persona
 from voice_of_agents.eval.config import VoAConfig
-from voice_of_agents.contracts.personas import Persona
 
 logger = logging.getLogger(__name__)
 
@@ -65,9 +65,11 @@ def _llm_generate_evaluation(persona: Persona, exploration: dict) -> dict:
 
     voice = _build_voice_profile(persona)
     journey_text = _format_journey_for_llm(exploration)
-    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier, 29)
+    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier.value, 29)
+    exp_years = persona.experience_years or 0
+    income = persona.income or 0
 
-    prompt = f"""You are {persona.name}, a {persona.role} with {persona.experience_years} years of experience in {persona.industry}. Your annual income is ${persona.income:,}. {voice['motivation_framing']}
+    prompt = f"""You are {persona.name}, a {persona.role} with {exp_years} years of experience in {persona.industry}. Your annual income is ${income:,}. {voice['motivation_framing']}
 
 You just tried Rooben Pro for the first time. Here's exactly what happened during your session:
 
@@ -81,7 +83,7 @@ SCORING (1-10 each):
 - efficiency: Was this faster than {voice['comparison_baseline']}?
 - trust: Do you trust this tool enough to use it in your {persona.industry.lower()} work?
 - learnability: Could you figure it out without help?
-- value_for_price: Worth ${tier_price}/month given your ${persona.income:,}/year income?
+- value_for_price: Worth ${tier_price}/month given your ${income:,}/year income?
 
 NARRATIVE (2-3 sentences each, in YOUR voice — {voice['vocabulary_style']} vocabulary, {voice['skepticism_level']} skepticism):
 - first_impression: Your gut reaction on first seeing the app
@@ -193,12 +195,14 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     overall = min(overall, max(goal_score, efficiency_score, trust_score, learn_score, value_score) + 1)
 
     # ── Voice-calibrated narrative ──
-    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier, 29)
+    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier.value, 29)
+    exp_years = persona.experience_years or 0
+    income = persona.income or 0
 
     # First impression
     if persona.voice.skepticism == "high":
         first_impression = (
-            f"As someone with {persona.experience_years} years in {persona.industry.lower()}, "
+            f"As someone with {exp_years} years in {persona.industry.lower()}, "
             f"I've seen many tools promise to solve my problems. The interface is clean, "
             f"but I need to see it work with my actual {persona.industry.lower()} data."
         )
@@ -276,7 +280,7 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
         )
     else:
         objection = (
-            f"At ${tier_price}/month against my ${persona.income:,}/year income, "
+            f"At ${tier_price}/month against my ${income:,}/year income, "
             f"I need to see clear ROI in the first month. Right now it's too early to tell."
         )
 
@@ -301,11 +305,7 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     would_pay = overall >= 6 and value_score >= 5 and goal_score >= 4
     retention_risk = "low" if overall >= 7 else ("high" if overall <= 4 else "medium")
 
-    first_obj = persona.objectives[0] if persona.objectives else None
-    upgrade_trigger = (
-        f"When I can {first_obj.goal.lower()} end-to-end without workarounds"
-        if first_obj else "When core features work reliably"
-    )
+    upgrade_trigger = "When core features work reliably end-to-end without workarounds"
     churn_trigger = (
         f"If it gives incorrect {persona.industry.lower()} guidance, "
         f"or if I can't import my existing data within the trial period"
@@ -364,9 +364,10 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
 def _build_voice_profile(persona: Persona) -> dict:
     """Build structured voice calibration parameters."""
     # Skepticism
-    if persona.experience_years >= 10:
+    exp_years = persona.experience_years or 0
+    if exp_years >= 10:
         skepticism = "high"
-    elif persona.experience_years >= 5:
+    elif exp_years >= 5:
         skepticism = "moderate"
     else:
         skepticism = "low"
@@ -394,9 +395,7 @@ def _build_voice_profile(persona: Persona) -> dict:
     }
     motivation = motiv_map.get(persona.voice.motivation, "You want tools that help you do better work.")
 
-    # Comparison baseline
-    baselines = [obj.efficiency_baseline for obj in persona.objectives if obj.efficiency_baseline]
-    comparison = baselines[0] if baselines else "my current manual process"
+    comparison = "my current manual process"
 
     # Trust bar
     trust_reqs = persona.trust_requirements
@@ -508,7 +507,7 @@ def _persona_header(persona: Persona) -> dict:
         "role": persona.role,
         "industry": persona.industry,
         "experience_years": persona.experience_years,
-        "tier": persona.tier,
+        "tier": persona.tier.value,
         "income": persona.income,
     }
 
@@ -548,7 +547,7 @@ def _load_latest_exploration(config: VoAConfig, persona: Persona) -> dict | None
 
 
 def _monthly_price(persona: Persona) -> int:
-    return {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier, 29)
+    return {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier.value, 29)
 
 
 def _classify_theme(description: str) -> str:

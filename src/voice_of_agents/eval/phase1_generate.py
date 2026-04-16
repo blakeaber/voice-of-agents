@@ -1,74 +1,64 @@
-"""Phase 1: Generate personas from target app analysis."""
+"""Phase 1: Generate starter personas from target app analysis."""
 
 from __future__ import annotations
 
 import logging
 
+from voice_of_agents.core.io import save_persona
+from voice_of_agents.core.pain import PainPoint, PainTheme
+from voice_of_agents.core.persona import Persona, VoiceProfile
 from voice_of_agents.eval.config import VoAConfig
-from voice_of_agents.contracts.personas import Persona, Objective, PainPoint, Voice, save_persona
 
 logger = logging.getLogger(__name__)
 
 
 def generate_personas(config: VoAConfig) -> list[Persona]:
-    """Analyze the target app and generate starter personas.
+    """Generate a minimal starter set of canonical Personas.
 
-    This is a bootstrap function — generates a minimal set of personas
-    spanning different user types, tiers, and pain themes. Real persona
-    development should be done manually with domain expertise.
+    This is a bootstrap function — real persona development should be done
+    manually with domain expertise. A full implementation would crawl the
+    target app to understand features.
     """
-    # For now, generate a minimal starter set
-    # A full implementation would crawl the target app to understand features
     starters = [
         Persona(
-            id="UXW-01",
+            id=1,
             name="Solo Professional",
             role="Domain Expert",
             industry="Consulting",
-            experience_years=10,
-            income=80000,
-            team_size=1,
+            segment="b2c",
             tier="DEVELOPER",
-            objectives=[
-                Objective(
-                    id="OBJ-01",
-                    goal="Capture and retrieve professional knowledge",
-                    trigger="Working on a task similar to one handled before",
-                    success_definition="Past decisions surface automatically within 60 seconds",
-                    efficiency_baseline="Manual search through files (30+ minutes)",
-                    target_efficiency="Automatic retrieval (<60 seconds)",
+            org_size=1,
+            income=80000,
+            experience_years=10,
+            pain_points=[
+                PainPoint(
+                    description="Can't find prior decisions when needed",
+                    impact="severity 8/10, daily",
                 ),
             ],
-            pain_points=[
-                PainPoint(description="Can't find prior decisions when needed", severity=8, theme="A"),
-            ],
+            pain_themes=[PainTheme(theme="A", intensity="HIGH")],
             trust_requirements=["Must surface my own work, not generic AI"],
-            voice=Voice(skepticism="moderate", motivation="efficiency"),
+            voice=VoiceProfile(skepticism="moderate", motivation="efficiency"),
         ),
         Persona(
-            id="UXW-02",
+            id=2,
             name="Team Leader",
             role="Department Manager",
             industry="Technology",
-            experience_years=12,
-            income=120000,
-            team_size=8,
+            segment="b2b",
             tier="TEAM",
-            objectives=[
-                Objective(
-                    id="OBJ-01",
-                    goal="Route questions to the right expert on my team",
-                    trigger="Team member asks a question I can't answer",
-                    success_definition="Question reaches the right person without my involvement",
-                    efficiency_baseline="Manual forwarding via email/Slack (20+ messages/day)",
-                    target_efficiency="Automatic routing (<5 manual interventions/day)",
+            org_size=8,
+            income=120000,
+            experience_years=12,
+            pain_points=[
+                PainPoint(
+                    description="I'm the bottleneck for all team questions",
+                    impact="severity 9/10, daily",
                 ),
             ],
-            pain_points=[
-                PainPoint(description="I'm the bottleneck for all team questions", severity=9, theme="B"),
-            ],
+            pain_themes=[PainTheme(theme="B", intensity="CRITICAL")],
             trust_requirements=["Must route to verified experts, not guess"],
-            voice=Voice(skepticism="high", motivation="efficiency"),
+            voice=VoiceProfile(skepticism="high", motivation="efficiency"),
         ),
     ]
 

@@ -2,10 +2,11 @@
 
 import pytest
 
-from voice_of_agents.eval.config import VoAConfig
-from voice_of_agents.contracts.personas import Persona, Objective, PainPoint, Voice
 from voice_of_agents.core.backlog import BacklogItem
+from voice_of_agents.core.pain import PainPoint, PainTheme
+from voice_of_agents.core.persona import Persona, VoiceProfile
 from voice_of_agents.eval.browser import NavLink
+from voice_of_agents.eval.config import VoAConfig
 
 
 @pytest.fixture
@@ -30,37 +31,25 @@ def config(tmp_data_dir):
 def maria():
     """Maria Gutierrez — immigration paralegal (B2C solo, DEVELOPER)."""
     return Persona(
-        id="UXW-01",
+        id=1,
         name="Maria Gutierrez",
         role="Immigration Paralegal",
         industry="Legal",
+        segment="b2c",
+        tier="DEVELOPER",
         experience_years=15,
         income=52000,
-        team_size=1,
-        tier="DEVELOPER",
-        objectives=[
-            Objective(
-                id="OBJ-01",
-                goal="Retrieve Past Visa Strategy for Similar Case",
-                trigger="New client intake with a case type handled before",
-                success_definition="Found prior petition strategy in under 60 seconds",
-                efficiency_baseline="45 min searching Google Drive",
-                target_efficiency="30 seconds via search",
-            ),
-            Objective(
-                id="OBJ-02",
-                goal="Capture New USCIS Requirement Change as Learning",
-                trigger="Unexpected RFE reveals a policy change",
-                success_definition="Policy change auto-surfaces on future similar cases",
-                efficiency_baseline="Sticky note, lost in 2 weeks",
-            ),
-        ],
+        org_size=1,
         pain_points=[
-            PainPoint(description="800 files in Google Drive, can't find anything", severity=9, frequency="daily", theme="A"),
-            PainPoint(description="Policy changes discovered via rejections", severity=8, frequency="monthly", theme="D"),
+            PainPoint(description="800 files in Google Drive, can't find anything", impact="severity 9/10, daily"),
+            PainPoint(description="Policy changes discovered via rejections", impact="severity 8/10, monthly"),
+        ],
+        pain_themes=[
+            PainTheme(theme="A", intensity="CRITICAL"),
+            PainTheme(theme="D", intensity="HIGH"),
         ],
         trust_requirements=["Must surface MY prior work, not generic AI answers"],
-        voice=Voice(skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="moderate"),
+        voice=VoiceProfile(skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="moderate"),
     )
 
 
@@ -68,29 +57,23 @@ def maria():
 def rachel():
     """Rachel Okafor — Dir People Ops (B2B team, TEAM tier)."""
     return Persona(
-        id="UXW-20",
+        id=20,
         name="Rachel Okafor",
         role="Director of People Operations",
         industry="HR",
+        segment="b2b",
+        tier="TEAM",
         experience_years=12,
         income=130000,
-        team_size=8,
-        tier="TEAM",
-        objectives=[
-            Objective(
-                id="OBJ-01",
-                goal="Create HR Policy Domain Agent to Deflect Manager Questions",
-                trigger="15th Slack DM today asking about PTO carryover",
-                success_definition="Manager DMs drop from 20/day to 5/day",
-                efficiency_baseline="2 hours/day answering DMs",
-                target_efficiency="30 min reviewing escalations",
-            ),
-        ],
+        org_size=8,
         pain_points=[
-            PainPoint(description="20+ policy questions daily from managers", severity=9, theme="B"),
+            PainPoint(description="20+ policy questions daily from managers", impact="severity 9/10, daily"),
+        ],
+        pain_themes=[
+            PainTheme(theme="B", intensity="CRITICAL"),
         ],
         trust_requirements=["Only answer approved policies, never fabricate"],
-        voice=Voice(skepticism="moderate", vocabulary="general", motivation="efficiency", price_sensitivity="low"),
+        voice=VoiceProfile(skepticism="moderate", vocabulary="general", motivation="efficiency", price_sensitivity="low"),
     )
 
 
@@ -98,28 +81,23 @@ def rachel():
 def james():
     """James Washington — small business bookkeeper (FREE, skeptical)."""
     return Persona(
-        id="UXW-04",
+        id=4,
         name="James Washington",
         role="Small Business Bookkeeper",
         industry="Finance",
+        segment="b2c",
+        tier="FREE",
         experience_years=25,
         income=45000,
-        team_size=1,
-        tier="FREE",
-        objectives=[
-            Objective(
-                id="OBJ-01",
-                goal="Retrieve past categorization decision",
-                trigger="Categorizing an expense similar to one handled 3 months ago",
-                success_definition="Prior decision surfaces with rationale in under 30 seconds",
-                efficiency_baseline="15 min searching QuickBooks + phone call",
-            ),
-        ],
+        org_size=1,
         pain_points=[
-            PainPoint(description="Categorization errors repeat every quarter", severity=7, theme="A"),
+            PainPoint(description="Categorization errors repeat every quarter", impact="severity 7/10, quarterly"),
+        ],
+        pain_themes=[
+            PainTheme(theme="A", intensity="HIGH"),
         ],
         trust_requirements=["Wants HIS reasoning, not AI opinions"],
-        voice=Voice(skepticism="high", vocabulary="financial", motivation="fear", price_sensitivity="high"),
+        voice=VoiceProfile(skepticism="high", vocabulary="financial", motivation="fear", price_sensitivity="high"),
     )
 
 
@@ -145,14 +123,14 @@ def sample_nav_links():
 def sample_exploration():
     """Exploration result with mixed outcomes."""
     return {
-        "persona_id": "UXW-01",
+        "persona_id": 1,
         "persona_name": "Maria Gutierrez",
         "run_timestamp": "20260402_120000",
         "target_url": "http://localhost:3000",
-        "objectives_attempted": 2,
+        "objectives_attempted": 1,
         "objectives": [
             {
-                "persona_id": "UXW-01",
+                "persona_id": "1",
                 "persona_name": "Maria Gutierrez",
                 "run_timestamp": "20260402_120000",
                 "objective": "Retrieve Past Visa Strategy for Similar Case",

@@ -16,11 +16,21 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from voice_of_agents.contracts.personas import Persona, Objective
+from voice_of_agents.core.persona import Persona
 
 logger = logging.getLogger(__name__)
 
 MAX_STEPS_PER_OBJECTIVE = 8
+
+
+@dataclass
+class ExplorationGoal:
+    """Lightweight goal descriptor used by the browser explorer."""
+
+    goal: str
+    trigger: str = ""
+    success_definition: str = ""
+    efficiency_baseline: str = ""
 
 
 @dataclass
@@ -102,6 +112,7 @@ async def explore_as_persona(
     target_url: str,
     session_token: str | None = None,
     screenshot_dir: Path | None = None,
+    goals: list[ExplorationGoal] | None = None,
 ) -> list[ExplorationResult]:
     """Explore the target app as a specific persona, pursuing their objectives.
 
@@ -110,6 +121,7 @@ async def explore_as_persona(
     """
     from playwright.async_api import async_playwright
 
+    goals = goals or []
     results: list[ExplorationResult] = []
     ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
@@ -131,18 +143,18 @@ async def explore_as_persona(
         else:
             page = await context.new_page()
 
-        for obj in persona.objectives:
+        for goal in goals:
             result = ExplorationResult(
-                persona_id=persona.id,
+                persona_id=str(persona.id),
                 persona_name=persona.name,
                 run_timestamp=ts,
-                objective=obj.goal,
-                objective_trigger=obj.trigger,
-                objective_success=obj.success_definition,
+                objective=goal.goal,
+                objective_trigger=goal.trigger,
+                objective_success=goal.success_definition,
             )
 
             try:
-                await _explore_objective(page, persona, obj, result, target_url, screenshot_dir)
+                await _explore_objective(page, persona, goal, result, target_url, screenshot_dir)
             except Exception as e:
                 result.outcome = "blocked"
                 result.friction_points.append(FrictionPoint(
@@ -150,7 +162,7 @@ async def explore_as_persona(
                     description=f"Exploration failed: {e}",
                     severity="critical",
                 ))
-                logger.error("Exploration failed for %s obj '%s': %s", persona.id, obj.goal, e)
+                logger.error("Exploration failed for %s goal '%s': %s", persona.id, goal.goal, e)
 
             results.append(result)
 
@@ -160,7 +172,7 @@ async def explore_as_persona(
 
 
 async def _explore_objective(
-    page, persona: Persona, objective: Objective,
+    page, persona: Persona, objective: ExplorationGoal,
     result: ExplorationResult, target_url: str,
     screenshot_dir: Path | None,
 ) -> None:
@@ -325,7 +337,7 @@ async def _parse_nav_links(page) -> list[NavLink]:
     return links
 
 
-def _find_best_link(objective: Objective, links: list[NavLink]) -> NavLink | None:
+def _find_best_link(objective: ExplorationGoal, links: list[NavLink]) -> NavLink | None:
     """Find the most relevant nav link for a persona's objective."""
     goal = objective.goal.lower()
     trigger = (objective.trigger or "").lower()
@@ -471,7 +483,7 @@ async def _read_page_content(page) -> dict:
 
 # ── Page Interaction ──────────────────────────────────────────────────
 
-def _derive_input_text(persona: Persona, objective: Objective) -> str:
+def _derive_input_text(persona: Persona, objective: ExplorationGoal) -> str:
     """Generate realistic input text from the persona's objective context."""
     # Use trigger as the most specific scenario description
     if objective.trigger:
@@ -493,7 +505,7 @@ def _derive_input_text(persona: Persona, objective: Objective) -> str:
     return objective.goal
 
 
-async def _interact_with_page(page, input_text: str, persona: Persona, objective: Objective) -> JourneyStep:
+async def _interact_with_page(page, input_text: str, persona: Persona, objective: ExplorationGoal) -> JourneyStep:
     """Fill the first available input on the page and observe the result."""
     t0 = time.monotonic()
 
@@ -533,7 +545,7 @@ async def _interact_with_page(page, input_text: str, persona: Persona, objective
     )
 
 
-async def _find_action_link(page, objective: Objective) -> str | None:
+async def _find_action_link(page, objective: ExplorationGoal) -> str | None:
     """Find a relevant action link or button on the current page."""
     goal_lower = objective.goal.lower()
 
@@ -582,7 +594,7 @@ def _react_to_nav(persona: Persona, links: list[NavLink]) -> str:
     return f"Clean sidebar with {count} items. I can see {len(relevant)} that match what I need."
 
 
-def _react_to_page(persona: Persona, objective: Objective, content: dict) -> str:
+def _react_to_page(persona: Persona, objective: ExplorationGoal, content: dict) -> str:
     if content["is_empty"]:
         if persona.voice.skepticism == "high":
             return f"It's empty. How do I get my existing {persona.industry.lower()} data in here? I have years of work that needs to be here before this is useful."
@@ -601,7 +613,7 @@ def _react_to_page(persona: Persona, objective: Objective, content: dict) -> str
     return "Page loaded. Let me explore what's here."
 
 
-def _react_to_input_result(persona: Persona, objective: Objective, content: dict) -> str:
+def _react_to_input_result(persona: Persona, objective: ExplorationGoal, content: dict) -> str:
     if content["is_empty"]:
         baseline = objective.efficiency_baseline or "my current method"
         return f"I typed my query but nothing came back. Without data here, this isn't faster than {baseline}."
@@ -611,14 +623,14 @@ def _react_to_input_result(persona: Persona, objective: Objective, content: dict
     return "Something appeared after I typed. Let me review."
 
 
-def _react_to_empty_state(persona: Persona, objective: Objective, page_name: str) -> str:
+def _react_to_empty_state(persona: Persona, objective: ExplorationGoal, page_name: str) -> str:
     baseline = objective.efficiency_baseline or "my current approach"
     if persona.voice.skepticism == "high":
         return f"The {page_name} is empty. Before this can replace {baseline}, I need a way to populate it with my existing knowledge."
     return f"Empty {page_name}. I'll need to add some data first."
 
 
-def _quote_cant_find(persona: Persona, objective: Objective) -> str:
+def _quote_cant_find(persona: Persona, objective: ExplorationGoal) -> str:
     """Generate an in-character quote about not finding what they need."""
     goal_short = objective.goal.lower()[:60]
     if persona.voice.motivation == "fear":
@@ -628,7 +640,7 @@ def _quote_cant_find(persona: Persona, objective: Objective) -> str:
     return f"I expected to be able to {goal_short} from the sidebar, but I don't see an obvious path."
 
 
-def _quote_empty_state(persona: Persona, objective: Objective, page_name: str) -> str:
+def _quote_empty_state(persona: Persona, objective: ExplorationGoal, page_name: str) -> str:
     baseline = objective.efficiency_baseline or "my current process"
     return f"The {page_name} is empty. I need to import or enter my existing data — I can't start from scratch when I have years of {persona.industry.lower()} work in {baseline}."
 
@@ -636,11 +648,9 @@ def _quote_empty_state(persona: Persona, objective: Objective, page_name: str) -
 def _is_relevant_to_persona(link: NavLink, persona: Persona) -> bool:
     """Check if a nav link is relevant to this persona's work."""
     text = link.text.lower()
-    if persona.team_size <= 1:
-        # Solo users — knowledge features are relevant, team features less so
+    if persona.org_size <= 1:
         return any(k in text for k in ["workspace", "knowledge", "library", "profile", "setting"])
     else:
-        # Team users — delegation features also relevant
         return any(k in text for k in ["workspace", "knowledge", "library", "profile", "agent",
                                         "expert", "delegation", "dashboard", "setting"])
 

@@ -1,15 +1,14 @@
-"""Integration tests: Persona YAML save/load roundtrip."""
+"""Integration tests: Canonical Persona YAML save/load roundtrip."""
 
 import pytest
 
-from voice_of_agents.contracts.personas import (
-    load_persona, load_personas, save_persona, validate_persona,
-)
+from voice_of_agents.core.io import load_persona, load_personas_dir, save_persona
 
 
 class TestPersonaRoundtrip:
     def test_save_load_preserves_fields(self, maria, tmp_data_dir):
-        path = save_persona(maria, tmp_data_dir / "personas")
+        personas_dir = tmp_data_dir / "personas"
+        path = save_persona(maria, personas_dir)
         loaded = load_persona(path)
         assert loaded.id == maria.id
         assert loaded.name == maria.name
@@ -18,10 +17,7 @@ class TestPersonaRoundtrip:
         assert loaded.tier == maria.tier
         assert loaded.income == maria.income
         assert loaded.experience_years == maria.experience_years
-        assert loaded.team_size == maria.team_size
-        assert len(loaded.objectives) == len(maria.objectives)
-        assert loaded.objectives[0].goal == maria.objectives[0].goal
-        assert loaded.objectives[0].trigger == maria.objectives[0].trigger
+        assert loaded.org_size == maria.org_size
         assert len(loaded.pain_points) == len(maria.pain_points)
         assert loaded.voice.skepticism == maria.voice.skepticism
         assert loaded.voice.vocabulary == maria.voice.vocabulary
@@ -31,18 +27,18 @@ class TestPersonaRoundtrip:
         personas_dir = tmp_data_dir / "personas"
         save_persona(maria, personas_dir)
         save_persona(rachel, personas_dir)
-        loaded = load_personas(personas_dir)
+        loaded = load_personas_dir(personas_dir)
         assert len(loaded) == 2
         ids = {p.id for p in loaded}
-        assert "UXW-01" in ids
-        assert "UXW-20" in ids
+        assert 1 in ids
+        assert 20 in ids
 
-    def test_loaded_persona_validates(self, maria, tmp_data_dir):
-        path = save_persona(maria, tmp_data_dir / "personas")
+    def test_loaded_persona_has_correct_slug(self, maria, tmp_data_dir):
+        personas_dir = tmp_data_dir / "personas"
+        path = save_persona(maria, personas_dir)
         loaded = load_persona(path)
-        issues = validate_persona(loaded)
-        assert issues == []
+        assert loaded.slug == "01-maria-gutierrez"
 
     def test_load_empty_dir(self, tmp_data_dir):
-        loaded = load_personas(tmp_data_dir / "personas")
+        loaded = load_personas_dir(tmp_data_dir / "personas")
         assert loaded == []

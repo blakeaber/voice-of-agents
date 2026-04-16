@@ -107,9 +107,10 @@ def prioritize_backlog(config: VoAConfig) -> None:
                 id=backlog_id,
                 title=finding.get("title", "Untitled"),
                 description=finding.get("description", ""),
+                source="eval",
                 score=round(score, 1),
                 finding_id=finding_id,
-                personas=personas,
+                personas=_to_int_ids(personas),
                 pain_themes=[theme],
                 effort=effort,
                 status="open",
@@ -226,6 +227,19 @@ def _revenue_score(personas: list[str], tiers: dict[str, str]) -> float:
         return 0.0
     weights = [TIER_WEIGHTS.get(tiers.get(p, "DEVELOPER"), 0.3) for p in personas]
     return max(weights) if weights else 0.3
+
+
+def _to_int_ids(persona_ids: list) -> list[int]:
+    """Convert persona IDs (str or int) to int, parsing UXW-style IDs."""
+    result = []
+    for p in persona_ids:
+        if isinstance(p, int):
+            result.append(p)
+        elif isinstance(p, str):
+            m = re.search(r"\d+", p)
+            if m:
+                result.append(int(m.group()))
+    return result
 
 
 def _estimate_effort(finding: dict) -> str:
