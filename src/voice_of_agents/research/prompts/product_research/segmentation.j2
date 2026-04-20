@@ -1,0 +1,52 @@
+# Bottom-Up Behavioral Segmentation
+
+You are synthesizing behavioral segments from research evidence. Segments must be behavioral — NOT demographic.
+
+## Research Question
+{{ question }}
+
+## Product Context
+{{ product_context }}
+
+## Hypothesis Verdicts
+{% for score in scores %}
+**{{ score.hypothesis_id }}:** {{ score.verdict }}
+Key quotes: {{ score.key_quotes | join('; ') }}
+{% endfor %}
+
+## Subject Evidence (Summary)
+{% for subject in subjects %}
+- **{{ subject.subject_id }}** ({{ subject.adoption_status }}): JTBD={{ subject.jtbd[:80] }}... | Failure={{ subject.failure_or_abandonment_mode[:60] }}...
+{% endfor %}
+
+## Segmentation Task
+
+1. Affinity-map subjects by behavioral axes:
+   - JTBD pattern (not job title)
+   - Adoption-trajectory shape (what drove them to try, what determined outcome)
+   - Constraint profile (what limits their choices)
+   - Failure/abandonment mode (what causes them to leave or reject)
+
+2. Cluster into 3-5 behavioral segments. Each segment must:
+   - Have a behavioral name (not "Enterprise Users" or "SMBs")
+   - Contain ≥2 subjects
+   - Have a distinct JTBD, trajectory, and failure mode from other segments
+
+3. Include a mandatory "Gaps vs. positioning" section for each segment.
+
+Respond ONLY with YAML:
+
+```yaml
+segments:
+  - name: "[behavioral descriptor — not demographic]"
+    description: "[2-3 sentences on what defines this segment behaviorally]"
+    subject_ids:
+      - "subject-XX"
+    primary_jtbd: "[what they are hiring a tool to do]"
+    adoption_trajectory_shape: "[how they evaluate and decide]"
+    dominant_constraint_profile: "[what limits their choices]"
+    dominant_failure_mode: "[what causes rejection or abandonment]"
+    gaps_vs_product_positioning: |
+      [What this segment needs that the product currently does not offer or
+       does not communicate. Be specific about the mismatch.]
+```

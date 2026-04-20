@@ -1,0 +1,72 @@
+# Workflow Map Synthesis — {{ uxw_id }}
+
+You are synthesizing 2-3 workflow maps from multiple episode interviews for the same persona.
+
+## Persona
+**UXW ID:** {{ uxw_id }}
+**Name:** {{ persona_name }}
+**JTBD:** {{ jtbd }}
+
+## Episode Evidence
+{% for episode in episodes %}
+---
+**Episode {{ loop.index }}: {{ episode.episode }}** ({{ episode.date }})
+
+Pre-state: {{ episode.pre_state }}
+
+Steps:
+{% for step in episode.steps %}
+  {{ loop.index }}. {{ step.step }} | Tool: {{ step.tool }} | Time: {{ step.time }} | Blocker: {{ step.blocker }}
+{% endfor %}
+
+Post-state: {{ episode.post_state }}
+Wished existed: {{ episode.what_i_wished_existed }}
+{% endfor %}
+
+## Synthesis Task
+
+From these {{ episodes | length }} episodes, synthesize 2-3 workflow maps:
+- **Primary workflow:** The canonical path when everything works
+- **Secondary workflow:** The most common variation (different trigger or constraint)
+- **Edge/recovery workflow:** What happens when the primary fails (optional, if evidence supports it)
+
+Each workflow must:
+- Collapse redundant steps across episodes
+- Identify the decision branches where the path diverges
+- Capture the tools actually used (not ideal tools)
+- Note friction risks at each step
+
+Respond ONLY with YAML matching this schema for each workflow:
+
+```yaml
+workflows:
+  - id: "{{ uxw_id }}-01"
+    persona: {{ persona_id }}
+    title: "[workflow title]"
+    intent_goal: "[what the persona is trying to achieve]"
+    intent_trigger: "[what event causes them to start this workflow]"
+    success_definition: "[what a successful completion looks like to them]"
+    preconditions:
+      - "[what must be true before they can start]"
+    steps:
+      - number: 1
+        action: "[what they do]"
+        tool: "[software or 'none']"
+        input: "[what they start with]"
+        output: "[what they produce]"
+        time: "[minutes]"
+        blocker: "[friction or 'none']"
+        friction_risk: "[what could go wrong here]"
+    success_criteria:
+      - criterion: "[how they know it worked]"
+        measurement: "[how they measure it]"
+    satisfaction_drivers:
+      - "[what makes this experience satisfying]"
+    dealbreakers:
+      - "[what would cause them to abandon this workflow]"
+    efficiency_baseline_method: "[how they currently measure how long this takes]"
+    efficiency_baseline_time: "[current time estimate]"
+    value_time_saved: "[estimated time savings if friction removed]"
+    value_errors_prevented: "[types of errors this would prevent]"
+    value_knowledge_preserved: "[what knowledge would be captured vs. lost]"
+```

@@ -1,0 +1,29 @@
+## Required Focus Group Response Schema
+
+Respond ONLY with a YAML block matching this exact schema. No prose before or after.
+
+```yaml
+persona_name: "{{ persona_name }}"
+uxw_id: "{{ uxw_id }}"
+score: {{ score }}  # integer 1-10
+
+what_i_loved:
+  - "[specific positive moment, in persona voice]"
+  - "[specific positive moment, in persona voice]"
+
+what_made_me_quit:
+  - "[specific friction or blocker, in persona voice]"
+  - "[specific friction or blocker, in persona voice]"
+
+top_3_must_fixes:
+  - "[must-fix #1 — most critical, actionable]"
+  - "[must-fix #2]"
+  - "[must-fix #3]"
+
+segment_specific_concern: |
+  [What concerns this persona that other segments might not share. Be segment-specific.]
+
+would_pay: "{{ would_pay }}"  # yes | no | conditional
+would_pay_reason: |
+  [Why they would or would not pay, in their voice. If conditional, state the condition.]
+```

@@ -1,0 +1,72 @@
+# Journey Synthesis — Must-Fix Identification and Revision
+
+You are synthesizing focus group feedback into must-fixes and revising the journey design.
+
+## Journey Being Evaluated
+**Title:** {{ journey_title }}
+**Anchor segment:** {{ anchor_segment }}
+
+## v0 Journey Steps
+| Step | Screen/Route | Affordance | Copy Sample | Principle |
+|------|-------------|------------|-------------|-----------|
+{% for step in v0_steps %}
+| {{ step.step_number }} | {{ step.screen_or_route }} | {{ step.affordance }} | {{ step.copy_sample }} | {{ step.principle_reference }} |
+{% endfor %}
+
+## Focus Group Responses
+{% for response in focus_group_responses %}
+---
+**{{ response.persona_name }} ({{ response.uxw_id }})** — Score: {{ response.score }}/10 | Pay: {{ response.would_pay }}
+
+Loved:
+{% for item in response.what_i_loved %}
+- {{ item }}
+{% endfor %}
+
+What made me quit:
+{% for item in response.what_made_me_quit %}
+- {{ item }}
+{% endfor %}
+
+Must-fixes:
+{% for fix in response.top_3_must_fixes %}
+{{ loop.index }}. {{ fix }}
+{% endfor %}
+
+Segment-specific concern: {{ response.segment_specific_concern }}
+Would pay reason: {{ response.would_pay_reason }}
+{% endfor %}
+
+## Synthesis Task
+
+### Step 1: Identify Must-Fixes
+Extract all must-fixes from all responses. A must-fix is **cross-cutting** if raised by ≥3 personas.
+
+### Step 2: Revise the Journey
+Revise the journey to address all cross-cutting must-fixes. For each changed step, annotate with the must-fix number(s) it addresses.
+
+Respond ONLY with YAML:
+
+```yaml
+must_fixes:
+  - number: 1
+    description: "[clear, actionable description]"
+    raised_by_persona_ids: ["UXW-01", "UXW-02"]
+    is_cross_cutting: true  # true if ≥3 personas raised it
+
+secondary_asks:
+  - number: 10
+    description: "[raised by 1-2 personas only]"
+    raised_by_persona_ids: ["UXW-03"]
+    is_cross_cutting: false
+
+revised_journey_steps:
+  - step_number: 1
+    screen_or_route: "[route]"
+    affordance: "[what the user can do here]"
+    copy_sample: "[suggested copy]"
+    principle_reference: "[design principle]"
+    must_fix_numbers: [1, 3]  # which must-fixes this step addresses; empty if unchanged
+
+average_score: {{ scores | sum / scores | length }}
+```

@@ -1,0 +1,56 @@
+# Hypothesis Scoring
+
+You are scoring a set of research hypotheses against subject interview data.
+
+## Research Question
+{{ question }}
+
+## Hypotheses
+{% for h in hypotheses %}
+**{{ h.id }}:** {{ h.statement }}
+*Refuted if:* {{ h.falsification_condition }}
+{% endfor %}
+
+## Subject Evidence
+{% for subject in subjects %}
+---
+**{{ subject.subject_id }}** ({{ subject.adoption_status }}, {{ subject.context_segment }})
+
+JTBD: {{ subject.jtbd }}
+Adoption trajectory: {{ subject.adoption_trajectory }}
+Last concrete episode: {{ subject.last_concrete_episode }}
+Failure/abandonment mode: {{ subject.failure_or_abandonment_mode }}
+Decision topology: {{ subject.decision_topology }}
+Anti-model of success: {{ subject.anti_model_of_success }}
+
+Key quotes:
+{% for q in subject.verbatim_quote_bank %}
+  {{ q.key }}: "{{ q.text }}"
+{% endfor %}
+{% endfor %}
+
+## Scoring Task
+
+For each hypothesis, determine the verdict based solely on the evidence above.
+
+**Verdict definitions:**
+- `supports`: Multiple subjects provide evidence consistent with the hypothesis being true
+- `refutes`: Multiple subjects provide evidence that meets the falsification condition
+- `orthogonal`: Subject evidence does not address this hypothesis either way
+- `insufficient-evidence`: Too few subjects touch this area to reach a verdict
+
+**Flag if ALL hypotheses return `supports`** — this indicates confirmation bias in the sampling frame.
+
+Respond ONLY with YAML:
+
+```yaml
+scores:
+{% for h in hypotheses %}
+  - hypothesis_id: "{{ h.id }}"
+    verdict: "[supports|refutes|orthogonal|insufficient-evidence]"
+    supporting_subject_ids: []  # list subject IDs whose evidence supports
+    refuting_subject_ids: []    # list subject IDs whose evidence refutes
+    key_quotes:
+      - "[SubjectID/Q#]: 'exact quote'"
+{% endfor %}
+```

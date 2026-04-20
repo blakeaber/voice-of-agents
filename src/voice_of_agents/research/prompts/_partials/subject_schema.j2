@@ -1,0 +1,42 @@
+## Required Output Schema
+
+Respond ONLY with a YAML block matching this exact schema. No prose before or after.
+
+```yaml
+subject_id: "{{ subject_id }}"
+adoption_status: "{{ adoption_status }}"  # one of: adopter, partial-adopter, abandoner, evaluated-and-rejected, never-tried-aware, actively-anti
+context_segment: "{{ context_segment }}"  # one of: B2B-small, B2B-mid, B2B-large-regulated, B2C-high-autonomy, B2C-low-autonomy
+
+jtbd: |
+  [The job-to-be-done: what this person is hiring a tool to accomplish. Behavioral, not demographic.]
+
+adoption_trajectory: |
+  [How they moved through: awareness → trial → adoption/rejection. Include the inflection point.]
+
+last_concrete_episode: |
+  [Describe the most recent specific episode in detail: what triggered it, what they did, what happened.]
+
+constraint_profile: |
+  [What constraints bind their choices: time, budget, approval, compliance, tooling, team size.]
+
+failure_or_abandonment_mode: |
+  [For non-adopters: the specific moment and reason they stopped or refused. For adopters: leave blank.]
+
+decision_topology: |
+  [How they make tool decisions: solo vs. committee, top-down vs. bottom-up, trial vs. budget cycle.]
+
+anti_model_of_success: |
+  [What a bad outcome looks like to them. What they are explicitly trying to avoid.]
+
+verbatim_quote_bank:
+  - key: "Q1"
+    text: "[Exact quote — the moment they almost gave up]"
+  - key: "Q2"
+    text: "[Exact quote — their workaround description]"
+  - key: "Q3"
+    text: "[Exact quote — what's missing]"
+  - key: "Q4"
+    text: "[Exact quote — friction reaction]"
+  - key: "Q5"
+    text: "[Exact quote — anti-model of success]"
+```

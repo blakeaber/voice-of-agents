@@ -1,0 +1,26 @@
+## Sampling Frame
+
+The research uses a 2D sampling matrix: 6 adoption-status rows × 5 context-segment columns.
+
+| Row | Adoption Status | Description |
+|-----|----------------|-------------|
+| 1 | adopter | Currently uses the product regularly |
+| 2 | partial-adopter | Uses it but inconsistently or for limited use cases |
+| 3 | abandoner | Tried it, used it, then stopped |
+| 4 | evaluated-and-rejected | Evaluated it seriously but chose not to adopt |
+| 5 | never-tried-aware | Aware of it but has never tried |
+| 6 | actively-anti | Actively advises others against it |
+
+| Column | Context Segment |
+|--------|----------------|
+| A | B2B-small (1-50 employees) |
+| B | B2B-mid (51-500 employees) |
+| C | B2B-large-regulated (500+ or regulated industry) |
+| D | B2C-high-autonomy (solo decision-maker) |
+| E | B2C-low-autonomy (requires others' buy-in) |
+
+**Row-count requirements:**
+- Rows 3, 4, 6 (abandoner, evaluated-and-rejected, actively-anti): **minimum 2 subjects each**
+- Rows 1, 2, 5: minimum 1 subject each
+
+Abandoners and refusers are structurally required — they answer adoption-friction questions that adopters cannot.

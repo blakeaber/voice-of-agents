@@ -1,0 +1,48 @@
+You are synthesizing a completed synthetic research session into a decision-oriented report for a founder or product engineer.
+
+Research question: {{ research_question }}
+Product context: {{ product_context }}
+
+Subjects interviewed: {{ subject_count }}
+Segments identified: {{ segments | length }}
+
+Segments:
+{% for seg in segments %}
+- {{ seg.name }}: {{ seg.description }} ({{ seg.subject_ids | length }} subjects)
+  JTBD: {{ seg.primary_jtbd }}
+  Failure mode: {{ seg.dominant_failure_mode }}
+  Gaps: {{ seg.gaps_vs_product_positioning }}
+{% endfor %}
+
+Hypothesis verdicts:
+{% for score in hypothesis_scores %}
+- {{ score.hypothesis_id }}: {{ score.verdict }}{% if score.supporting_quote_keys %} (evidence: {{ score.supporting_quote_keys | join(', ') }}){% endif %}
+
+{% endfor %}
+
+Personas:
+{% for sidecar in persona_sidecars %}
+- {{ sidecar.uxw_id }} {{ sidecar.name }}: {{ sidecar.jtbd }}
+  Constraint: {{ sidecar.constraint_profile }}
+  Failure: {{ sidecar.failure_or_abandonment_mode }}
+  Anti-model: {{ sidecar.anti_model_of_success }}
+{% endfor %}
+
+Produce a JSON object with exactly these fields. Be specific and actionable — not general research language.
+
+{
+  "top_findings": ["<3-5 specific behavioral findings, each one sentence>"],
+  "build_this_first": "<single most important feature or capability, one sentence, backed by the evidence above>",
+  "churn_triggers": ["<what would cause each user type to leave, one trigger per segment>"],
+  "validate_with": ["<3 concrete questions a founder could ask a real user in a 30-minute call>"],
+  "personas": [
+    {
+      "uxw_id": "<UXW-XX>",
+      "archetype": "<plain-English name for this type of user>",
+      "top_concern": "<what keeps them up at night, one sentence>",
+      "would_pay_if": "<the condition under which they would pay for this, one sentence>"
+    }
+  ]
+}
+
+Return ONLY the JSON object. No markdown, no explanation.
