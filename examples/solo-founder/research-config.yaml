@@ -1,0 +1,6 @@
+research_question: "Do developers abandon AI coding tools within the first month because the tool breaks their flow more often than it helps?"
+scope: "Solo founders and product engineers at early-stage startups (1-20 people), using AI coding tools actively, 2024-2026"
+slug: "ai-tool-abandonment"
+product_context: "A coding assistant that learns your codebase and helps you write, review, and test code faster"
+subject_count: 10
+anthropic_model: claude-haiku-4-5-20251001
