@@ -1,0 +1,79 @@
+# Persona Synthesis — {{ segment_name }}
+
+You are synthesizing a primary-research persona from behavioral evidence. This persona must be grounded in citations — every field must reference the subject evidence it comes from.
+
+## Segment Being Represented
+**Name:** {{ segment_name }}
+**Description:** {{ segment_description }}
+**Contributing subjects:** {{ subject_ids | join(', ') }}
+
+## Subject Evidence
+{% for subject in subjects %}
+---
+**{{ subject.subject_id }}** ({{ subject.adoption_status }}, {{ subject.context_segment }})
+
+JTBD: {{ subject.jtbd }}
+Adoption trajectory: {{ subject.adoption_trajectory }}
+Constraint profile: {{ subject.constraint_profile }}
+Failure mode: {{ subject.failure_or_abandonment_mode }}
+Decision topology: {{ subject.decision_topology }}
+Anti-model: {{ subject.anti_model_of_success }}
+
+Key quotes:
+{% for q in subject.verbatim_quote_bank %}
+  {{ q.key }}: "{{ q.text }}"
+{% endfor %}
+{% endfor %}
+
+## Synthesis Task
+
+Create a primary-research persona from this evidence. Rules:
+- Every field must end with `[source: evidence/{{ subject_ids[0] }}.md Q##]` or similar citation
+- The persona must be behaviorally differentiated from other segments — NOT demographically defined
+- Use the most representative subject quotes verbatim in verbatim_quote_bank
+- Minimum 2 subject IDs in subject_ids (reject if only 1 subject)
+
+Respond ONLY with YAML matching this schema:
+
+```yaml
+uxw_id: "UXW-{{ uxw_number }}"
+name: "[persona first name only — fictional but believable]"
+segment_source: "{{ segment_name }}"
+subject_ids:
+{% for sid in subject_ids %}
+  - "{{ sid }}"
+{% endfor %}
+
+jtbd: |
+  [Synthesized JTBD from evidence. [source: evidence/subject-NN.md Q##]]
+
+adoption_trajectory: |
+  [Synthesized trajectory. [source: evidence/subject-NN.md Q##]]
+
+last_concrete_episode: |
+  [Representative episode drawn from evidence. [source: evidence/subject-NN.md Q##]]
+
+constraint_profile: |
+  [Synthesized constraints. [source: evidence/subject-NN.md Q##]]
+
+failure_or_abandonment_mode: |
+  [Synthesized failure mode. [source: evidence/subject-NN.md Q##]]
+
+decision_topology: |
+  [Synthesized decision process. [source: evidence/subject-NN.md Q##]]
+
+anti_model_of_success: |
+  [What this persona explicitly avoids. [source: evidence/subject-NN.md Q##]]
+
+verbatim_quote_bank:
+  - key: "Q1"
+    text: "[exact quote from a contributing subject]"
+  - key: "Q2"
+    text: "[exact quote]"
+  - key: "Q3"
+    text: "[exact quote]"
+  - key: "Q4"
+    text: "[exact quote]"
+  - key: "Q5"
+    text: "[exact quote]"
+```

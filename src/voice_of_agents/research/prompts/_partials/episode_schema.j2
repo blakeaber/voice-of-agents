@@ -1,0 +1,26 @@
+## Required Episode Output Schema
+
+Respond ONLY with a YAML block matching this exact schema. No prose before or after.
+
+```yaml
+episode: "{{ episode_name }}"
+date: "{{ date_anchor }}"  # relative anchor, e.g. "3 weeks ago", "last quarter"
+
+pre_state: |
+  [What the situation was before the episode began: context, tools in use, pressure, goals.]
+
+steps:
+  - step: "[action name]"
+    tool: "[software tool or 'none']"
+    input: "[what they started with]"
+    output: "[what they produced]"
+    time: "[estimated minutes]"
+    blocker: "[friction encountered or 'none']"
+  # ... repeat for each step
+
+post_state: |
+  [What the situation was after the episode: outcome, what changed, what was left unresolved.]
+
+what_i_wished_existed: |
+  [In their own words: what capability, tool, or shortcut would have made this episode dramatically easier.]
+```
