@@ -1,0 +1,6 @@
+research_question: "Do developer experience practitioners abandon AI-assisted code review tools because the suggestions conflict with their team's established patterns?"
+scope: "DX practitioners, platform engineers, and developer advocates at companies with 50-500 engineers, 2024-2026"
+slug: "dx-tool-adoption"
+product_context: "An AI-assisted code review tool that learns team conventions and enforces them in real time"
+subject_count: 10
+anthropic_model: claude-haiku-4-5-20251001

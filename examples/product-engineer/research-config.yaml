@@ -1,0 +1,6 @@
+research_question: "Do product engineers abandon roadmap prioritization tools because they can't connect user pain to engineering effort estimates?"
+scope: "Product engineers and engineering managers at B2B SaaS companies (20-500 employees), actively using roadmap tools, 2024-2026"
+slug: "roadmap-tool-friction"
+product_context: "A roadmap prioritization tool that connects user research signals to engineering cost estimates"
+subject_count: 10
+anthropic_model: claude-opus-4-7
