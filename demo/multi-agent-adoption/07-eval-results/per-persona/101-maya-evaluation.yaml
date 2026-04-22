@@ -1,0 +1,83 @@
+persona:
+  id: 101
+  name: Maya
+  role: Research-Derived Persona
+  industry: Technology
+  experience_years: null
+  tier: FREE
+  income: null
+run_date: '20260421_193425'
+generation_method: llm
+scores:
+  overall: 4
+  goal_achievement: 2
+  efficiency: 3
+  trust: 2
+  learnability: 5
+  value_for_price: 6
+narrative:
+  first_impression: "The interface feels modern and the sidebar is clean, but I immediately\
+    \ hit a wall\u2014there's no way to understand what this tool actually does before\
+    \ being pushed into a workflow creation. I came here to evaluate whether Rooben\
+    \ Pro solves my hiring problem, not to start building something blind. That's\
+    \ backwards from how I approach any new tool.\n"
+  highlight_moment: "The \"New Project\" flow with the open-ended question \"What\
+    \ needs doing?\" shows the tool is designed around conversational input, which\
+    \ is promising. The fact that it let me type a full scenario about hiring a multi-agent\
+    \ workflow tool without truncating or rejecting my input felt natural and efficient\u2014\
+    that's the only moment I thought \"okay, this might work.\"\n"
+  frustration_moment: "After typing my objective, clicking \"Start\" didn't reveal\
+    \ anything about what the tool would do with my input or what output I should\
+    \ expect. I had no visibility into the product's capabilities, architecture, or\
+    \ whether it actually handles workflow orchestration at scale. The sidebar has\
+    \ 10 options but none of them answered the question \"What does this do?\" There's\
+    \ no FAQ, no feature overview, no demo\u2014just immediate project creation. That's\
+    \ a trust killer.\n"
+  feature_request: "Add a \"How it works\" or \"See it in action\" section that shows\
+    \ me a real example of a completed workflow\u2014what the output looks like, how\
+    \ agents interact, what quality looks like. Let me understand the product before\
+    \ I commit my scenario to it. Right now it feels like walking into a kitchen blindfolded\
+    \ and being told to cook.\n"
+  objection: 'I have zero income and the free tier is appealing on paper, but I won''t
+    use a tool I don''t trust. If I can''t understand how Rooben Pro generates its
+    outputs or validates them before I rely on them for hiring decisions, I''m better
+    off doing this manually or finding something with transparent workflows. Time
+    saved means nothing if the output is wrong.
+
+    '
+  would_recommend: "I'd mention it to other solo operators, but only with a major\
+    \ caveat: \"The core idea is smart\u2014conversational workflow creation\u2014\
+    but don't use it until you've tested it on something low-stakes. The product doesn't\
+    \ explain itself, so you're guessing whether it's right for your actual problem.\"\
+    \n"
+verdict:
+  would_pay: false
+  would_recommend: false
+  retention_risk: high
+unmet_needs:
+- need: Understand the product's actual capabilities and output quality before committing
+    a real scenario
+  pain_theme: D
+  severity: 9
+  persona_quote: I can't trust a tool that doesn't show me how it works. If I'm using
+    this to hire people or build workflows, I need to see examples of what success
+    looks like first.
+- need: Access product documentation, feature overview, or demo without entering the
+    creation flow
+  pain_theme: A
+  severity: 8
+  persona_quote: Every tool I use professionally has a 'Learn' section or a demo video.
+    This one just throws me into project creation. Where's the retrieval of basic
+    information about what I'm actually using?
+- need: Visibility into how the tool processes my input and generates recommendations
+  pain_theme: C
+  severity: 9
+  persona_quote: "Context matters\u2014I need to know if Rooben understands the nuance\
+    \ of my hiring scenario or if it's just pattern-matching to generic workflows.\
+    \ Without that transparency, I'm flying blind."
+- need: A clear success path that shows me what to expect after I click 'Start'
+  pain_theme: C
+  severity: 7
+  persona_quote: I typed my scenario and then... nothing happened. No preview, no
+    confirmation, no 'here's what we'll generate.' The UX stops the moment I finish
+    typing.

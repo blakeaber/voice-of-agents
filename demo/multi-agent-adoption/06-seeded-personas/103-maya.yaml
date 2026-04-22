@@ -1,0 +1,126 @@
+id: 103
+name: Maya
+role: Research-Derived Persona
+industry: Technology
+segment: b2c
+tier: FREE
+org_size: 50
+ai_history: 'Discovered the tool through a technical community channel (HN, Latent
+  Space, YouTube indie
+
+  hacker), signed up same-day on a free or low-tier plan, built or imported a workflow
+  within
+
+  hours. First runs partially worked. Within 10-15 days, a coordination failure —
+  an upstream
+
+  agent producing malformed or stale output that a downstream agent accepted without
+
+  validation — triggered a retreat. They did not churn. Instead they shrank scope:
+  kept the
+
+  simplest, most-verifiable workflow in use and either dropped the higher-value pipeline
+  back
+
+  to manual single-prompt execution, cherry-pick one agent at a time, or froze pilot
+
+  expansion. Stable but ceiling-constrained usage persists. [source: evidence/subject-03.md
+  Q1] [source: evidence/subject-04.md Q2] [source: evidence/subject-12.md Q1]
+
+  '
+mindset: 'Hiring a multi-agent workflow tool to offload repetitive, context-heavy
+  drafting work —
+
+  feedback triage, listing/caption generation, or compliance-adjacent drafting — so
+  that a
+
+  multi-hour chore collapses into a trigger-and-review step, without replacing the
+  operator''s
+
+  judgment on the final output. The goal is reliable drafts they can verify in minutes,
+  not
+
+  autonomous end-to-end execution. [source: evidence/subject-03.md Q2] [source: evidence/subject-04.md
+  Q2] [source: evidence/subject-12.md Q2]
+
+  '
+pain_points:
+- description: 'Time is the dominant constraint — cannot spend a weekend debugging
+    orchestration. Budget is
+
+    secondary but real (monthly gut-check against concrete ROI; trials on free tier,
+    never
+
+    annual commit). Verification cost is the binding economic variable: if checking
+    every
+
+    agent''s work takes longer than doing it manually, adoption collapses. Downstream
+
+    stakeholders (a non-technical co-founder, a brand-voice helper, an InfoSec reviewer,
+    an
+
+    auditor) cannot debug agent output, which raises the blast radius of silent failures.
+    BATNA
+
+    is always "I''ll just write the script / do it by hand," and it''s credible. [source:
+    evidence/subject-03.md Q2] [source: evidence/subject-04.md Q2] [source: evidence/subject-12.md
+    Q2]
+
+    '
+  impact: Derived from synthetic research — quantify with real users
+- description: 'Partial abandonment via scope collapse, not churn. The triggering
+    pattern is always the
+
+    same: an agent accepts malformed, hallucinated, or stale input from an upstream
+    agent
+
+    without validation, produces a confident-looking output, and nothing in the system
+    signals
+
+    that a handoff was malformed. They retain the workflow where wrongness is self-evident
+    on
+
+    read (a PR description, a single listing draft, a low-risk questionnaire) and
+    drop or
+
+    freeze the workflow where wrongness is only detectable by cross-checking source
+    of truth.
+
+    They keep paying because cancellation cost exceeds the subscription. [source:
+    evidence/subject-03.md Q3] [source: evidence/subject-03.md Q4] [source: evidence/subject-12.md
+    Q3]
+
+    '
+  impact: Leads to abandonment — high severity
+pain_themes: []
+unmet_need: 'A tool that sounds confident while being wrong — "confidently incomplete,"
+  "lie politely,"
+
+  "confidently wrong." A pipeline of green checkmarks over an output that silently
+  dropped
+
+  inputs, hallucinated a detail, or propagated a stale doc. They would categorically
+  rather
+
+  have a loud error than a clean-looking summary of nothing. The worst outcome is
+  a bad
+
+  output reaching a consequential reader — a co-founder, a customer, an auditor —
+  because no
+
+  mechanism flagged the malformed handoff between agents. [source: evidence/subject-03.md
+  Q5] [source: evidence/subject-04.md Q5] [source: evidence/subject-12.md Q5]
+
+  '
+trust_requirements: []
+voice:
+  skepticism: moderate
+  vocabulary: general
+  motivation: efficiency
+  price_sensitivity: moderate
+metadata:
+  source: generated
+  research_basis:
+  - research:multi-agent-adoption:UXW-04
+  validation_status: draft
+  legacy_id: UXW-04
