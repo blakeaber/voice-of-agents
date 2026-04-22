@@ -22,7 +22,7 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
     try:
         signup_data = api.signup(
             email=email,
-            org_name=f"{persona.name}'s Org",
+            org_name=f"{persona.name}-{persona.id:03d} Org",
             display_name=persona.name,
         )
         result["user_id"] = signup_data.get("user_id")
@@ -35,7 +35,7 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
             alt_email = f"{persona.id:02d}-{int(time.time()) % 10000}@voa-test.dev"
             signup_data = api.signup(
                 email=alt_email,
-                org_name=f"{persona.name}'s Org",
+                org_name=f"{persona.name}-{persona.id:03d}-alt Org",
                 display_name=persona.name,
             )
             result["user_id"] = signup_data.get("user_id")
@@ -47,19 +47,9 @@ def seed_persona(persona: Persona, api: TargetAPI) -> dict:
             logger.warning("Could not create account for %s: %s", persona.id, e2)
             return result
 
-    goals = _derive_goals(persona)
-    if goals:
-        try:
-            api.save_onboarding_step("goals", {"goals": goals})
-            result["goals"] = goals
-        except Exception as e:
-            logger.warning("Failed to set goals for %s: %s", persona.id, e)
-
-    try:
-        api.save_onboarding_step("complete", {})
-    except Exception:
-        pass
-
+    # Do NOT mark onboarding complete via API — let the browser experience the
+    # gradual onboarding flow naturally, as a real new user would.
+    result["goals"] = _derive_goals(persona)
     return result
 
 

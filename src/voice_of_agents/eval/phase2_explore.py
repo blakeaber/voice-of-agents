@@ -19,28 +19,52 @@ logger = logging.getLogger(__name__)
 
 
 def _load_goals_for_persona(persona: Persona, config: VoAConfig) -> list[ExplorationGoal]:
-    """Load exploration goals from PersonaWorkflowMapping, or return empty list."""
+    """Load exploration goals from PersonaWorkflowMapping, or derive from persona profile."""
     workflows_dir = config.workflows_path
-    if not workflows_dir.exists():
-        return []
+    if workflows_dir.exists():
+        for wf_path in workflows_dir.glob(f"PWM-{persona.id:02d}-*.yaml"):
+            try:
+                data = yaml.safe_load(wf_path.read_text())
+                goals = []
+                for g in data.get("goals", []):
+                    vm = g.get("value_metrics") or {}
+                    goals.append(ExplorationGoal(
+                        goal=g.get("title", ""),
+                        trigger=g.get("trigger", ""),
+                        success_definition=g.get("success_statement", ""),
+                        efficiency_baseline=vm.get("time_saved", "") if isinstance(vm, dict) else "",
+                    ))
+                if goals:
+                    return goals
+            except Exception as e:
+                logger.warning("Failed to load workflow mapping %s: %s", wf_path, e)
 
-    for wf_path in workflows_dir.glob(f"PWM-{persona.id:02d}-*.yaml"):
-        try:
-            data = yaml.safe_load(wf_path.read_text())
-            goals = []
-            for g in data.get("goals", []):
-                vm = g.get("value_metrics") or {}
-                goals.append(ExplorationGoal(
-                    goal=g.get("title", ""),
-                    trigger=g.get("trigger", ""),
-                    success_definition=g.get("success_statement", ""),
-                    efficiency_baseline=vm.get("time_saved", "") if isinstance(vm, dict) else "",
-                ))
-            return goals
-        except Exception as e:
-            logger.warning("Failed to load workflow mapping %s: %s", wf_path, e)
+    # Fall back to goals derived from the persona's profile
+    return _derive_goals_from_persona(persona)
 
-    return []
+
+def _derive_goals_from_persona(persona: Persona) -> list[ExplorationGoal]:
+    """Derive exploration goals from persona mindset and pain points when no PWM exists."""
+    mindset_summary = (persona.mindset or "")[:200].split(".")[0]
+    pain_summary = ""
+    if persona.pain_points:
+        pain_summary = (persona.pain_points[0].description or "")[:150].split(".")[0]
+
+    goals = [
+        ExplorationGoal(
+            goal=f"Explore the core product and attempt to complete a primary task",
+            trigger=mindset_summary or f"Evaluate whether this tool fits {persona.role} workflows",
+            success_definition="Successfully navigate the main interface and attempt at least one core workflow",
+            efficiency_baseline="",
+        ),
+        ExplorationGoal(
+            goal="Understand what the product does and whether it solves the key problem",
+            trigger=pain_summary or f"Determine if the product addresses {persona.name}'s primary pain point",
+            success_definition="Find and read key feature explanations; locate any workflow or automation builder",
+            efficiency_baseline="",
+        ),
+    ]
+    return goals
 
 
 def explore_personas(personas: list[Persona], config: VoAConfig) -> None:

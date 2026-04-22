@@ -151,7 +151,8 @@ def _append_findings(findings: list[dict], path: Path, eval_count: int) -> None:
         lines.append(f"### {f['id']}: {f['title']}")
         lines.append(f"**Type:** {f['type']} | **Theme:** {f['classification']['pain_theme']} "
                       f"| **Severity:** {f['impact']['severity']} | **Breadth:** {f['impact']['breadth']}")
-        lines.append(f"**Personas:** {', '.join(f['evidence']['personas_affected'])} "
+        personas_list = [str(p) for p in f['evidence']['personas_affected']]
+        lines.append(f"**Personas:** {', '.join(personas_list)} "
                       f"({f['evidence']['persona_count']}/{eval_count})")
         lines.append(f"**Status:** {f['status']}")
 
