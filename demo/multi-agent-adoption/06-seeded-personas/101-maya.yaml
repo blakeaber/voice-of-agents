@@ -1,0 +1,85 @@
+id: 101
+name: Maya
+role: Research-Derived Persona
+industry: Technology
+segment: b2c
+tier: FREE
+org_size: 50
+ai_history: 'Discovers tools through podcasts, HN Show-HN threads, YouTube walkthroughs,
+  and indie-hacker Slack communities. Signs up for free tier the same night, rebuilds
+  a real weekly pipeline from a template on a Saturday, iterates prompts via conversational
+  refine for a few days, then flips it live against actual production traffic (trial
+  IS prod). Inflection happens within 4–14 days when a multi-agent run silently ships
+  a plausible-but-wrong output — a fabricated arXiv link, a "reactive celadon" mug,
+  hallucinated pricing numbers, a greenwashed B-Corp claim. Response is either full
+  cancellation, partial retreat to using one agent as a draft tool, or rewriting the
+  whole thing as a single Python file with one narrowly-scoped LLM call. [source:
+  evidence/subject-06.md adoption_trajectory] [source: evidence/subject-11.md adoption_trajectory]
+  [source: evidence/subject-04.md adoption_trajectory]
+
+  '
+mindset: 'A solo operator hiring a multi-agent workflow tool to collapse a recurring
+  weekly content/production chore (newsletter digest, listing factory, benchmark report)
+  into something she can trigger and walk away from — research → write → QA → publish
+  without babysitting it at 6am Sunday or 11pm Monday. She explicitly does NOT want
+  to hire a tool to "think"; she wants deterministic execution of a pipeline she already
+  understands, so she can spend her scarce hours on original work instead of orchestration
+  glue. [source: evidence/subject-11.md JTBD] [source: evidence/subject-06.md JTBD]
+  [source: evidence/subject-02.md JTBD]
+
+  '
+pain_points:
+- description: 'Solo operator, team size 1 (occasionally 1.5 with a part-time helper
+    or partner who sees the bill). Time is the binding constraint — Sundays and late
+    weeknights only, no Saturday to "learn the tool." Budget is real but not the blocker
+    ($29–$400/mo range); cancels mid-month without ceremony. No approval chain, personal
+    card. No compliance layer, but reputational risk to 140–4,200 paying subscribers
+    is existential — one bad send costs real churn. No QA step available because there''s
+    no one to delegate verification to. Tech comfort is high (Python, can read a DAG,
+    writes her own scrapers) but she refuses to maintain a third orchestrator on top
+    of Zapier/Notion/Shopify/Beehiiv. [source: evidence/subject-11.md constraint_profile]
+    [source: evidence/subject-04.md constraint_profile] [source: evidence/subject-02.md
+    constraint_profile]
+
+    '
+  impact: Derived from synthetic research — quantify with real users
+- description: 'The abandonment trigger is never the hallucination itself — she expects
+    LLM error as a baseline. It''s the discovery that multi-agent coordination LAUNDERS
+    a single upstream hallucination through downstream "validations," so a fabricated
+    field emerges as a confident falsehood with a green QA checkmark. Partial correctness
+    (80% fine, one fabricated item buried mid-output) is worse than a crash, because
+    a crash she catches before publish and a plausible lie ships under her name. She''d
+    rather have one dumb LLM call she doesn''t trust than four agents that lie to
+    her smoothly. Retreat path is either (a) cancel and rewrite as a single Python
+    file with one LLM call plus regex/diff guardrails, or (b) cherry-pick one agent''s
+    output at a time, copy into Notion, eyeball, paste by hand. [source: evidence/subject-06.md
+    failure_mode] [source: evidence/subject-11.md failure_mode] [source: evidence/subject-04.md
+    failure_mode]
+
+    '
+  impact: Leads to abandonment — high severity
+pain_themes: []
+unmet_need: 'Explicitly avoids any tool that is right 85% of the time — "the death
+  zone for a solo," because 85% means she still has to read every word, which means
+  she saved zero time AND she''s one bad week from losing customers. Avoids tools
+  that sound confident while being wrong, tools with opaque agent logs where debugging
+  one dropped field takes an hour, and tools that require her to become a prompt engineer
+  to keep them working. Takes "flaky and honest" over "smooth and occasionally lying"
+  every time. The nightmare outcome is being the kind of indie hacker whose newsletter/store
+  gets a reputation for AI slop while she pays $49/mo for the illusion of automation.
+  [source: evidence/subject-11.md Q5] [source: evidence/subject-06.md Q5] [source:
+  evidence/subject-02.md Q5]
+
+  '
+trust_requirements: []
+voice:
+  skepticism: moderate
+  vocabulary: general
+  motivation: efficiency
+  price_sensitivity: moderate
+metadata:
+  source: generated
+  research_basis:
+  - research:multi-agent-adoption:UXW-02
+  validation_status: draft
+  legacy_id: UXW-02

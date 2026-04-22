@@ -1,0 +1,53 @@
+persona:
+  id: 103
+  name: Maya
+  role: Research-Derived Persona
+  industry: Technology
+  experience_years: null
+  tier: FREE
+  income: null
+run_date: '20260421_193433'
+generation_method: template
+scores:
+  overall: 5
+  goal_achievement: 3
+  efficiency: 5
+  trust: 6
+  learnability: 5
+  value_for_price: 4
+narrative:
+  first_impression: "The signup was quick and it asked what I care about \u2014 technology\
+    \ knowledge management. That's a good start."
+  highlight_moment: I was able to navigate to 2 different pages. The sidebar was focused
+    on what's relevant to my work.
+  frustration_moment: I came here to explore the core product and attempt to complete
+    a primary task, but I couldn't find a clear path to do that. The navigation didn't
+    match what I was looking for.
+  feature_request: 'I need a way to direct navigation for: understand what the product
+    does and whether it solves the key problem. That''s the difference between a demo
+    and something I''d actually use daily.'
+  objection: At $0/month against my $0/year income, I need to see clear ROI in the
+    first month. Right now it's too early to tell.
+  would_recommend: "I'd mention it to a colleague, but with caveats \u2014 it's promising\
+    \ but not quite ready for my technology workflow."
+verdict:
+  would_pay: false
+  would_recommend: false
+  retention_risk: medium
+  upgrade_trigger: When core features work reliably end-to-end without workarounds
+  churn_trigger: If it gives incorrect technology guidance, or if I can't import my
+    existing data within the trial period
+unmet_needs:
+- need: 'No sidebar link matches objective: Understand what the product does and whether
+    it solves the key problem'
+  pain_theme: A
+  severity: 7
+  persona_quote: I expected to be able to understand what the product does and whether
+    it solves the k from the sidebar, but I don't see an obvious path.
+- need: 'Direct navigation for: Understand what the product does and whether it solves
+    the key problem'
+  pain_theme: A
+  severity: 7
+  persona_quote: 'I expected to be able to direct navigation for: understand what
+    the product does and whether it solves the key problem, but it''s not available.
+    For my technology work, this is essential.'

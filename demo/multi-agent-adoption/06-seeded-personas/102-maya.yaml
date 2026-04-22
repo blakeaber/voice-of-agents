@@ -1,0 +1,120 @@
+id: 102
+name: Maya
+role: Research-Derived Persona
+industry: Technology
+segment: b2c
+tier: FREE
+org_size: 50
+ai_history: 'Heard about the tool through technical channels (Hacker News threads,
+  Twitter/X
+
+  discussions of CrewAI/AutoGen, podcast ads, internal hack-day demos of LangGraph).
+
+  Either signed up for a trial and dug in for ~1-2 weeks against replayed real data,
+
+  or signed up for access and never logged in past email verification — both paths
+
+  end in rejection shaped by prior exposure to multi-agent failures, their own or
+  a
+
+  peer''s. Already pattern-matched the category as "demo-grade until proven otherwise"
+
+  before the first click. [source: evidence/subject-08.md Adoption trajectory;
+
+  evidence/subject-09.md Adoption trajectory]
+
+  '
+mindset: 'Hire a multi-agent automation to replace brittle chains of scripts and point-to-point
+
+  integrations for a reasoning-heavy internal pipeline — e.g., ticket triage with
+
+  enrichment and draft generation, or weekly customer-health synthesis across Zendesk,
+
+  Mixpanel/Snowflake, and Salesforce — so a lean technical team can stop babysitting
+
+  the pipeline and spend their time on decisions rather than data-gathering or
+
+  middle-of-the-night debugging. [source: evidence/subject-08.md JTBD; evidence/subject-09.md
+  JTBD]
+
+  '
+pain_points:
+- description: 'Tiny operational surface — 2 engineers on a 6-person startup, or a
+    solo internal-tools
+
+    owner at a ~120-person Series B — so whoever adopts the tool also owns it on-call.
+
+    Budget is not the binding constraint (happy to pay $100-$200/mo); debuggability
+    and
+
+    data handling are. Hard constraints include SOC2-friendly data flow, data that
+
+    can''t leave the VPC without a DPA, and the rule that any automation touching
+
+    customer-facing output must be debuggable by a non-author engineer within ~10
+    minutes.
+
+    Significant tooling gravity toward existing stacks (n8n, Airflow, dbt, Python,
+
+    Postgres, OpenAI API). [source: evidence/subject-08.md Constraint profile;
+
+    evidence/subject-09.md Constraint profile]
+
+    '
+  impact: Derived from synthetic research — quantify with real users
+- description: 'Abandonment is triggered not by a loud failure but by a second plausible-but-wrong
+
+    output after a "refine" attempt, which confirms the abstraction is leaky in ways
+
+    the user can''t reason about. The core refusal is epistemic: they cannot see the
+
+    literal prompt one agent sent another, cannot diff the handoff, and cannot
+
+    code-review a conversation. Once the category is tagged as "confidently wrong
+    in
+
+    ways I can''t reconstruct," they stop investing — either closing the tab mid-trial
+
+    or never starting. They fall back to uglier, more verbose tooling (printf-debugged
+
+    n8n, 400-line single-prompt Python cron) specifically because those fail loudly
+
+    and legibly. [source: evidence/subject-08.md Failure mode Q1, Q2, Q3;
+
+    evidence/subject-09.md Failure mode Q1, Q2, Q3]
+
+    '
+  impact: Leads to abandonment — high severity
+pain_themes: []
+unmet_need: 'The explicit nightmare is a tool that shifts work from "doing the task"
+  to
+
+  "auditing the machine" — automation that produces plausible-looking but subtly
+
+  wrong outputs that get acted on (a cancelled customer treated as active in an
+
+  outbound draft, a healthy account flagged at-risk to the CS team) and whose
+
+  reasoning lives in ephemeral inter-agent messages that can''t be reconstructed on
+
+  Tuesday morning. They would take a hundred loud, obvious errors over one
+
+  silent partial correctness. Green checks on a DAG are anti-signal, not
+
+  reassurance. [source: evidence/subject-08.md Anti-model Q5;
+
+  evidence/subject-09.md Anti-model Q5]
+
+  '
+trust_requirements: []
+voice:
+  skepticism: moderate
+  vocabulary: general
+  motivation: efficiency
+  price_sensitivity: moderate
+metadata:
+  source: generated
+  research_basis:
+  - research:multi-agent-adoption:UXW-03
+  validation_status: draft
+  legacy_id: UXW-03

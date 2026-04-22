@@ -1,0 +1,8 @@
+research_question: "Do early adopters of multi-agent workflow tools abandon after initial setup because agent coordination failures erode trust faster than successful automations build it?"
+scope: "Prosumer developers, indie hackers, and technical founders in the US actively using or evaluating AI workflow automation tools, 1-10 person teams, 2025-2026"
+slug: "multi-agent-adoption"
+product_context: "Rooben Pro — a multi-agent workflow orchestration platform that decomposes tasks into coordinated agent pipelines, with a visual DAG interface and a conversational refine flow for iterating on workflow design"
+subject_count: 12
+anthropic_model: claude-opus-4-7
+output_dir: demo/multi-agent-adoption
+session_dir: demo/multi-agent-adoption
