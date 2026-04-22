@@ -69,13 +69,23 @@ def _llm_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     exp_years = persona.experience_years or 0
     income = persona.income or 0
 
+    if not journey_text.strip():
+        journey_text = (
+            "You visited the landing page but could not complete account creation "
+            "(signup failed). You only saw the marketing copy and the signup form. "
+            "You never made it inside the product."
+        )
+        experience_context = "Based on this first-contact experience (landing page + failed signup), provide your honest evaluation."
+    else:
+        experience_context = "Based on THIS SPECIFIC experience (not hypothetical), provide your honest evaluation."
+
     prompt = f"""You are {persona.name}, a {persona.role} with {exp_years} years of experience in {persona.industry}. Your annual income is ${income:,}. {voice['motivation_framing']}
 
 You just tried Rooben Pro for the first time. Here's exactly what happened during your session:
 
 {journey_text}
 
-Based on THIS SPECIFIC experience (not hypothetical), provide your honest evaluation.
+{experience_context}
 
 SCORING (1-10 each):
 - overall: Your overall impression
@@ -411,7 +421,7 @@ def _build_voice_profile(persona: Persona) -> dict:
         "motivation_framing": motivation,
         "comparison_baseline": comparison,
         "trust_bar": trust_bar,
-        "price_anchor": f"${_monthly_price(persona)}/mo against ${persona.income:,}/yr income",
+        "price_anchor": f"${_monthly_price(persona)}/mo against ${persona.income:,}/yr income" if persona.income else f"${_monthly_price(persona)}/mo",
     }
 
 
@@ -424,11 +434,11 @@ def _validate_evaluation(evaluation: dict) -> list[str]:
     narrative = evaluation.get("narrative", {})
     verdict = evaluation.get("verdict", {})
 
-    overall = scores.get("overall", 5)
-    goal = scores.get("goal_achievement", 5)
-    trust = scores.get("trust", 5)
-    value = scores.get("value_for_price", 5)
-    efficiency = scores.get("efficiency", 5)
+    overall = scores.get("overall") or 5
+    goal = scores.get("goal_achievement") or 5
+    trust = scores.get("trust") or 5
+    value = scores.get("value_for_price") or 5
+    efficiency = scores.get("efficiency") or 5
 
     # Goal achievement vs overall
     if goal <= 3 and overall >= 7:
