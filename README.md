@@ -132,8 +132,11 @@ voa eval init --target http://localhost:3000 --api http://localhost:8420
 voa eval run [--all]
 voa eval status
 voa eval backlog
+voa eval capabilities
 voa eval diff
 ```
+
+The eval browser layer is LLM-driven — a Claude Sonnet 4.6 vision agent navigates the live app, selects elements, and decides when an exploration goal has succeeded or stalled. It is not a Playwright test runner.
 
 ### Design phase
 
@@ -197,6 +200,10 @@ print(estimate.display())
 | [Solo founder](examples/solo-founder/) | Pre-PMF solo founders | quickstart → run → decision-report |
 | [Product engineer](examples/product-engineer/) | Product engineers and PMs | `quick_research()` one-liner, output parsing |
 | [DX practitioner](examples/dx-practitioner/) | Platform engineers, developer advocates | Full research → eval bridge |
+
+### Worked example: full pipeline output
+
+[`demo/multi-agent-adoption/`](demo/multi-agent-adoption/) captures a complete end-to-end run of the pipeline against a real product — research config, decision report, 4 seeded eval personas, browser exploration logs, per-persona evaluations, focus-group analysis, and prioritized backlog. Read it top-to-bottom before running your own.
 
 ---
 
