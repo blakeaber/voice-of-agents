@@ -1,0 +1,93 @@
+persona_id: 100
+persona_name: Priya
+run_timestamp: '20260421_193420'
+target_url: http://localhost:3000
+objectives_attempted: 2
+objectives:
+- persona_id: '100'
+  persona_name: Priya
+  run_timestamp: '20260421_193420'
+  objective: Explore the core product and attempt to complete a primary task
+  objective_trigger: 'Hire a multi-agent workflow tool to automate multi-step research,
+    synthesis, and drafting pipelines
+
+    (escalation triage, voice-of-customer briefs, claims extraction, SOC2 evidence,
+    vendor questionnaire'
+  objective_success: Successfully navigate the main interface and attempt at least
+    one core workflow
+  outcome: partial
+  pages_visited:
+  - http://localhost:3000/
+  - http://localhost:3000/workflows/new?flow=brief
+  journey:
+  - action: Open http://localhost:3000
+    observation: Redirected to http://localhost:3000/
+    reaction: I'm on the main page. Let me figure out where to go.
+    page_url: http://localhost:3000/
+    latency_ms: 582
+    screenshot: ''
+  - action: Scan sidebar navigation
+    observation: "Found 10 nav links: ['HHome', 'WProjects', '+New Project', '\U0001F4DA\
+      Your Playbook', '\U0001F4CBTemplates', '\U0001F465Your Team', '\U0001F50DFind\
+      \ Expert', '\u2713Quality', '\U0001F916My Expertise', '\u2699Settings']"
+    reaction: Clean sidebar with 10 items. I can see 3 that match what I need.
+    page_url: http://localhost:3000/
+    latency_ms: 0
+    screenshot: ''
+  - action: Navigate to '+New Project' (/workflows/new?flow=brief)
+    observation: "Page: Rooben Pro. Headings: ['What needs doing?']. Input fields:\
+      \ ['Review this ']. Buttons: ['Skip questions \u2192 run now', 'Start \u2192\
+      ']"
+    reaction: I see an input field (Review this ). Let me try entering something related
+      to my work.
+    page_url: http://localhost:3000/workflows/new?flow=brief
+    latency_ms: 563
+    screenshot: ''
+  - action: Type 'Hire a multi-agent workflow tool to automate multi-step rese...'
+      into input field
+    observation: "After typing: Headings: ['What needs doing?']. Buttons: ['Skip questions\
+      \ \u2192 run now', 'Start \u2192']"
+    reaction: "Results appeared. I can see options: Skip questions \u2192 run now,\
+      \ Start \u2192. Let me see if any match what I need."
+    page_url: http://localhost:3000/workflows/new?flow=brief
+    latency_ms: 2058
+    screenshot: ''
+  friction_points: []
+  surprises: []
+  missing_capabilities: []
+- persona_id: '100'
+  persona_name: Priya
+  run_timestamp: '20260421_193420'
+  objective: Understand what the product does and whether it solves the key problem
+  objective_trigger: Mid-market to regulated-enterprise context
+  objective_success: Find and read key feature explanations; locate any workflow or
+    automation builder
+  outcome: blocked
+  pages_visited:
+  - http://localhost:3000/
+  journey:
+  - action: Open http://localhost:3000
+    observation: Redirected to http://localhost:3000/
+    reaction: I'm on the main page. Let me figure out where to go.
+    page_url: http://localhost:3000/
+    latency_ms: 556
+    screenshot: ''
+  - action: Scan sidebar navigation
+    observation: "Found 10 nav links: ['HHome', 'WProjects', '+New Project', '\U0001F4DA\
+      Your Playbook', '\U0001F4CBTemplates', '\U0001F465Your Team', '\U0001F50DFind\
+      \ Expert', '\u2713Quality', '\U0001F916My Expertise', '\u2699Settings']"
+    reaction: Clean sidebar with 10 items. I can see 3 that match what I need.
+    page_url: http://localhost:3000/
+    latency_ms: 0
+    screenshot: ''
+  friction_points:
+  - type: gap
+    description: 'No sidebar link matches objective: Understand what the product does
+      and whether it solves the key problem'
+    severity: high
+    persona_quote: I expected to be able to understand what the product does and whether
+      it solves the k from the sidebar, but I don't see an obvious path.
+  surprises: []
+  missing_capabilities:
+  - 'Direct navigation for: Understand what the product does and whether it solves
+    the key problem'

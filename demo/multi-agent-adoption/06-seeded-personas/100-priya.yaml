@@ -1,0 +1,147 @@
+id: 100
+name: Priya
+role: Research-Derived Persona
+industry: Technology
+segment: b2c
+tier: FREE
+org_size: 50
+ai_history: 'Awareness typically arrives via technical channels (Latent Space podcast,
+  Hacker News, peer
+
+  forwards). The persona spins up a sandbox or solo trial within days, refuses sales-gated
+  demos,
+
+  and builds a real pilot DAG within the first week against synthetic or low-risk
+  data. The
+
+  inflection point — in either direction — always arrives at a specific coordination
+  failure
+
+  between agents (a dropped field, a hallucinated citation, a stale doc, a cosigned
+  lie). Adopters
+
+  keep paying only when they can inspect the exact token where context was lost and
+  bolt on a
+
+  schema contract themselves; abandoners and rejectors walk the moment a plausible-but-wrong
+  output
+
+  passes a peer agent''s check. Partial adopters freeze scope at the first such incident
+  rather
+
+  than expand. [source: evidence/subject-01.md Q1] [source: evidence/subject-05.md
+  Q1]
+
+  [source: evidence/subject-12.md Q1]
+
+  '
+mindset: 'Hire a multi-agent workflow tool to automate multi-step research, synthesis,
+  and drafting pipelines
+
+  (escalation triage, voice-of-customer briefs, claims extraction, SOC2 evidence,
+  vendor questionnaires)
+
+  that currently burn 6-10 hours/week of senior engineering or PM time — without introducing
+  silent
+
+  data corruption or shifting verification cost back onto the human reviewer. The
+  job is eliminating
+
+  context-gathering toil, not eliminating judgment; every inter-agent handoff must
+  be auditable and
+
+  every probabilistic step must be gated by deterministic verification before it causes
+  side effects.
+
+  [source: evidence/subject-01.md Q5] [source: evidence/subject-10.md Q2] [source:
+  evidence/subject-12.md Q5]
+
+  '
+pain_points:
+- description: 'Mid-market to regulated-enterprise context. Discretionary budget typically
+    $500/mo solo,
+
+    higher amounts route through VP/procurement. SOC2 Type II is table stakes; HIPAA/PCI/BAA/self-
+
+    hosted-VPC required in regulated segments. Team is small (4-6 engineers) with
+    no dedicated
+
+    ML/AI ops headcount, so tools cannot require a full-time maintainer. Time budget
+    for tooling
+
+    experiments is ~20% of one engineer''s week. Hard floor: inter-agent handoffs
+    must be logged,
+
+    replayable, and auditable; no probabilistic step can be terminal — deterministic
+    code must own
+
+    the go/no-go before any side effect. [source: evidence/subject-01.md Q2]
+
+    [source: evidence/subject-07.md Q3] [source: evidence/subject-10.md Q2] [source:
+    evidence/subject-12.md Q3]
+
+    '
+  impact: Derived from synthetic research — quantify with real users
+- description: 'Abandons (or freezes scope) the moment coordination between agents
+    produces a confident,
+
+    well-formatted output that is subtly wrong in a way only surfaced by manual re-verification.
+
+    The trigger is not breakage — it''s a plausible-wrong output that another stochastic
+    step
+
+    cosigned. Refine/prompt-tweak loops actively make it worse because they accumulate
+    untestable
+
+    technical debt and signal that the vendor treats correctness as a prompt-engineering
+    problem.
+
+    The verification tax erases the automation ROI: "I haven''t automated anything,
+    I''ve just added
+
+    a verification step to my job." [source: evidence/subject-01.md Q5] [source: evidence/subject-05.md
+    Q3]
+
+    [source: evidence/subject-10.md Q5]
+
+    '
+  impact: Leads to abandonment — high severity
+pain_themes: []
+unmet_need: 'The outcome being organized against is "silent partial correctness" —
+  a pipeline that runs green,
+
+  produces beautiful output, is wrong in ways the reviewer won''t catch, and is cosigned
+  by another
+
+  probabilistic agent that launders the error as verified. Downstream consequences:
+  a PM builds a
+
+  roadmap on a fabricated quote, a member gets denied on a hallucinated policy citation,
+  a customer
+
+  receives a vendor questionnaire misrepresenting security posture, a PII column ships
+  to staging
+
+  mapped wrong. The persona would rather have a loud crash than a plausible lie. Vendors
+  who
+
+  respond to a correctness bug with "try a better prompt" are disqualified permanently.
+
+  [source: evidence/subject-05.md Q5] [source: evidence/subject-07.md Q5] [source:
+  evidence/subject-10.md Q5]
+
+  [source: evidence/subject-12.md Q5]
+
+  '
+trust_requirements: []
+voice:
+  skepticism: moderate
+  vocabulary: general
+  motivation: efficiency
+  price_sensitivity: moderate
+metadata:
+  source: generated
+  research_basis:
+  - research:multi-agent-adoption:UXW-01
+  validation_status: draft
+  legacy_id: UXW-01
