@@ -18,12 +18,19 @@ def runner():
 def init_project(runner, tmp_path):
     """Initialize a VoA project in a temp directory."""
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        result = runner.invoke(cli, [
-            "eval", "init",
-            "--target", "http://localhost:3000",
-            "--api", "http://localhost:8420",
-            "--data", "./data",
-        ])
+        result = runner.invoke(
+            cli,
+            [
+                "eval",
+                "init",
+                "--target",
+                "http://localhost:3000",
+                "--api",
+                "http://localhost:8420",
+                "--data",
+                "./data",
+            ],
+        )
         assert result.exit_code == 0
         assert "Initialized" in result.output
         yield tmp_path
@@ -36,6 +43,7 @@ class TestInit:
             assert result.exit_code == 0
             assert "Initialized" in result.output
             from pathlib import Path
+
             assert (Path(td) / "voa-config.json").exists()
 
 
@@ -74,5 +82,6 @@ class TestSelectPersonas:
 
     def test_no_flags_raises(self, maria):
         import click
+
         with pytest.raises(click.exceptions.ClickException):
             _select_personas([maria], None, None, False)

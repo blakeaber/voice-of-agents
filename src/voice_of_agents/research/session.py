@@ -12,13 +12,10 @@ from pydantic import BaseModel, Field
 
 from voice_of_agents.research.notice import generate_notice, write_notice
 from voice_of_agents.research.models import (
-    JourneyRedesignInput,
     JourneyRedesignOutput,
-    PersonaResearchInput,
     PersonaResearchOutput,
     ProductResearchInput,
     ProductResearchOutput,
-    WorkflowResearchInput,
     WorkflowResearchOutput,
 )
 
@@ -58,9 +55,7 @@ class ResearchSession(BaseModel):
     ) -> "ResearchSession":
         now = datetime.now(timezone.utc)
         slug = product_research_input.slug
-        session_id = hashlib.sha256(
-            f"{slug}-{now.isoformat()}".encode()
-        ).hexdigest()[:12]
+        session_id = hashlib.sha256(f"{slug}-{now.isoformat()}".encode()).hexdigest()[:12]
         return cls(
             session_id=session_id,
             slug=slug,

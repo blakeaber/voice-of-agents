@@ -9,9 +9,7 @@ from voice_of_agents.core.enums import GoalCategory, GoalPriority, Tier
 from voice_of_agents.design.workflow import (
     Goal,
     PersonaWorkflowMapping,
-    ValueMetrics,
     Workflow,
-    WorkflowStep,
 )
 
 
@@ -55,19 +53,21 @@ class TestGoal:
         assert g.priority == GoalPriority.PRIMARY
 
     def test_all_capabilities(self):
-        goal = self._goal(workflows=[
-            Workflow(
-                id="W-01-1-a",
-                title="A",
-                capabilities_used=["CAP-LEARN-SEARCH"],
-                capabilities_missing=["CAP-IMPORT-BULK"],
-            ),
-            Workflow(
-                id="W-01-1-b",
-                title="B",
-                capabilities_used=["CAP-LEARN-CREATE"],
-            ),
-        ])
+        goal = self._goal(
+            workflows=[
+                Workflow(
+                    id="W-01-1-a",
+                    title="A",
+                    capabilities_used=["CAP-LEARN-SEARCH"],
+                    capabilities_missing=["CAP-IMPORT-BULK"],
+                ),
+                Workflow(
+                    id="W-01-1-b",
+                    title="B",
+                    capabilities_used=["CAP-LEARN-CREATE"],
+                ),
+            ]
+        )
         assert goal.all_capabilities_used() == {"CAP-LEARN-SEARCH", "CAP-LEARN-CREATE"}
         assert goal.all_capabilities_missing() == {"CAP-IMPORT-BULK"}
 
@@ -89,8 +89,7 @@ class TestPersonaWorkflowMapping:
                     category=GoalCategory.KNOWLEDGE,
                     priority=GoalPriority.PRIMARY,
                     workflows=[
-                        Workflow(id="W-01-1-a", title="WF",
-                                 capabilities_used=["CAP-LEARN-SEARCH"])
+                        Workflow(id="W-01-1-a", title="WF", capabilities_used=["CAP-LEARN-SEARCH"])
                     ],
                 ),
                 Goal(
@@ -99,9 +98,12 @@ class TestPersonaWorkflowMapping:
                     category=GoalCategory.DELEGATION,
                     priority=GoalPriority.SECONDARY,
                     workflows=[
-                        Workflow(id="W-01-2-a", title="WF2",
-                                 capabilities_used=["CAP-ROUTE-FIND"],
-                                 capabilities_missing=["CAP-IMPORT-BULK"])
+                        Workflow(
+                            id="W-01-2-a",
+                            title="WF2",
+                            capabilities_used=["CAP-ROUTE-FIND"],
+                            capabilities_missing=["CAP-IMPORT-BULK"],
+                        )
                     ],
                 ),
             ],
@@ -129,8 +131,14 @@ class TestPersonaWorkflowMapping:
 
     def test_feature_recommendations_are_backlog_items(self):
         from voice_of_agents.core.backlog import BacklogItem
-        item = BacklogItem(id="B-001", title="Test feat", description="Desc", source="design",
-                           extends_capability="CAP-LEARN-SEARCH")
+
+        item = BacklogItem(
+            id="B-001",
+            title="Test feat",
+            description="Desc",
+            source="design",
+            extends_capability="CAP-LEARN-SEARCH",
+        )
         m = self._mapping(feature_recommendations=[item])
         assert m.feature_recommendations[0].source == "design"
         assert m.feature_recommendations[0].extends_capability == "CAP-LEARN-SEARCH"

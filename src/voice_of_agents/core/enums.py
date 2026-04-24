@@ -49,6 +49,6 @@ class GoalCategory(str, Enum):
 
 
 class GoalPriority(str, Enum):
-    PRIMARY = "primary"         # Day-1 value
-    SECONDARY = "secondary"     # Month-1 expansion
+    PRIMARY = "primary"  # Day-1 value
+    SECONDARY = "secondary"  # Month-1 expansion
     ASPIRATIONAL = "aspirational"  # Quarter-1 advanced usage

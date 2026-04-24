@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 
 from voice_of_agents.core.capability import Capability, CapabilityRegistry
 from voice_of_agents.core.enums import GoalCategory, GoalPriority, Segment, Tier
@@ -25,18 +24,32 @@ def _make_registry():
         product="Test",
         version="1.0.0",
         capabilities=[
-            Capability(id="CAP-LEARN-SEARCH", name="Search", description="Search",
-                       status="complete", feature_area="Learning"),
-            Capability(id="CAP-LEARN-CREATE", name="Create", description="Create",
-                       status="complete", feature_area="Learning"),
+            Capability(
+                id="CAP-LEARN-SEARCH",
+                name="Search",
+                description="Search",
+                status="complete",
+                feature_area="Learning",
+            ),
+            Capability(
+                id="CAP-LEARN-CREATE",
+                name="Create",
+                description="Create",
+                status="complete",
+                feature_area="Learning",
+            ),
         ],
     )
 
 
 def _make_persona(persona_id=1, segment=Segment.B2C, tier=Tier.DEVELOPER):
     return Persona(
-        id=persona_id, name="Test", role="Tester", segment=segment,
-        industry="Testing", tier=tier,
+        id=persona_id,
+        name="Test",
+        role="Tester",
+        segment=segment,
+        industry="Testing",
+        tier=tier,
     )
 
 
@@ -52,8 +65,11 @@ def _make_mapping(persona_id=1, tier=Tier.DEVELOPER, goals=None):
                     Workflow(
                         id=f"W-{persona_id:02d}-1-a",
                         title="Test WF",
-                        steps=[WorkflowStep(seq=1, action="Do something",
-                                            capability_id="CAP-LEARN-SEARCH")],
+                        steps=[
+                            WorkflowStep(
+                                seq=1, action="Do something", capability_id="CAP-LEARN-SEARCH"
+                            )
+                        ],
                         capabilities_used=["CAP-LEARN-SEARCH"],
                     )
                 ],
@@ -73,38 +89,47 @@ class TestValidateWorkflowAgainstRegistry:
         assert result.ok
 
     def test_unknown_capability_in_step(self):
-        mapping = _make_mapping(goals=[
-            Goal(
-                id="G-01-1", title="Test",
-                category=GoalCategory.KNOWLEDGE, priority=GoalPriority.PRIMARY,
-                workflows=[
-                    Workflow(
-                        id="W-01-1-a", title="Test",
-                        steps=[WorkflowStep(seq=1, action="Do",
-                                            capability_id="CAP-NONEXIST")],
-                        capabilities_used=["CAP-NONEXIST"],
-                    )
-                ],
-            )
-        ])
+        mapping = _make_mapping(
+            goals=[
+                Goal(
+                    id="G-01-1",
+                    title="Test",
+                    category=GoalCategory.KNOWLEDGE,
+                    priority=GoalPriority.PRIMARY,
+                    workflows=[
+                        Workflow(
+                            id="W-01-1-a",
+                            title="Test",
+                            steps=[WorkflowStep(seq=1, action="Do", capability_id="CAP-NONEXIST")],
+                            capabilities_used=["CAP-NONEXIST"],
+                        )
+                    ],
+                )
+            ]
+        )
         result = validate_workflow_against_registry(mapping, _make_registry())
         assert not result.ok
         assert len(result.errors) == 2  # step + capabilities_used
 
     def test_missing_but_available_warns(self):
-        mapping = _make_mapping(goals=[
-            Goal(
-                id="G-01-1", title="Test",
-                category=GoalCategory.KNOWLEDGE, priority=GoalPriority.PRIMARY,
-                workflows=[
-                    Workflow(
-                        id="W-01-1-a", title="Test",
-                        capabilities_used=["CAP-LEARN-SEARCH"],
-                        capabilities_missing=["CAP-LEARN-CREATE"],
-                    )
-                ],
-            )
-        ])
+        mapping = _make_mapping(
+            goals=[
+                Goal(
+                    id="G-01-1",
+                    title="Test",
+                    category=GoalCategory.KNOWLEDGE,
+                    priority=GoalPriority.PRIMARY,
+                    workflows=[
+                        Workflow(
+                            id="W-01-1-a",
+                            title="Test",
+                            capabilities_used=["CAP-LEARN-SEARCH"],
+                            capabilities_missing=["CAP-LEARN-CREATE"],
+                        )
+                    ],
+                )
+            ]
+        )
         result = validate_workflow_against_registry(mapping, _make_registry())
         assert result.ok
         assert len(result.warnings) == 1
@@ -123,13 +148,17 @@ class TestValidateWorkflowAgainstPersona:
         assert not result.ok
 
     def test_no_primary_goals(self):
-        mapping = _make_mapping(goals=[
-            Goal(
-                id="G-01-1", title="Test",
-                category=GoalCategory.KNOWLEDGE, priority=GoalPriority.ASPIRATIONAL,
-                workflows=[],
-            )
-        ])
+        mapping = _make_mapping(
+            goals=[
+                Goal(
+                    id="G-01-1",
+                    title="Test",
+                    category=GoalCategory.KNOWLEDGE,
+                    priority=GoalPriority.ASPIRATIONAL,
+                    workflows=[],
+                )
+            ]
+        )
         result = validate_workflow_against_persona(mapping, _make_persona())
         assert not result.ok
 
@@ -160,10 +189,18 @@ class TestValidateAll:
 
     def test_summary_all_pass(self):
         goals = [
-            Goal(id="G-01-1", title="G1", category=GoalCategory.KNOWLEDGE,
-                 priority=GoalPriority.PRIMARY),
-            Goal(id="G-01-2", title="G2", category=GoalCategory.DELEGATION,
-                 priority=GoalPriority.SECONDARY),
+            Goal(
+                id="G-01-1",
+                title="G1",
+                category=GoalCategory.KNOWLEDGE,
+                priority=GoalPriority.PRIMARY,
+            ),
+            Goal(
+                id="G-01-2",
+                title="G2",
+                category=GoalCategory.DELEGATION,
+                priority=GoalPriority.SECONDARY,
+            ),
         ]
         result = validate_all([_make_persona()], [_make_mapping(goals=goals)], _make_registry())
         assert "All validations passed" in result.summary()

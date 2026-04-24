@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from importlib.resources import files
 from pathlib import Path
 
 from anthropic import AsyncAnthropic

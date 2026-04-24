@@ -40,12 +40,28 @@ _SAMPLING_FRAME_TEMPLATE: list[tuple[AdoptionStatus, ContextSegment, str]] = [
     (AdoptionStatus.PARTIAL_ADOPTER, ContextSegment.B2C_LOW_AUTONOMY, "Individual needing buy-in"),
     (AdoptionStatus.ABANDONER, ContextSegment.B2B_MID, "Mid-market team that churned"),
     (AdoptionStatus.ABANDONER, ContextSegment.B2C_HIGH_AUTONOMY, "Solo practitioner who left"),
-    (AdoptionStatus.EVALUATED_AND_REJECTED, ContextSegment.B2B_LARGE_REGULATED, "Regulated enterprise that passed"),
-    (AdoptionStatus.EVALUATED_AND_REJECTED, ContextSegment.B2B_SMALL, "Small team that chose a competitor"),
+    (
+        AdoptionStatus.EVALUATED_AND_REJECTED,
+        ContextSegment.B2B_LARGE_REGULATED,
+        "Regulated enterprise that passed",
+    ),
+    (
+        AdoptionStatus.EVALUATED_AND_REJECTED,
+        ContextSegment.B2B_SMALL,
+        "Small team that chose a competitor",
+    ),
     (AdoptionStatus.NEVER_TRIED_AWARE, ContextSegment.B2B_MID, "Aware but never started"),
     (AdoptionStatus.ACTIVELY_ANTI, ContextSegment.B2B_MID, "Active critic"),
-    (AdoptionStatus.ACTIVELY_ANTI, ContextSegment.B2C_HIGH_AUTONOMY, "Solo practitioner who advises against"),
-    (AdoptionStatus.PARTIAL_ADOPTER, ContextSegment.B2B_LARGE_REGULATED, "Regulated enterprise partial user"),
+    (
+        AdoptionStatus.ACTIVELY_ANTI,
+        ContextSegment.B2C_HIGH_AUTONOMY,
+        "Solo practitioner who advises against",
+    ),
+    (
+        AdoptionStatus.PARTIAL_ADOPTER,
+        ContextSegment.B2B_LARGE_REGULATED,
+        "Regulated enterprise partial user",
+    ),
 ]
 
 
@@ -82,8 +98,8 @@ async def _stage1_decompose_question(
         "```yaml\n"
         "hypotheses:\n"
         "  - id: H1\n"
-        "    statement: \"[the hypothesis]\"\n"
-        "    falsification_condition: \"[what evidence would force a refutes verdict]\"\n"
+        '    statement: "[the hypothesis]"\n'
+        '    falsification_condition: "[what evidence would force a refutes verdict]"\n'
         "```\n"
     )
     response = await client.messages.create(
@@ -133,16 +149,11 @@ async def _stage3_parallel_interviews(
         )
         return _parse_subject_record(response.content[0].text, subject_id, cell)
 
-    tasks = [
-        call_one(cell, f"subject-{i + 1:02d}")
-        for i, cell in enumerate(frame)
-    ]
+    tasks = [call_one(cell, f"subject-{i + 1:02d}") for i, cell in enumerate(frame)]
     return list(await asyncio.gather(*tasks))
 
 
-def _parse_subject_record(
-    raw: str, subject_id: str, cell: SamplingCell
-) -> SubjectRecord:
+def _parse_subject_record(raw: str, subject_id: str, cell: SamplingCell) -> SubjectRecord:
     block = _extract_yaml_block(raw)
     try:
         data = yaml.safe_load(block)
@@ -151,13 +162,11 @@ def _parse_subject_record(
 
     quotes_raw = data.get("verbatim_quote_bank", [])
     quotes = [
-        VerbatimQuote(key=q["key"], text=q["text"])
-        for q in quotes_raw
-        if isinstance(q, dict)
+        VerbatimQuote(key=q["key"], text=q["text"]) for q in quotes_raw if isinstance(q, dict)
     ]
     if len(quotes) < 5:
         for i in range(5 - len(quotes)):
-            quotes.append(VerbatimQuote(key=f"Q{len(quotes)+1}", text="[placeholder]"))
+            quotes.append(VerbatimQuote(key=f"Q{len(quotes) + 1}", text="[placeholder]"))
 
     return SubjectRecord(
         subject_id=subject_id,
@@ -319,9 +328,7 @@ async def run_product_research(
     validate_sampling_frame_row_counts(sampling_frame)
 
     # Stage 3 — Parallel interviews (THE core async pattern)
-    subjects = await _stage3_parallel_interviews(
-        sampling_frame, input, hypotheses, client, model
-    )
+    subjects = await _stage3_parallel_interviews(sampling_frame, input, hypotheses, client, model)
 
     # Stage 4 — Hypothesis scoring
     scores = await _stage4_score_hypotheses(hypotheses, subjects, client, model)

@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -29,8 +28,7 @@ class DecisionReport(BaseModel):
 
     def render_markdown(self) -> str:
         segments = "\n".join(
-            f"- **{s.get('name', '')}**: {s.get('description', '')}"
-            for s in self.segment_map
+            f"- **{s.get('name', '')}**: {s.get('description', '')}" for s in self.segment_map
         )
         validated = "\n".join(f"- {h}" for h in self.validated_hypotheses) or "- none"
         refuted = "\n".join(f"- {h}" for h in self.refuted_hypotheses) or "- none"
@@ -99,7 +97,6 @@ async def generate_decision_report(
         and open_questions fields populated.
     """
     """Transform a completed ResearchSession into a DecisionReport via a Claude call."""
-    from voice_of_agents.research.client import get_template_env
 
     product_out = session.product_research_output
     persona_out = session.persona_research_output

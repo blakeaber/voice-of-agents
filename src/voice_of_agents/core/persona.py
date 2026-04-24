@@ -67,7 +67,6 @@ class Persona(BaseModel):
 
     def theme_intensity(self, theme_code: str) -> Optional[str]:
         """Return intensity for a pain theme code, or None if not present."""
-        from voice_of_agents.core.enums import ThemeCode
         for pt in self.pain_themes:
             if pt.theme.value == theme_code:
                 return pt.intensity.value

@@ -32,13 +32,17 @@ class TestDeriveGoals:
 
     def test_solo_knowledge_user(self):
         """Solo user with no special attributes gets only 'knowledge'."""
-        persona = _make_persona(org_size=1, income=80000, price_sensitivity="low", pain_themes=["A"])
+        persona = _make_persona(
+            org_size=1, income=80000, price_sensitivity="low", pain_themes=["A"]
+        )
         goals = _derive_goals(persona)
         assert goals == ["knowledge"]
 
     def test_team_user_includes_delegation(self):
         """Team user (org_size=8) gets 'delegation' added."""
-        persona = _make_persona(org_size=8, income=130000, price_sensitivity="low", pain_themes=["B"])
+        persona = _make_persona(
+            org_size=8, income=130000, price_sensitivity="low", pain_themes=["B"]
+        )
         goals = _derive_goals(persona)
         assert "knowledge" in goals
         assert "delegation" in goals

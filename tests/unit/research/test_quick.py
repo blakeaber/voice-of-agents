@@ -1,7 +1,7 @@
 """Tests for research/quick.py — QuickResearchResult and related models."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 from voice_of_agents.research.quick import (
     QuickPersona,
@@ -80,18 +80,19 @@ class TestTranslateToConfig:
 
     @pytest.mark.asyncio
     async def test_translates_plain_english_to_config(self):
-        from unittest.mock import AsyncMock, MagicMock
         from voice_of_agents.research.quick import _translate_to_config
 
         mock_client = MagicMock()
         mock_response = MagicMock()
         mock_response.content = [
-            MagicMock(text="""```yaml
+            MagicMock(
+                text="""```yaml
 research_question: "Do developers abandon AI tools because they break their flow?"
 scope: "Senior developers at startups, 2024-2026"
 slug: "dev-tool-abandonment"
 product_context: "A coding assistant that helps write tests"
-```""")
+```"""
+            )
         ]
         mock_client.messages.create = AsyncMock(return_value=mock_response)
 
@@ -104,11 +105,13 @@ product_context: "A coding assistant that helps write tests"
         )
 
         assert config.slug == "dev-tool-abandonment"
-        assert "abandon" in config.research_question.lower() or "flow" in config.research_question.lower()
+        assert (
+            "abandon" in config.research_question.lower()
+            or "flow" in config.research_question.lower()
+        )
 
     @pytest.mark.asyncio
     async def test_falls_back_gracefully_on_malformed_yaml(self):
-        from unittest.mock import AsyncMock, MagicMock
         from voice_of_agents.research.quick import _translate_to_config
 
         mock_client = MagicMock()

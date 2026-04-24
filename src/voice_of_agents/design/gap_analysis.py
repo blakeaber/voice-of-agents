@@ -10,7 +10,7 @@ from jinja2 import Template
 from voice_of_agents.core.backlog import BacklogItem
 from voice_of_agents.core.capability import CapabilityRegistry
 from voice_of_agents.core.persona import Persona
-from voice_of_agents.design.workflow import GoalPriority, PersonaWorkflowMapping
+from voice_of_agents.design.workflow import PersonaWorkflowMapping
 from voice_of_agents.design.prompts import GAP_ANALYSIS_PROMPT
 
 
@@ -103,9 +103,7 @@ class GapAnalyzer:
         used_caps: defaultdict[str, CapabilityCoverage] = defaultdict(
             lambda: CapabilityCoverage(capability_id="")
         )
-        gap_caps: defaultdict[str, GapEntry] = defaultdict(
-            lambda: GapEntry(capability_id="")
-        )
+        gap_caps: defaultdict[str, GapEntry] = defaultdict(lambda: GapEntry(capability_id=""))
 
         for mapping in mappings:
             for goal in mapping.goals:
@@ -137,8 +135,7 @@ class GapAnalyzer:
         product_name: str,
     ) -> str:
         gaps_dict = {
-            gap_id: sorted(set(entry.persona_ids))
-            for gap_id, entry in report.gaps.items()
+            gap_id: sorted(set(entry.persona_ids)) for gap_id, entry in report.gaps.items()
         }
         template = Template(GAP_ANALYSIS_PROMPT)
         return template.render(
@@ -169,7 +166,7 @@ class GapAnalyzer:
             effort = _EFFORT_MAP.get(complexity, "medium")
             persona_ids = entry.get("personas_benefited", [])
             item = BacklogItem(
-                id=entry.get("id", f"FR-{i+1:02d}"),
+                id=entry.get("id", f"FR-{i + 1:02d}"),
                 title=entry.get("title", "Untitled"),
                 description=entry.get("description", ""),
                 source="design",
@@ -199,17 +196,21 @@ class GapAnalyzer:
             coverage = report.coverage.get(cap.id)
             if coverage:
                 areas[area]["used"] += 1
-                areas[area]["capabilities"].append({
-                    "id": cap.id,
-                    "name": cap.name,
-                    "persona_count": coverage.persona_count,
-                })
+                areas[area]["capabilities"].append(
+                    {
+                        "id": cap.id,
+                        "name": cap.name,
+                        "persona_count": coverage.persona_count,
+                    }
+                )
             else:
-                areas[area]["capabilities"].append({
-                    "id": cap.id,
-                    "name": cap.name,
-                    "persona_count": 0,
-                })
+                areas[area]["capabilities"].append(
+                    {
+                        "id": cap.id,
+                        "name": cap.name,
+                        "persona_count": 0,
+                    }
+                )
 
         return areas
 

@@ -27,7 +27,7 @@ from voice_of_agents.research.models import (
 
 
 def _make_quotes(n: int = 5) -> list[VerbatimQuote]:
-    return [VerbatimQuote(key=f"Q{i+1}", text=f"quote {i+1}") for i in range(n)]
+    return [VerbatimQuote(key=f"Q{i + 1}", text=f"quote {i + 1}") for i in range(n)]
 
 
 def _minimal_product_output() -> ProductResearchOutput:
@@ -36,8 +36,7 @@ def _minimal_product_output() -> ProductResearchOutput:
         run_date="2026-01-01",
         run_dir="docs/research/test",
         hypotheses=[
-            Hypothesis(id=f"H{i+1}", statement="s", falsification_condition="f")
-            for i in range(4)
+            Hypothesis(id=f"H{i + 1}", statement="s", falsification_condition="f") for i in range(4)
         ],
         hypotheses_ratified=True,
         sampling_frame=[
@@ -49,7 +48,7 @@ def _minimal_product_output() -> ProductResearchOutput:
         ],
         subjects=[],
         hypothesis_scores=[
-            HypothesisScore(hypothesis_id=f"H{i+1}", verdict=HypothesisVerdict.REFUTES)
+            HypothesisScore(hypothesis_id=f"H{i + 1}", verdict=HypothesisVerdict.REFUTES)
             for i in range(4)
         ],
         segments=[
@@ -100,7 +99,11 @@ def _minimal_persona_output() -> PersonaResearchOutput:
     )
     return PersonaResearchOutput(
         topup_subjects=[],
-        persona_sidecars=[_minimal_sidecar("UXW-01"), _minimal_sidecar("UXW-02"), _minimal_sidecar("UXW-03")],
+        persona_sidecars=[
+            _minimal_sidecar("UXW-01"),
+            _minimal_sidecar("UXW-02"),
+            _minimal_sidecar("UXW-03"),
+        ],
         task_cards=[task_card],
         coverage_map={"seg-a": 3},
     )
@@ -143,9 +146,7 @@ def _minimal_episode() -> EpisodeRecord:
         episode="test",
         date="yesterday",
         pre_state="started",
-        steps=[
-            EpisodeStep(step="s", tool="none", input="i", output="o", time="1", blocker="none")
-        ],
+        steps=[EpisodeStep(step="s", tool="none", input="i", output="o", time="1", blocker="none")],
         post_state="done",
         what_i_wished_existed="better tool",
     )
@@ -181,6 +182,7 @@ class TestStage2ToStage3Contract:
             target_uxw_id="UXW-99",  # doesn't exist
         )
         from voice_of_agents.research.workflows_from_interviews import _get_sidecar
+
         with pytest.raises(ValueError, match="UXW-99"):
             _get_sidecar(workflow_in)
 
@@ -206,6 +208,7 @@ class TestStage3ToStage4Contract:
 
     def test_journey_input_rejects_fewer_than_3_panel(self):
         from pydantic import ValidationError
+
         workflow_out = WorkflowResearchOutput(
             uxw_id="UXW-01",
             episodes=[_minimal_episode()],

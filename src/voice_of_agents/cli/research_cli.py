@@ -4,10 +4,14 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import click
 from rich.console import Console
 from rich.table import Table
+
+if TYPE_CHECKING:
+    from voice_of_agents.research.session import ResearchSession
 
 console = Console()
 
@@ -99,16 +103,19 @@ def research_validate_config(config_file: str) -> None:
 @click.option("--session", default=None, help="Path to an existing session YAML to resume.")
 @click.option("--model", default=None, help="Override the Anthropic model.")
 @click.option(
-    "--model-haiku", "use_haiku", is_flag=True, default=False,
+    "--model-haiku",
+    "use_haiku",
+    is_flag=True,
+    default=False,
     help="Use claude-haiku-4-5-20251001 for low-cost exploration (~1/20th the cost).",
 )
 @click.option(
-    "--dry-run", is_flag=True, default=False,
+    "--dry-run",
+    is_flag=True,
+    default=False,
     help="Show cost/time estimate and exit without making API calls.",
 )
-@click.option(
-    "--anchor-segment", default=None, help="Journey anchor segment (Stage 4 only)."
-)
+@click.option("--anchor-segment", default=None, help="Journey anchor segment (Stage 4 only).")
 def research_run(
     config_file: str,
     stage: str,
@@ -132,7 +139,9 @@ def research_run(
 
     config = ResearchConfig.from_file(path)
 
-    effective_model = "claude-haiku-4-5-20251001" if use_haiku else (model or config.anthropic_model)
+    effective_model = (
+        "claude-haiku-4-5-20251001" if use_haiku else (model or config.anthropic_model)
+    )
     config = config.model_copy(update={"anthropic_model": effective_model})
 
     problems = config.validate_before_run()
@@ -167,7 +176,9 @@ def research_run(
         if session_path.exists():
             existing_session = ResearchSession.load(session_path)
             console.print(f"Resuming session: {existing_session.session_id}")
-            console.print(f"Completed stages: {', '.join(existing_session.stages_completed) or 'none'}")
+            console.print(
+                f"Completed stages: {', '.join(existing_session.stages_completed) or 'none'}"
+            )
 
     jrd_config: dict = {}
     if anchor_segment:
@@ -241,7 +252,10 @@ def research_status(session_file: str) -> None:
 @research_cli.command("export")
 @click.argument("session_file")
 @click.option(
-    "--output", "-o", default="RESEARCH-SUMMARY.md", show_default=True,
+    "--output",
+    "-o",
+    default="RESEARCH-SUMMARY.md",
+    show_default=True,
     help="Output path for the summary artifact.",
 )
 def research_export(session_file: str, output: str) -> None:
@@ -261,9 +275,7 @@ def research_export(session_file: str, output: str) -> None:
 
 
 @research_cli.command("list-sessions")
-@click.option(
-    "--dir", "sessions_dir", default="research-sessions", show_default=True
-)
+@click.option("--dir", "sessions_dir", default="research-sessions", show_default=True)
 def research_list_sessions(sessions_dir: str) -> None:
     """List all research sessions in the sessions directory."""
     from voice_of_agents.research.session import ResearchSession
@@ -297,7 +309,9 @@ def research_list_sessions(sessions_dir: str) -> None:
 
 @research_cli.command("demo")
 @click.option("--save", is_flag=True, default=False, help="Save session output to ./demo-output/")
-@click.option("--model", default="claude-opus-4-7", show_default=True, help="Anthropic model to use.")
+@click.option(
+    "--model", default="claude-opus-4-7", show_default=True, help="Anthropic model to use."
+)
 def research_demo(save: bool, model: str) -> None:
     """Run the 60-second preset demo — no config required.
 
@@ -360,7 +374,10 @@ def research_demo(save: bool, model: str) -> None:
 
 @research_cli.command("quickstart")
 @click.option(
-    "--output", "-o", default="research-config.yaml", show_default=True,
+    "--output",
+    "-o",
+    default="research-config.yaml",
+    show_default=True,
     help="Output path for the generated config.",
 )
 def research_quickstart(output: str) -> None:
@@ -369,7 +386,6 @@ def research_quickstart(output: str) -> None:
     Translates your answers into a valid ResearchConfig using Claude.
     """
     import asyncio
-    from voice_of_agents.research.config import ResearchConfig
 
     console.print("\n[bold]Voice of Agents — Research Quickstart[/bold]")
     console.print("Answer 3 questions. We'll handle the research design.\n")
@@ -381,15 +397,13 @@ def research_quickstart(output: str) -> None:
     console.print("\n[dim]Translating to a research question...[/dim]")
 
     try:
-        config = asyncio.run(
-            _async_from_plain_english(what=what, who=who, understand=understand)
-        )
+        config = asyncio.run(_async_from_plain_english(what=what, who=who, understand=understand))
     except Exception as exc:
         console.print(f"[red]Translation failed: {exc}[/red]")
         console.print("Try being more specific about the behavior you want to understand.")
         raise SystemExit(1)
 
-    console.print(f"\n[bold]Translated research question:[/bold]")
+    console.print("\n[bold]Translated research question:[/bold]")
     console.print(f"  {config.research_question}")
     console.print(f"\n[bold]Scope:[/bold] {config.scope}")
     console.print(f"[bold]Slug:[/bold] {config.slug}")
@@ -407,17 +421,23 @@ def research_quickstart(output: str) -> None:
 
 async def _async_from_plain_english(what: str, who: str, understand: str):
     from voice_of_agents.research.config import ResearchConfig
+
     return await ResearchConfig.from_plain_english(what=what, who=who, understand=understand)
 
 
 @research_cli.command("seed-eval")
 @click.argument("session_file")
 @click.option(
-    "--output", "-o", default="data/personas",
-    show_default=True, help="Directory to write canonical Persona YAML files.",
+    "--output",
+    "-o",
+    default="data/personas",
+    show_default=True,
+    help="Directory to write canonical Persona YAML files.",
 )
 @click.option(
-    "--starting-id", default=100, show_default=True,
+    "--starting-id",
+    default=100,
+    show_default=True,
     help="Starting integer ID for generated personas (avoids collisions with existing).",
 )
 def research_seed_eval(session_file: str, output: str, starting_id: int) -> None:
@@ -438,9 +458,7 @@ def research_seed_eval(session_file: str, output: str, starting_id: int) -> None
     session = ResearchSession.load(path)
 
     if not session.persona_research_output:
-        console.print(
-            "[red]Session has no persona output. Run at least Stage 2 first.[/red]"
-        )
+        console.print("[red]Session has no persona output. Run at least Stage 2 first.[/red]")
         sys.exit(1)
 
     personas = session_to_personas(session, starting_id=starting_id)
@@ -476,15 +494,21 @@ def _print_session_summary(session: "ResearchSession") -> None:  # type: ignore[
         pr = session.product_research_output
         console.print(f"\nStage 1: {len(pr.subjects)} subjects, {len(pr.segments)} segments")
         if pr.all_hypotheses_supported_flag:
-            console.print("[yellow]  WARNING: All hypotheses supported — review for confirmation bias[/yellow]")
+            console.print(
+                "[yellow]  WARNING: All hypotheses supported — review for confirmation bias[/yellow]"
+            )
     if session.persona_research_output:
         per = session.persona_research_output
         console.print(f"Stage 2: {len(per.persona_sidecars)} personas synthesized")
     if session.workflow_research_output:
         wf = session.workflow_research_output
-        console.print(f"Stage 3: {len(wf.episodes)} episodes, {len(wf.workflow_maps)} workflow maps")
+        console.print(
+            f"Stage 3: {len(wf.episodes)} episodes, {len(wf.workflow_maps)} workflow maps"
+        )
     if session.journey_redesign_output:
         jrd = session.journey_redesign_output
-        console.print(f"Stage 4: avg score {jrd.average_score:.1f}/10, {len(jrd.cross_cutting_must_fixes)} cross-cutting must-fixes")
+        console.print(
+            f"Stage 4: avg score {jrd.average_score:.1f}/10, {len(jrd.cross_cutting_must_fixes)} cross-cutting must-fixes"
+        )
 
     console.print(f"\nNext: [bold]voa research export research-sessions/{session.slug}.yaml[/bold]")

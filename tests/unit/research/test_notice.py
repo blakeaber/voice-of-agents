@@ -3,10 +3,8 @@
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from voice_of_agents.research.notice import (
-    SyntheticDataNotice,
     generate_notice,
     write_notice,
 )

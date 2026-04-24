@@ -31,7 +31,7 @@ class SignalSet(BaseModel):
     def to_verbatim_quotes(self) -> list[VerbatimQuote]:
         """Convert signals to VerbatimQuote format for injection into prompts."""
         return [
-            VerbatimQuote(key=f"RS{i+1}", text=signal.verbatim[:500])
+            VerbatimQuote(key=f"RS{i + 1}", text=signal.verbatim[:500])
             for i, signal in enumerate(self.signals[:8])
         ]
 
@@ -65,10 +65,9 @@ def from_transcripts(paths: list[Path | str]) -> SignalSet:
 
         for line in text.splitlines():
             stripped = line.strip()
-            is_participant = (
-                stripped.startswith(("P:", "User:", "Participant:", "R:", "Respondent:"))
-                or (len(stripped) > 20 and not stripped.startswith(("I:", "Q:", "Interviewer:")))
-            )
+            is_participant = stripped.startswith(
+                ("P:", "User:", "Participant:", "R:", "Respondent:")
+            ) or (len(stripped) > 20 and not stripped.startswith(("I:", "Q:", "Interviewer:")))
             if is_participant and len(stripped) >= 20:
                 quote = stripped.split(":", 1)[-1].strip() if ":" in stripped else stripped
                 if len(quote) >= 15:
@@ -220,10 +219,7 @@ def inject_signals_into_prompt(base_prompt: str, signal_set: SignalSet) -> str:
     if not signal_set.signals:
         return base_prompt
 
-    quotes = "\n".join(
-        f"- [{s.source}] {s.verbatim}" for s in signal_set.signals[:10]
-    )
+    quotes = "\n".join(f"- [{s.source}] {s.verbatim}" for s in signal_set.signals[:10])
     return (
-        base_prompt
-        + f"\n\n## Real User Verbatims (augment your analysis with these)\n{quotes}\n"
+        base_prompt + f"\n\n## Real User Verbatims (augment your analysis with these)\n{quotes}\n"
     )

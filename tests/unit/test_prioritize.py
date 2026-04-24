@@ -5,7 +5,6 @@ import pytest
 from voice_of_agents.eval.phase5_prioritize import (
     _estimate_effort,
     _revenue_score,
-    TIER_WEIGHTS,
 )
 
 

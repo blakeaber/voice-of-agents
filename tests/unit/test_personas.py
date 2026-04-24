@@ -2,7 +2,6 @@
 
 import pytest
 
-from voice_of_agents.core.pain import PainPoint, PainTheme
 from voice_of_agents.core.persona import Persona, PersonaMetadata, VoiceProfile
 
 
@@ -16,16 +15,23 @@ class TestPersonaSlug:
         assert rachel.slug == "20-rachel-okafor"
 
     def test_slug_strips_special_chars(self):
-        p = Persona(id=99, name="Jean-Luc O'Brien III", role="Tester", industry="Tech",
-                    segment="b2c", tier="FREE")
+        p = Persona(
+            id=99,
+            name="Jean-Luc O'Brien III",
+            role="Tester",
+            industry="Tech",
+            segment="b2c",
+            tier="FREE",
+        )
         slug = p.slug
         assert slug.startswith("99-")
         assert "'" not in slug
         assert slug == "99-jean-luc-o-brien-iii"
 
     def test_slug_lowercases(self):
-        p = Persona(id=5, name="ALICE SMITH", role="Dev", industry="Tech",
-                    segment="b2c", tier="FREE")
+        p = Persona(
+            id=5, name="ALICE SMITH", role="Dev", industry="Tech", segment="b2c", tier="FREE"
+        )
         assert "alice-smith" in p.slug
 
 
@@ -34,8 +40,19 @@ class TestPersonaModelDump:
 
     def test_dump_has_core_keys(self, maria):
         d = maria.model_dump()
-        for key in ("id", "name", "role", "industry", "segment", "tier", "org_size",
-                    "pain_points", "pain_themes", "voice", "metadata"):
+        for key in (
+            "id",
+            "name",
+            "role",
+            "industry",
+            "segment",
+            "tier",
+            "org_size",
+            "pain_points",
+            "pain_themes",
+            "voice",
+            "metadata",
+        ):
             assert key in d, f"Missing key: {key}"
 
     def test_dump_voice_is_flat_dict(self, maria):
@@ -58,8 +75,7 @@ class TestPersonaValidation:
 
     def test_org_size_must_be_positive(self):
         with pytest.raises(Exception):
-            Persona(id=1, name="X", role="Y", industry="Z", segment="b2c", tier="FREE",
-                    org_size=0)
+            Persona(id=1, name="X", role="Y", industry="Z", segment="b2c", tier="FREE", org_size=0)
 
     def test_valid_persona_constructs(self, maria):
         assert maria.id == 1

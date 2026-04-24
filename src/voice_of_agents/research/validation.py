@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from voice_of_agents.research.models import (
     AdoptionStatus,
-    BehavioralSegment,
     Hypothesis,
     HypothesisScore,
     HypothesisVerdict,
@@ -16,6 +15,7 @@ from voice_of_agents.research.models import (
 
 class ResearchValidationError(ValueError):
     """Raised when a stage-entry gate condition is not met."""
+
     pass
 
 
@@ -55,13 +55,9 @@ def validate_sampling_frame_row_counts(frame: list[SamplingCell]) -> None:
 def validate_hypothesis_set(hypotheses: list[Hypothesis]) -> None:
     """Enforce 4-7 hypotheses, each with a falsification condition."""
     if len(hypotheses) < 4:
-        raise ResearchValidationError(
-            f"Minimum 4 hypotheses required; {len(hypotheses)} provided."
-        )
+        raise ResearchValidationError(f"Minimum 4 hypotheses required; {len(hypotheses)} provided.")
     if len(hypotheses) > 7:
-        raise ResearchValidationError(
-            f"Maximum 7 hypotheses per run; {len(hypotheses)} provided."
-        )
+        raise ResearchValidationError(f"Maximum 7 hypotheses per run; {len(hypotheses)} provided.")
     for h in hypotheses:
         if not h.falsification_condition.strip():
             raise ResearchValidationError(

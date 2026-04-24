@@ -68,23 +68,35 @@ def add_item(path: Path, item: BacklogItem) -> None:
     _append_raw(path, "item_added", {"item": item.model_dump()})
 
 
-def update_score(path: Path, item_id: str, prev_score: float, new_score: float, reason: str = "") -> None:
-    _append_raw(path, "score_updated", {
-        "item_id": item_id,
-        "prev_score": prev_score,
-        "new_score": new_score,
-        "reason": reason,
-    })
+def update_score(
+    path: Path, item_id: str, prev_score: float, new_score: float, reason: str = ""
+) -> None:
+    _append_raw(
+        path,
+        "score_updated",
+        {
+            "item_id": item_id,
+            "prev_score": prev_score,
+            "new_score": new_score,
+            "reason": reason,
+        },
+    )
 
 
-def change_status(path: Path, item_id: str, prev_status: str, new_status: str, by: str = "system", note: str = "") -> None:
-    _append_raw(path, "status_changed", {
-        "item_id": item_id,
-        "prev_status": prev_status,
-        "new_status": new_status,
-        "by": by,
-        "note": note,
-    })
+def change_status(
+    path: Path, item_id: str, prev_status: str, new_status: str, by: str = "system", note: str = ""
+) -> None:
+    _append_raw(
+        path,
+        "status_changed",
+        {
+            "item_id": item_id,
+            "prev_status": prev_status,
+            "new_status": new_status,
+            "by": by,
+            "note": note,
+        },
+    )
 
 
 def load_events(path: Path) -> list[dict]:
@@ -131,7 +143,9 @@ def materialize_backlog(path: Path) -> list[BacklogItem]:
         elif etype == "status_changed":
             item_id = event.get("item_id", "")
             if item_id in items:
-                items[item_id]["status"] = event.get("new_status", items[item_id].get("status", "open"))
+                items[item_id]["status"] = event.get(
+                    "new_status", items[item_id].get("status", "open")
+                )
 
     result = []
     for data in items.values():
@@ -167,7 +181,9 @@ def render_backlog_markdown(path: Path) -> str:
             f"| {item.status} | {item.source} | {personas} | {themes} |"
         )
 
-    quick_wins = [i for i in items if i.score > 60 and i.effort in ("trivial", "small") and i.status == "open"]
+    quick_wins = [
+        i for i in items if i.score > 60 and i.effort in ("trivial", "small") and i.status == "open"
+    ]
     if quick_wins:
         lines.extend(["", "## Quick Wins", ""])
         for item in quick_wins:

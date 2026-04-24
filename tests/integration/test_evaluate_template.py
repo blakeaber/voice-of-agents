@@ -1,7 +1,5 @@
 """Integration tests: Full template evaluation with sample exploration data."""
 
-import pytest
-
 from voice_of_agents.eval.phase3_evaluate import (
     _template_generate_evaluation,
     _validate_evaluation,
@@ -32,7 +30,9 @@ class TestTemplateEvaluation:
         # Modify exploration to have all blocked outcomes
         for obj in sample_exploration["objectives"]:
             obj["outcome"] = "blocked"
-            obj["friction_points"] = [{"type": "gap", "severity": "critical", "description": "Totally broken"}]
+            obj["friction_points"] = [
+                {"type": "gap", "severity": "critical", "description": "Totally broken"}
+            ]
         result = _template_generate_evaluation(maria, sample_exploration)
         assert result["scores"]["goal_achievement"] <= 3
         assert result["scores"]["overall"] <= 4
@@ -46,9 +46,11 @@ class TestTemplateEvaluation:
 
     def test_fear_motivated_objection(self, maria, sample_exploration):
         result = _template_generate_evaluation(maria, sample_exploration)
-        assert "wrong information" in result["narrative"]["objection"].lower() or \
-               "liability" in result["narrative"]["objection"].lower() or \
-               "incorrect" in result["narrative"]["objection"].lower()
+        assert (
+            "wrong information" in result["narrative"]["objection"].lower()
+            or "liability" in result["narrative"]["objection"].lower()
+            or "incorrect" in result["narrative"]["objection"].lower()
+        )
 
     def test_unmet_needs_extracted(self, maria, sample_exploration):
         result = _template_generate_evaluation(maria, sample_exploration)
@@ -64,4 +66,6 @@ class TestTemplateEvaluation:
         result = _template_generate_evaluation(rachel, sample_exploration)
         # Efficiency-motivated objection should mention ROI or cost
         objection = result["narrative"]["objection"].lower()
-        assert "roi" in objection or "$" in objection or "income" in objection or "month" in objection
+        assert (
+            "roi" in objection or "$" in objection or "income" in objection or "month" in objection
+        )

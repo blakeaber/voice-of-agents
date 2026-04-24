@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -75,10 +74,10 @@ def prioritize_backlog(config: VoAConfig) -> None:
 
         # Weighted score
         score = (
-            coverage * config.weight_coverage +
-            pain * config.weight_pain +
-            revenue * config.weight_revenue +
-            effort_inv * config.weight_effort
+            coverage * config.weight_coverage
+            + pain * config.weight_pain
+            + revenue * config.weight_revenue
+            + effort_inv * config.weight_effort
         ) * 100
 
         # Check if this finding already has a backlog item

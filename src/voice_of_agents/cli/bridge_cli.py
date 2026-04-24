@@ -40,8 +40,13 @@ def bridge_status_cmd():
 
 
 @bridge_cli.command("sync-gaps")
-@click.option("--dir", "project_dir", default=".", show_default=True,
-              help="Directory containing capabilities.yaml and workflows/")
+@click.option(
+    "--dir",
+    "project_dir",
+    default=".",
+    show_default=True,
+    help="Directory containing capabilities.yaml and workflows/",
+)
 def sync_gaps_cmd(project_dir: str):
     """Sync design-layer gap analysis findings into backlog.jsonl."""
     from pathlib import Path
@@ -70,4 +75,6 @@ def sync_gaps_cmd(project_dir: str):
     report = analyzer.analyze(mappings)
     config = VoAConfig.load()
     n = sync_gap_analysis_to_backlog(report, config)
-    click.echo(f"Synced {n} new backlog item(s) from gap analysis ({len(report.feature_recommendations)} total gaps found).")
+    click.echo(
+        f"Synced {n} new backlog item(s) from gap analysis ({len(report.feature_recommendations)} total gaps found)."
+    )

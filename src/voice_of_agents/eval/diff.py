@@ -60,12 +60,14 @@ def generate_diff(config: VoAConfig) -> None:
             prev_overall = prior_eval.get("scores", {}).get("overall", 0)
             if curr_overall != prev_overall:
                 persona_id = current_eval.get("persona", {}).get("id", persona_slug)
-                sentiment_shifts.append({
-                    "persona": persona_id,
-                    "previous_overall": prev_overall,
-                    "current_overall": curr_overall,
-                    "delta": curr_overall - prev_overall,
-                })
+                sentiment_shifts.append(
+                    {
+                        "persona": persona_id,
+                        "previous_overall": prev_overall,
+                        "current_overall": curr_overall,
+                        "delta": curr_overall - prev_overall,
+                    }
+                )
 
     if sentiment_shifts:
         lines.append("### Sentiment Shifts\n")
@@ -83,7 +85,9 @@ def generate_diff(config: VoAConfig) -> None:
     # Summary
     total_personas = len(persona_runs)
     multi_run = sum(1 for runs in persona_runs.values() if len(runs) >= 2)
-    lines.append(f"**Summary:** {total_personas} personas evaluated, {multi_run} with prior runs for comparison.\n")
+    lines.append(
+        f"**Summary:** {total_personas} personas evaluated, {multi_run} with prior runs for comparison.\n"
+    )
 
     # Append to diff report
     config.diff_report_path.parent.mkdir(parents=True, exist_ok=True)

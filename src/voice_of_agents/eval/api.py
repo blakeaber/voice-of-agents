@@ -26,11 +26,14 @@ class TargetAPI:
 
     def signup(self, email: str, org_name: str, display_name: str) -> dict:
         """Create a new user account. Returns user_id, org_id, api_key, session_token."""
-        resp = self._client.post("/api/auth/signup", json={
-            "email": email,
-            "org_name": org_name,
-            "display_name": display_name,
-        })
+        resp = self._client.post(
+            "/api/auth/signup",
+            json={
+                "email": email,
+                "org_name": org_name,
+                "display_name": display_name,
+            },
+        )
         resp.raise_for_status()
         data = resp.json()
         self._session_token = data.get("session_token")
@@ -38,10 +41,13 @@ class TargetAPI:
 
     def login(self, email: str, api_key: str) -> dict:
         """Login with email + API key. Returns session_token."""
-        resp = self._client.post("/api/auth/login", json={
-            "email": email,
-            "api_key": api_key,
-        })
+        resp = self._client.post(
+            "/api/auth/login",
+            json={
+                "email": email,
+                "api_key": api_key,
+            },
+        )
         resp.raise_for_status()
         data = resp.json()
         self._session_token = data.get("session_token")
@@ -55,22 +61,29 @@ class TargetAPI:
         """Save an onboarding step (goals, provider, complete)."""
         return self._authed_post("/api/auth/onboarding", {"step": step, "data": data})
 
-    def create_agent_profile(self, name: str, description: str, specializations: list[str],
-                             agent_type: str = "personal") -> dict:
+    def create_agent_profile(
+        self, name: str, description: str, specializations: list[str], agent_type: str = "personal"
+    ) -> dict:
         """Publish an agent profile."""
-        return self._authed_post("/api/org/agents", {
-            "name": name,
-            "description": description,
-            "specializations": specializations,
-            "agent_type": agent_type,
-        })
+        return self._authed_post(
+            "/api/org/agents",
+            {
+                "name": name,
+                "description": description,
+                "specializations": specializations,
+                "agent_type": agent_type,
+            },
+        )
 
     def create_learning(self, content: str, keywords: list[str]) -> dict:
         """Create a learning entry."""
-        return self._authed_post("/api/org/learnings", {
-            "content": content,
-            "keywords": keywords,
-        })
+        return self._authed_post(
+            "/api/org/learnings",
+            {
+                "content": content,
+                "keywords": keywords,
+            },
+        )
 
     def search_learnings(self, query: str) -> list[dict]:
         """Search learnings by query."""

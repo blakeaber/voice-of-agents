@@ -41,15 +41,23 @@ def maria():
         income=52000,
         org_size=1,
         pain_points=[
-            PainPoint(description="800 files in Google Drive, can't find anything", impact="severity 9/10, daily"),
-            PainPoint(description="Policy changes discovered via rejections", impact="severity 8/10, monthly"),
+            PainPoint(
+                description="800 files in Google Drive, can't find anything",
+                impact="severity 9/10, daily",
+            ),
+            PainPoint(
+                description="Policy changes discovered via rejections",
+                impact="severity 8/10, monthly",
+            ),
         ],
         pain_themes=[
             PainTheme(theme="A", intensity="CRITICAL"),
             PainTheme(theme="D", intensity="HIGH"),
         ],
         trust_requirements=["Must surface MY prior work, not generic AI answers"],
-        voice=VoiceProfile(skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="moderate"),
+        voice=VoiceProfile(
+            skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="moderate"
+        ),
     )
 
 
@@ -67,13 +75,21 @@ def rachel():
         income=130000,
         org_size=8,
         pain_points=[
-            PainPoint(description="20+ policy questions daily from managers", impact="severity 9/10, daily"),
+            PainPoint(
+                description="20+ policy questions daily from managers",
+                impact="severity 9/10, daily",
+            ),
         ],
         pain_themes=[
             PainTheme(theme="B", intensity="CRITICAL"),
         ],
         trust_requirements=["Only answer approved policies, never fabricate"],
-        voice=VoiceProfile(skepticism="moderate", vocabulary="general", motivation="efficiency", price_sensitivity="low"),
+        voice=VoiceProfile(
+            skepticism="moderate",
+            vocabulary="general",
+            motivation="efficiency",
+            price_sensitivity="low",
+        ),
     )
 
 
@@ -91,13 +107,18 @@ def james():
         income=45000,
         org_size=1,
         pain_points=[
-            PainPoint(description="Categorization errors repeat every quarter", impact="severity 7/10, quarterly"),
+            PainPoint(
+                description="Categorization errors repeat every quarter",
+                impact="severity 7/10, quarterly",
+            ),
         ],
         pain_themes=[
             PainTheme(theme="A", intensity="HIGH"),
         ],
         trust_requirements=["Wants HIS reasoning, not AI opinions"],
-        voice=VoiceProfile(skepticism="high", vocabulary="financial", motivation="fear", price_sensitivity="high"),
+        voice=VoiceProfile(
+            skepticism="high", vocabulary="financial", motivation="fear", price_sensitivity="high"
+        ),
     )
 
 
@@ -140,8 +161,12 @@ def sample_exploration():
                 "pages_visited": ["http://localhost:3000/", "http://localhost:3000/pro/workspace"],
                 "journey": [],
                 "friction_points": [
-                    {"type": "empty_state", "description": "Workspace page is empty",
-                     "severity": "medium", "persona_quote": "Everything is empty."},
+                    {
+                        "type": "empty_state",
+                        "description": "Workspace page is empty",
+                        "severity": "medium",
+                        "persona_quote": "Everything is empty.",
+                    },
                 ],
                 "surprises": [],
                 "missing_capabilities": [],

@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import datetime, timezone
-from pathlib import Path
 
 import yaml
 
@@ -28,12 +27,16 @@ def _load_goals_for_persona(persona: Persona, config: VoAConfig) -> list[Explora
                 goals = []
                 for g in data.get("goals", []):
                     vm = g.get("value_metrics") or {}
-                    goals.append(ExplorationGoal(
-                        goal=g.get("title", ""),
-                        trigger=g.get("trigger", ""),
-                        success_definition=g.get("success_statement", ""),
-                        efficiency_baseline=vm.get("time_saved", "") if isinstance(vm, dict) else "",
-                    ))
+                    goals.append(
+                        ExplorationGoal(
+                            goal=g.get("title", ""),
+                            trigger=g.get("trigger", ""),
+                            success_definition=g.get("success_statement", ""),
+                            efficiency_baseline=vm.get("time_saved", "")
+                            if isinstance(vm, dict)
+                            else "",
+                        )
+                    )
                 if goals:
                     return goals
             except Exception as e:
@@ -52,14 +55,15 @@ def _derive_goals_from_persona(persona: Persona) -> list[ExplorationGoal]:
 
     goals = [
         ExplorationGoal(
-            goal=f"Explore the core product and attempt to complete a primary task",
+            goal="Explore the core product and attempt to complete a primary task",
             trigger=mindset_summary or f"Evaluate whether this tool fits {persona.role} workflows",
             success_definition="Successfully navigate the main interface and attempt at least one core workflow",
             efficiency_baseline="",
         ),
         ExplorationGoal(
             goal="Understand what the product does and whether it solves the key problem",
-            trigger=pain_summary or f"Determine if the product addresses {persona.name}'s primary pain point",
+            trigger=pain_summary
+            or f"Determine if the product addresses {persona.name}'s primary pain point",
             success_definition="Find and read key feature explanations; locate any workflow or automation builder",
             efficiency_baseline="",
         ),
@@ -110,5 +114,9 @@ def explore_personas(personas: list[Persona], config: VoAConfig) -> None:
         missing_count = sum(len(r.missing_capabilities) for r in results)
         logger.info(
             "  %s: %d objectives, outcomes=%s, %d friction points, %d missing capabilities",
-            persona.id, len(results), outcomes, friction_count, missing_count,
+            persona.id,
+            len(results),
+            outcomes,
+            friction_count,
+            missing_count,
         )

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from voice_of_agents.core.enums import Segment, Tier, ValidationStatus
-from voice_of_agents.core.pain import PainPoint, PainTheme
+from voice_of_agents.core.pain import PainPoint
 from voice_of_agents.core.persona import Persona, PersonaMetadata, VoiceProfile
 from voice_of_agents.research.models import (
     AdoptionStatus,
@@ -89,11 +89,7 @@ def sidecar_to_canonical_persona(
         if context_segment
         else _infer_segment(sidecar)
     )
-    org_size = (
-        _CONTEXT_TO_ORG_SIZE.get(context_segment, 50)
-        if context_segment
-        else 50
-    )
+    org_size = _CONTEXT_TO_ORG_SIZE.get(context_segment, 50) if context_segment else 50
     tier = _infer_tier(sidecar)
     price_sensitivity = (
         _ADOPTION_TO_PRICE_SENSITIVITY.get(adoption_status, "moderate")
@@ -115,7 +111,9 @@ def sidecar_to_canonical_persona(
             )
         )
 
-    research_basis = [f"research:{session_slug}:{sidecar.uxw_id}"] if session_slug else [sidecar.uxw_id]
+    research_basis = (
+        [f"research:{session_slug}:{sidecar.uxw_id}"] if session_slug else [sidecar.uxw_id]
+    )
 
     return Persona(
         id=persona_id,

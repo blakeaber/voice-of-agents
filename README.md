@@ -1,5 +1,10 @@
 # Voice of Agents
 
+[![PyPI version](https://img.shields.io/pypi/v/voice-of-agents.svg)](https://pypi.org/project/voice-of-agents/)
+[![Python versions](https://img.shields.io/pypi/pyversions/voice-of-agents.svg)](https://pypi.org/project/voice-of-agents/)
+[![CI](https://github.com/blakeaber/voice-of-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/blakeaber/voice-of-agents/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Research-grade rigor for developers who can't afford a research team.
 
 ```python

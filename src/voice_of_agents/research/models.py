@@ -7,8 +7,6 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
-from voice_of_agents.core.enums import Tier
-
 
 # ── Research-specific enums ────────────────────────────────────────────
 
@@ -72,10 +70,7 @@ class SubjectRecord(BaseModel):
             AdoptionStatus.EVALUATED_AND_REJECTED,
             AdoptionStatus.ACTIVELY_ANTI,
         }
-        if (
-            self.adoption_status in requires_failure
-            and not self.failure_or_abandonment_mode
-        ):
+        if self.adoption_status in requires_failure and not self.failure_or_abandonment_mode:
             raise ValueError(
                 f"failure_or_abandonment_mode is required for {self.adoption_status.value} subjects"
             )
@@ -128,15 +123,9 @@ class BehavioralSegment(BaseModel):
 
 
 class ProductResearchInput(BaseModel):
-    question: str = Field(
-        description="Falsifiable research question about a customer population"
-    )
-    scope: str = Field(
-        description="Population boundary: region, firm-size, time window"
-    )
-    slug: str = Field(
-        description="≤6 kebab-case words; used in artifact directory name"
-    )
+    question: str = Field(description="Falsifiable research question about a customer population")
+    scope: str = Field(description="Population boundary: region, firm-size, time window")
+    slug: str = Field(description="≤6 kebab-case words; used in artifact directory name")
     product_context: str = Field(
         description="Brief description of the product being researched (not a target market)"
     )

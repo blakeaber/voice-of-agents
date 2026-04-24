@@ -89,20 +89,26 @@ class ExplorationResult:
             "outcome": self.outcome,
             "pages_visited": self.pages_visited,
             "journey": [
-                {"action": s.action, "observation": s.observation,
-                 "reaction": s.reaction, "page_url": s.page_url,
-                 "latency_ms": s.latency_ms, "screenshot": s.screenshot}
+                {
+                    "action": s.action,
+                    "observation": s.observation,
+                    "reaction": s.reaction,
+                    "page_url": s.page_url,
+                    "latency_ms": s.latency_ms,
+                    "screenshot": s.screenshot,
+                }
                 for s in self.journey
             ],
             "friction_points": [
-                {"type": f.type, "description": f.description,
-                 "severity": f.severity, "persona_quote": f.persona_quote}
+                {
+                    "type": f.type,
+                    "description": f.description,
+                    "severity": f.severity,
+                    "persona_quote": f.persona_quote,
+                }
                 for f in self.friction_points
             ],
-            "surprises": [
-                {"type": s.type, "description": s.description}
-                for s in self.surprises
-            ],
+            "surprises": [{"type": s.type, "description": s.description} for s in self.surprises],
             "missing_capabilities": self.missing_capabilities,
         }
 
@@ -130,12 +136,16 @@ async def explore_as_persona(
         context = await browser.new_context(viewport={"width": 1280, "height": 800})
 
         if session_token:
-            await context.add_cookies([{
-                "name": "rooben_session",
-                "value": session_token,
-                "domain": "localhost",
-                "path": "/",
-            }])
+            await context.add_cookies(
+                [
+                    {
+                        "name": "rooben_session",
+                        "value": session_token,
+                        "domain": "localhost",
+                        "path": "/",
+                    }
+                ]
+            )
             page = await context.new_page()
             await page.goto(target_url, wait_until="networkidle", timeout=15000)
             await page.evaluate(f"localStorage.setItem('rooben_session', '{session_token}')")
@@ -156,11 +166,13 @@ async def explore_as_persona(
                 await _explore_objective(page, persona, goal, result, target_url, screenshot_dir)
             except Exception as e:
                 result.outcome = "blocked"
-                result.friction_points.append(FrictionPoint(
-                    type="broken",
-                    description=f"Exploration failed: {e}",
-                    severity="critical",
-                ))
+                result.friction_points.append(
+                    FrictionPoint(
+                        type="broken",
+                        description=f"Exploration failed: {e}",
+                        severity="critical",
+                    )
+                )
                 logger.error("Exploration failed for %s goal '%s': %s", persona.id, goal.goal, e)
 
             results.append(result)
@@ -171,8 +183,11 @@ async def explore_as_persona(
 
 
 async def _explore_objective(
-    page, persona: Persona, objective: ExplorationGoal,
-    result: ExplorationResult, target_url: str,
+    page,
+    persona: Persona,
+    objective: ExplorationGoal,
+    result: ExplorationResult,
+    target_url: str,
     screenshot_dir: Path | None,
 ) -> None:
     """LLM-driven multi-step exploration of a single objective.
@@ -191,13 +206,17 @@ async def _explore_objective(
     current_url = page.url
     result.pages_visited.append(current_url)
 
-    result.journey.append(JourneyStep(
-        action=f"Open {target_url}",
-        observation=f"Redirected to {current_url}" if current_url != target_url else f"Loaded {current_url}",
-        reaction=_react_to_landing(persona, current_url),
-        page_url=current_url,
-        latency_ms=latency,
-    ))
+    result.journey.append(
+        JourneyStep(
+            action=f"Open {target_url}",
+            observation=f"Redirected to {current_url}"
+            if current_url != target_url
+            else f"Loaded {current_url}",
+            reaction=_react_to_landing(persona, current_url),
+            page_url=current_url,
+            latency_ms=latency,
+        )
+    )
 
     if screenshot_dir:
         fname = await _screenshot(page, screenshot_dir, "step-01-landing")
@@ -214,16 +233,15 @@ async def _explore_objective(
         url_before = page.url
 
         recent_steps = result.journey[-5:]
-        action_history = "\n".join(
-            f"- {s.action}: {s.observation[:120]}" for s in recent_steps
-        )
+        action_history = "\n".join(f"- {s.action}: {s.observation[:120]}" for s in recent_steps)
 
         # Build list of already-tried actions on this URL for the prompt
         already_tried = sorted(tried_on_url.get(url_before, set()))
         tried_hint = (
             "Actions you have ALREADY tried on this URL (do NOT repeat them): "
             + ", ".join(f'"{a} {t}"' for a, t in already_tried)
-            if already_tried else ""
+            if already_tried
+            else ""
         )
 
         action_json = await _ask_llm_for_action(
@@ -244,12 +262,14 @@ async def _explore_objective(
         if action_json.get("friction"):
             f = action_json["friction"]
             if isinstance(f, dict):
-                result.friction_points.append(FrictionPoint(
-                    type=f.get("type", "gap"),
-                    description=f.get("description", ""),
-                    severity=f.get("severity", "medium"),
-                    persona_quote=f.get("persona_quote", ""),
-                ))
+                result.friction_points.append(
+                    FrictionPoint(
+                        type=f.get("type", "gap"),
+                        description=f.get("description", ""),
+                        severity=f.get("severity", "medium"),
+                        persona_quote=f.get("persona_quote", ""),
+                    )
+                )
 
         if action_json.get("missing_capability"):
             cap = action_json["missing_capability"]
@@ -257,32 +277,40 @@ async def _explore_objective(
                 result.missing_capabilities.append(cap)
 
         if action == "achieved":
-            result.journey.append(JourneyStep(
-                action="Objective achieved",
-                observation=observation or "Successfully completed the objective",
-                reaction=reason,
-                page_url=page.url,
-            ))
+            result.journey.append(
+                JourneyStep(
+                    action="Objective achieved",
+                    observation=observation or "Successfully completed the objective",
+                    reaction=reason,
+                    page_url=page.url,
+                )
+            )
             result.outcome = "achieved"
             if screenshot_dir:
                 await _screenshot(page, screenshot_dir, f"step-{step_num:02d}-achieved")
             return
 
         if action == "blocked":
-            result.journey.append(JourneyStep(
-                action="Blocked — cannot proceed",
-                observation=observation or "No path forward found",
-                reaction=reason,
-                page_url=page.url,
-            ))
+            result.journey.append(
+                JourneyStep(
+                    action="Blocked — cannot proceed",
+                    observation=observation or "No path forward found",
+                    reaction=reason,
+                    page_url=page.url,
+                )
+            )
             result.outcome = "blocked"
-            if not any(fp.severity == "high" or fp.severity == "critical" for fp in result.friction_points):
-                result.friction_points.append(FrictionPoint(
-                    type="gap",
-                    description=reason or f"Cannot complete: {objective.goal}",
-                    severity="high",
-                    persona_quote=_quote_cant_find(persona, objective),
-                ))
+            if not any(
+                fp.severity == "high" or fp.severity == "critical" for fp in result.friction_points
+            ):
+                result.friction_points.append(
+                    FrictionPoint(
+                        type="gap",
+                        description=reason or f"Cannot complete: {objective.goal}",
+                        severity="high",
+                        persona_quote=_quote_cant_find(persona, objective),
+                    )
+                )
             if screenshot_dir:
                 await _screenshot(page, screenshot_dir, f"step-{step_num:02d}-blocked")
             return
@@ -308,8 +336,9 @@ async def _explore_objective(
         url_changed = new_url != url_before
         if not url_changed and action == "click":
             exec_observation = (
-                exec_observation or observation or ""
-            ) + " [URL unchanged — this was a selection toggle, not a navigation. Look for Continue/Submit/Next.]"
+                (exec_observation or observation or "")
+                + " [URL unchanged — this was a selection toggle, not a navigation. Look for Continue/Submit/Next.]"
+            )
 
         target_desc = (
             action_json.get("target_text")
@@ -331,13 +360,16 @@ async def _explore_objective(
         result.journey.append(step)
 
         if not success:
-            logger.debug("Action failed at step %d for %s: %s", step_num, persona.id, exec_observation)
+            logger.debug(
+                "Action failed at step %d for %s: %s", step_num, persona.id, exec_observation
+            )
 
     # Exhausted steps without terminal state
     result.outcome = "partial"
 
 
 # ── LLM Action Engine ─────────────────────────────────────────────────
+
 
 async def _capture_screenshot_b64(page) -> str:
     """Capture a JPEG screenshot and return as base64 string."""
@@ -440,7 +472,7 @@ async def _ask_llm_for_action(
         pain_summary = (persona.pain_points[0].description or "")[:200]
 
     system_prompt = f"""You are {persona.name}, a {persona.role} in {persona.industry}.
-Mindset: {(persona.mindset or '')[:250]}
+Mindset: {(persona.mindset or "")[:250]}
 Primary pain: {pain_summary}
 
 You are navigating a web application to achieve a specific objective. Your job is to decide the single best next action.
@@ -486,18 +518,22 @@ Critical rules:
 
     content: list[dict] = []
     if screenshot_b64:
-        content.append({
-            "type": "image",
-            "source": {
-                "type": "base64",
-                "media_type": "image/jpeg",
-                "data": screenshot_b64,
-            },
-        })
-    content.append({
-        "type": "text",
-        "text": "Based on the page state above and this screenshot, what is the best single next action to take?",
-    })
+        content.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": "image/jpeg",
+                    "data": screenshot_b64,
+                },
+            }
+        )
+    content.append(
+        {
+            "type": "text",
+            "text": "Based on the page state above and this screenshot, what is the best single next action to take?",
+        }
+    )
 
     try:
         response = client.messages.create(
@@ -548,7 +584,11 @@ def _parse_action_json(text: str) -> dict:
                     start = None
 
     logger.warning("Could not parse LLM action JSON: %s", text[:300])
-    return {"action": "blocked", "reason": "Could not parse LLM response", "observation": text[:200]}
+    return {
+        "action": "blocked",
+        "reason": "Could not parse LLM response",
+        "observation": text[:200],
+    }
 
 
 async def _execute_action(page, action_json: dict, target_url: str) -> tuple[bool, str]:
@@ -674,6 +714,7 @@ async def _execute_action(page, action_json: dict, target_url: str) -> tuple[boo
 
 # ── Page Content Reading ──────────────────────────────────────────────
 
+
 async def _read_page_content(page) -> dict:
     """Read and summarize the current page's content and structure."""
     title = await page.title()
@@ -720,10 +761,18 @@ async def _read_page_content(page) -> dict:
         pass
 
     main_lower = main_text.lower()
-    is_empty = any(phrase in main_lower for phrase in [
-        "no learnings yet", "no delegations yet", "no agents",
-        "no data", "empty", "get started", "no results",
-    ])
+    is_empty = any(
+        phrase in main_lower
+        for phrase in [
+            "no learnings yet",
+            "no delegations yet",
+            "no agents",
+            "no data",
+            "empty",
+            "get started",
+            "no results",
+        ]
+    )
     empty_message = ""
     if is_empty:
         for phrase in ["no learnings yet", "no delegations yet", "no agents yet"]:
@@ -759,6 +808,7 @@ async def _read_page_content(page) -> dict:
 
 # ── Persona-Voice Reactions ───────────────────────────────────────────
 
+
 def _react_to_landing(persona: Persona, url: str) -> str:
     if "/login" in url:
         return "I need to log in first."
@@ -788,8 +838,20 @@ def _is_relevant_to_persona(link: NavLink, persona: Persona) -> bool:
     if persona.org_size <= 1:
         return any(k in text for k in ["workspace", "knowledge", "library", "profile", "setting"])
     else:
-        return any(k in text for k in ["workspace", "knowledge", "library", "profile", "agent",
-                                        "expert", "delegation", "dashboard", "setting"])
+        return any(
+            k in text
+            for k in [
+                "workspace",
+                "knowledge",
+                "library",
+                "profile",
+                "agent",
+                "expert",
+                "delegation",
+                "dashboard",
+                "setting",
+            ]
+        )
 
 
 async def _screenshot(page, screenshot_dir: Path, name: str) -> str:

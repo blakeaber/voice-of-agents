@@ -1,7 +1,5 @@
 """Integration tests: Canonical Persona YAML save/load roundtrip."""
 
-import pytest
-
 from voice_of_agents.core.io import load_persona, load_personas_dir, save_persona
 
 

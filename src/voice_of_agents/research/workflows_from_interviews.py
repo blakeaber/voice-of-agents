@@ -25,11 +25,31 @@ from voice_of_agents.research.validation import guard_stage3_input
 _DEFAULT_MODEL = "claude-opus-4-7"
 
 _EPISODE_SCENARIOS = [
-    ("primary-task", "3 weeks ago", "The most recent time you completed your primary task from start to finish"),
-    ("under-pressure", "last month", "A time you had to complete this task under unusual time pressure"),
-    ("failure-recovery", "2 months ago", "A time something went wrong mid-task and you had to recover"),
-    ("delegation", "last quarter", "A time you had to hand off this task to someone else or receive a handoff"),
-    ("new-constraint", "recently", "A time you encountered a new constraint that changed how you worked"),
+    (
+        "primary-task",
+        "3 weeks ago",
+        "The most recent time you completed your primary task from start to finish",
+    ),
+    (
+        "under-pressure",
+        "last month",
+        "A time you had to complete this task under unusual time pressure",
+    ),
+    (
+        "failure-recovery",
+        "2 months ago",
+        "A time something went wrong mid-task and you had to recover",
+    ),
+    (
+        "delegation",
+        "last quarter",
+        "A time you had to hand off this task to someone else or receive a handoff",
+    ),
+    (
+        "new-constraint",
+        "recently",
+        "A time you encountered a new constraint that changed how you worked",
+    ),
 ]
 
 
@@ -84,8 +104,7 @@ async def _run_episode_interviews(
         return _parse_episode(response.content[0].text, episode_name, time_anchor)
 
     tasks = [
-        call_one(ep_name, time_anchor, scenario)
-        for ep_name, time_anchor, scenario in scenarios
+        call_one(ep_name, time_anchor, scenario) for ep_name, time_anchor, scenario in scenarios
     ]
     return list(await asyncio.gather(*tasks))
 
@@ -111,7 +130,16 @@ def _parse_episode(raw: str, episode_name: str, date: str) -> EpisodeRecord:
                 )
             )
     if not steps:
-        steps = [EpisodeStep(step="[no steps captured]", tool="none", input="", output="", time="", blocker="none")]
+        steps = [
+            EpisodeStep(
+                step="[no steps captured]",
+                tool="none",
+                input="",
+                output="",
+                time="",
+                blocker="none",
+            )
+        ]
 
     return EpisodeRecord(
         episode=data.get("episode", episode_name),
@@ -236,9 +264,7 @@ async def run_workflows_from_interviews(
     sidecar = _get_sidecar(input)
 
     # Spawn parallel episode interviews
-    episodes = await _run_episode_interviews(
-        sidecar, input.episode_count, client, model
-    )
+    episodes = await _run_episode_interviews(sidecar, input.episode_count, client, model)
 
     # Synthesize workflow maps from episodes
     workflow_maps = await _synthesize_workflow_maps(sidecar, episodes, client, model)

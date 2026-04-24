@@ -3,7 +3,6 @@
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from voice_of_agents.research.bridge import (
     sidecar_to_canonical_persona,
@@ -16,7 +15,7 @@ from voice_of_agents.research.models import (
     UXWPersonaSidecar,
     VerbatimQuote,
 )
-from voice_of_agents.core.enums import Segment, Tier, ValidationStatus
+from voice_of_agents.core.enums import Segment, ValidationStatus
 
 
 def _make_sidecar(uxw_id: str = "UXW-01") -> UXWPersonaSidecar:
@@ -39,6 +38,7 @@ def _make_sidecar(uxw_id: str = "UXW-01") -> UXWPersonaSidecar:
 class TestSidecarToCanonicalPersona:
     def test_returns_persona(self):
         from voice_of_agents.core.persona import Persona
+
         sidecar = _make_sidecar()
         persona = sidecar_to_canonical_persona(sidecar, persona_id=1)
         assert isinstance(persona, Persona)

@@ -3,9 +3,7 @@
 import csv
 import json
 import tempfile
-from pathlib import Path
 
-import pytest
 
 from voice_of_agents.research.signals import (
     RealSignal,
@@ -61,7 +59,9 @@ class TestFromCsv:
         with tempfile.NamedTemporaryFile(suffix=".csv", mode="w", delete=False, newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["feedback", "status"])
             writer.writeheader()
-            writer.writerow({"feedback": "This tool changed how I work completely", "status": "user"})
+            writer.writerow(
+                {"feedback": "This tool changed how I work completely", "status": "user"}
+            )
             writer.writerow({"feedback": "I stopped using it after two weeks", "status": "churned"})
             fname = f.name
 
@@ -73,7 +73,9 @@ class TestFromCsv:
         with tempfile.NamedTemporaryFile(suffix=".csv", mode="w", delete=False, newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["text", "type"])
             writer.writeheader()
-            writer.writerow({"text": "I stopped after a month, it was not working for me", "type": "abandoned"})
+            writer.writerow(
+                {"text": "I stopped after a month, it was not working for me", "type": "abandoned"}
+            )
             fname = f.name
 
         signals = from_csv(fname, text_column="text", adoption_column="type")
@@ -94,8 +96,14 @@ class TestFromCsv:
 class TestFromJson:
     def test_extracts_text_field(self):
         data = [
-            {"response": "The tool helped me dramatically reduce time spent on reports.", "type": "adopter"},
-            {"response": "I tried it once and never went back because it was confusing.", "type": "abandoner"},
+            {
+                "response": "The tool helped me dramatically reduce time spent on reports.",
+                "type": "adopter",
+            },
+            {
+                "response": "I tried it once and never went back because it was confusing.",
+                "type": "abandoner",
+            },
         ]
         with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
             json.dump(data, f)
@@ -106,7 +114,9 @@ class TestFromJson:
         assert signals.signals[0].source == "json"
 
     def test_maps_adoption_status(self):
-        data = [{"text": "I abandoned it after week one it was too slow for me", "status": "abandoner"}]
+        data = [
+            {"text": "I abandoned it after week one it was too slow for me", "status": "abandoner"}
+        ]
         with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
             json.dump(data, f)
             fname = f.name
@@ -115,7 +125,9 @@ class TestFromJson:
         assert signals.signals[0].adoption_status == AdoptionStatus.ABANDONER
 
     def test_handles_wrapped_object(self):
-        data = {"results": [{"quote": "A really long and meaningful user quote here", "type": "user"}]}
+        data = {
+            "results": [{"quote": "A really long and meaningful user quote here", "type": "user"}]
+        }
         with tempfile.NamedTemporaryFile(suffix=".json", mode="w", delete=False) as f:
             json.dump(data, f)
             fname = f.name
@@ -140,9 +152,11 @@ class TestMergeSignalSets:
 
 class TestInjectSignalsIntoPrompt:
     def test_appends_signals_to_prompt(self):
-        signals = SignalSet(signals=[
-            RealSignal(source="transcript", verbatim="Users often say they feel overwhelmed"),
-        ])
+        signals = SignalSet(
+            signals=[
+                RealSignal(source="transcript", verbatim="Users often say they feel overwhelmed"),
+            ]
+        )
         result = inject_signals_into_prompt("Base prompt.", signals)
         assert "Real User Verbatims" in result
         assert "Users often say they feel overwhelmed" in result
@@ -155,19 +169,19 @@ class TestInjectSignalsIntoPrompt:
 
 class TestSignalSetToVerbatimQuotes:
     def test_converts_to_verbatim_quotes(self):
-        signals = SignalSet(signals=[
-            RealSignal(source="csv", verbatim=f"User quote number {i} here")
-            for i in range(5)
-        ])
+        signals = SignalSet(
+            signals=[
+                RealSignal(source="csv", verbatim=f"User quote number {i} here") for i in range(5)
+            ]
+        )
         quotes = signals.to_verbatim_quotes()
         assert len(quotes) == 5
         for q in quotes:
             assert q.key.startswith("RS")
 
     def test_caps_at_eight_quotes(self):
-        signals = SignalSet(signals=[
-            RealSignal(source="csv", verbatim=f"Quote {i}")
-            for i in range(20)
-        ])
+        signals = SignalSet(
+            signals=[RealSignal(source="csv", verbatim=f"Quote {i}") for i in range(20)]
+        )
         quotes = signals.to_verbatim_quotes()
         assert len(quotes) <= 8

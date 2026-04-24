@@ -2,15 +2,18 @@
 
 from __future__ import annotations
 
-import pytest
-from pydantic import ValidationError
 
 from voice_of_agents.core.capability import Capability, CapabilityRegistry, TestResult
 
 
 def _cap(**kwargs):
-    defaults = dict(id="CAP-LEARN-SEARCH", name="Learning Search", description="Search learnings",
-                    status="complete", feature_area="Learning System")
+    defaults = dict(
+        id="CAP-LEARN-SEARCH",
+        name="Learning Search",
+        description="Search learnings",
+        status="complete",
+        feature_area="Learning System",
+    )
     defaults.update(kwargs)
     return Capability(**defaults)
 
@@ -37,10 +40,12 @@ class TestCapability:
         assert _cap().latest_test() is None
 
     def test_latest_test_returns_last(self):
-        c = _cap(test_results=[
-            TestResult(run_date="2026-01-01", status="pass"),
-            TestResult(run_date="2026-02-01", status="fail"),
-        ])
+        c = _cap(
+            test_results=[
+                TestResult(run_date="2026-01-01", status="pass"),
+                TestResult(run_date="2026-02-01", status="fail"),
+            ]
+        )
         assert c.latest_test().status == "fail"
         assert c.latest_test().run_date == "2026-02-01"
 
@@ -48,7 +53,11 @@ class TestCapability:
         assert _cap().requested_by == []
 
     def test_personas_in_test_result(self):
-        c = _cap(test_results=[TestResult(run_date="2026-01-01", status="pass", personas_tested=[1, 2, 3])])
+        c = _cap(
+            test_results=[
+                TestResult(run_date="2026-01-01", status="pass", personas_tested=[1, 2, 3])
+            ]
+        )
         assert c.latest_test().personas_tested == [1, 2, 3]
 
 

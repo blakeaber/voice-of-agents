@@ -49,14 +49,19 @@ def init(project_dir: str, product: str):
     if not registry_path.exists():
         registry = CapabilityRegistry(product=product, version="0.1.0", capabilities=[])
         with open(registry_path, "w") as f:
-            yaml.dump(registry.model_dump(mode="json", exclude_none=True), f,
-                      default_flow_style=False, sort_keys=False)
+            yaml.dump(
+                registry.model_dump(mode="json", exclude_none=True),
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+            )
         console.print(f"[green]Created[/] {registry_path}")
 
     console.print(f"[green]Initialized VoA design project[/] at {root.absolute()}")
 
 
 # ─── Persona commands ───────────────────────────────────────────────────
+
 
 @design_cli.group("persona")
 def persona():
@@ -91,8 +96,12 @@ def persona_list(project_dir: str):
 
     for p in personas:
         table.add_row(
-            str(p.id), p.name, p.role,
-            p.segment.value.upper(), p.tier.value, p.industry,
+            str(p.id),
+            p.name,
+            p.role,
+            p.segment.value.upper(),
+            p.tier.value,
+            p.industry,
             p.metadata.validation_status.value,
         )
 
@@ -130,16 +139,21 @@ def persona_validate(project_dir: str):
 @click.option("--segment", default="b2c")
 @click.option("--count", default=3)
 @click.option("--output", "-o", default=None)
-def persona_generate_prompt(project_dir, product, description, industry, roles, segment, count, output):
+def persona_generate_prompt(
+    project_dir, product, description, industry, roles, segment, count, output
+):
     """Generate an LLM prompt for creating new personas."""
     personas_dir, _, _ = _resolve_paths(project_dir)
     from voice_of_agents.design.persona_pipeline import PersonaGenerationRequest, PersonaPipeline
 
     pipeline = PersonaPipeline(personas_dir)
     request = PersonaGenerationRequest(
-        product_name=product, product_description=description,
-        industry=industry, roles=[r.strip() for r in roles.split(",")],
-        segment=segment, count=count,
+        product_name=product,
+        product_description=description,
+        industry=industry,
+        roles=[r.strip() for r in roles.split(",")],
+        segment=segment,
+        count=count,
     )
     prompt = pipeline.build_prompt(request)
 
@@ -175,6 +189,7 @@ def persona_import(yaml_file: str, project_dir: str):
 
 
 # ─── Workflow commands ──────────────────────────────────────────────────
+
 
 @design_cli.group("workflow")
 def workflow():
@@ -214,8 +229,12 @@ def workflow_list(project_dir: str):
         gap_style = "red" if gaps > 0 else "green"
 
         table.add_row(
-            str(m.persona_id), m.persona_name, m.persona_tier.value,
-            str(len(m.goals)), str(primary), str(caps),
+            str(m.persona_id),
+            m.persona_name,
+            m.persona_tier.value,
+            str(len(m.goals)),
+            str(primary),
+            str(caps),
             f"[{gap_style}]{gaps}[/{gap_style}]",
         )
 
@@ -283,6 +302,7 @@ def workflow_import(yaml_file: str, persona_id: int, project_dir: str):
 
 # ─── Analysis commands ──────────────────────────────────────────────────
 
+
 @design_cli.group("analyze")
 def analyze():
     """Run analysis across personas and workflows."""
@@ -308,12 +328,12 @@ def analyze_gaps(project_dir: str):
     analyzer = GapAnalyzer(registry)
     report = analyzer.analyze(mappings)
 
-    console.print(f"\n[bold]Gap Analysis Report[/bold]\n")
+    console.print("\n[bold]Gap Analysis Report[/bold]\n")
     console.print(report.summary())
 
     coverage = analyzer.coverage_by_feature_area(mappings)
     if coverage:
-        console.print(f"\n[bold]Coverage by Feature Area[/bold]")
+        console.print("\n[bold]Coverage by Feature Area[/bold]")
         table = Table()
         table.add_column("Feature Area")
         table.add_column("Used", justify="center")
@@ -323,8 +343,9 @@ def analyze_gaps(project_dir: str):
         for area, data in sorted(coverage.items()):
             rate = data["used"] / data["total"] if data["total"] else 0
             style = "green" if rate >= 0.7 else ("yellow" if rate >= 0.3 else "red")
-            table.add_row(area, str(data["used"]), str(data["total"]),
-                          f"[{style}]{rate:.0%}[/{style}]")
+            table.add_row(
+                area, str(data["used"]), str(data["total"]), f"[{style}]{rate:.0%}[/{style}]"
+            )
 
         console.print(table)
 
@@ -357,16 +378,20 @@ def analyze_coverage(project_dir: str):
     for cap in registry.capabilities:
         cov = report.coverage.get(cap.id)
         if cov:
-            table.add_row(f"{cap.id}\n  {cap.name}", cap.status,
-                          str(cov.persona_count), str(cov.workflow_count))
+            table.add_row(
+                f"{cap.id}\n  {cap.name}",
+                cap.status,
+                str(cov.persona_count),
+                str(cov.workflow_count),
+            )
         else:
-            table.add_row(f"{cap.id}\n  {cap.name}", cap.status,
-                          "[dim]0[/dim]", "[dim]0[/dim]")
+            table.add_row(f"{cap.id}\n  {cap.name}", cap.status, "[dim]0[/dim]", "[dim]0[/dim]")
 
     console.print(table)
 
 
 # ─── Validate command ───────────────────────────────────────────────────
+
 
 @design_cli.command("validate")
 @click.option("--dir", "project_dir", default=".", help="Project directory")

@@ -28,6 +28,7 @@ def eval_cli():
 
 # ── Init ───────────────────────────────────────────────────────────────
 
+
 @eval_cli.command("init")
 @click.option("--target", default="http://localhost:3000", help="Target app URL")
 @click.option("--api", default="http://localhost:8420", help="Target API URL")
@@ -50,12 +51,13 @@ def init(target: str, api: str, data: str):
 
 # ── Migrate ────────────────────────────────────────────────────────────
 
+
 @eval_cli.command("migrate")
 @click.option("--dry-run", is_flag=True, help="Show planned changes without writing")
 @click.option("--no-backup", is_flag=True, help="Skip backing up original files")
 def migrate_cmd(dry_run: bool, no_backup: bool):
     """Migrate UXW-format persona YAMLs and feature-inventory to canonical format."""
-    from voice_of_agents.eval.migrate import migrate_persona_yaml, migrate_feature_inventory
+    from voice_of_agents.eval.migrate import migrate_persona_yaml
 
     config = VoAConfig.load()
     personas_dir = config.personas_path
@@ -112,6 +114,7 @@ def migrate_cmd(dry_run: bool, no_backup: bool):
 
 # ── Import ─────────────────────────────────────────────────────────────
 
+
 @eval_cli.group("import")
 def import_group():
     """Import data from external sources."""
@@ -123,6 +126,7 @@ def import_group():
 def import_personas(source_dir: str):
     """Copy UXW-format persona YAMLs into the personas directory for migration."""
     import shutil
+
     config = _load_config()
     source = Path(source_dir)
     copied = 0
@@ -138,12 +142,14 @@ def import_personas(source_dir: str):
 def import_inventory(source_file: str):
     """Import capability registry from YAML."""
     import shutil
+
     config = _load_config()
     shutil.copy2(source_file, config.inventory_path)
     click.echo(f"Imported inventory to {config.inventory_path}")
 
 
 # ── Phase Commands ─────────────────────────────────────────────────────
+
 
 @eval_cli.command("phase1")
 @click.option("--generate-personas", is_flag=True)
@@ -154,6 +160,7 @@ def phase1(generate_personas: bool):
 
     if generate_personas:
         from voice_of_agents.eval.phase1_generate import generate_personas as gen
+
         personas = gen(config)
         click.echo(f"Generated {len(personas)} personas")
     else:
@@ -227,6 +234,7 @@ def phase5():
 
 # ── Full Pipeline ──────────────────────────────────────────────────────
 
+
 @eval_cli.command("run")
 @click.option("--personas", default=None)
 @click.option("--batch", default=None, type=int)
@@ -263,6 +271,7 @@ def run(personas: str | None, batch: int | None, run_all: bool):
 
 # ── Utilities ──────────────────────────────────────────────────────────
 
+
 @eval_cli.command("status")
 def status():
     """Show evaluation status — what's been run, what's pending."""
@@ -292,10 +301,13 @@ def status():
 
     if config.backlog_jsonl_path.exists():
         from voice_of_agents.core.backlog import materialize_backlog
+
         items = materialize_backlog(config.backlog_jsonl_path)
         open_items = [i for i in items if i.status == "open"]
         resolved = [i for i in items if i.status == "resolved"]
-        click.echo(f"Backlog: {len(items)} items ({len(open_items)} open, {len(resolved)} resolved)")
+        click.echo(
+            f"Backlog: {len(items)} items ({len(open_items)} open, {len(resolved)} resolved)"
+        )
     else:
         click.echo("Backlog: not yet generated")
 
@@ -305,6 +317,7 @@ def backlog():
     """Pretty-print the current backlog."""
     config = _load_config()
     from voice_of_agents.core.backlog import render_backlog_markdown
+
     click.echo(render_backlog_markdown(config.backlog_jsonl_path))
 
 
@@ -316,9 +329,10 @@ def capabilities():
     if not cap_path.exists():
         cap_path = config.inventory_path
     if not cap_path.exists():
-        raise click.ClickException(f"No capabilities file found. Run 'voa eval migrate' first.")
+        raise click.ClickException("No capabilities file found. Run 'voa eval migrate' first.")
 
     from voice_of_agents.core.io import load_capability_registry, LoadError
+
     try:
         registry = load_capability_registry(cap_path)
         click.echo(f"Capabilities: {len(registry.capabilities)} entries")
@@ -337,11 +351,13 @@ def diff():
     """Generate diff report comparing latest run to prior."""
     config = _load_config()
     from voice_of_agents.eval.diff import generate_diff
+
     generate_diff(config)
     click.echo(f"Diff report at {config.diff_report_path}")
 
 
 # ── Helpers ────────────────────────────────────────────────────────────
+
 
 def _select_personas(all_personas, persona_ids: str | None, batch: int | None, run_all: bool):
     if run_all:

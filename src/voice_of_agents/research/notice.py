@@ -15,7 +15,7 @@ class SyntheticDataNotice(BaseModel):
     validation_questions: list[str]
 
     def render(self) -> str:
-        vqs = "\n".join(f"  {i+1}. {q}" for i, q in enumerate(self.validation_questions))
+        vqs = "\n".join(f"  {i + 1}. {q}" for i, q in enumerate(self.validation_questions))
         return f"""# ⚠️ Synthetic Data Notice
 
 ## What this is
@@ -52,7 +52,7 @@ def generate_notice(
     """Generate a synthetic data notice for a research session."""
     if validation_questions is None:
         validation_questions = [
-            f"Can you walk me through the last time you experienced [the problem this research is about]?",
+            "Can you walk me through the last time you experienced [the problem this research is about]?",
             "What did you try before? Why didn't it stick?",
             "If this tool existed and worked perfectly, what would you be able to do that you can't today?",
         ]

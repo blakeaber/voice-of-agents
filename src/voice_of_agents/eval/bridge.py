@@ -39,19 +39,13 @@ def bridge_status(config: VoAConfig) -> dict:
     results_dir = config.results_path
 
     personas = load_personas_dir(personas_dir) if personas_dir.exists() else []
-    raw_mappings = (
-        load_workflow_mappings_dir(workflows_dir) if workflows_dir.exists() else []
-    )
+    raw_mappings = load_workflow_mappings_dir(workflows_dir) if workflows_dir.exists() else []
     mappings = {m.persona_id: m for m in raw_mappings}
 
     status = []
     for p in personas:
         has_mapping = p.id in mappings
-        has_results = (
-            bool(list(results_dir.glob(f"{p.slug}*/")))
-            if results_dir.exists()
-            else False
-        )
+        has_results = bool(list(results_dir.glob(f"{p.slug}*/"))) if results_dir.exists() else False
         if not has_results and results_dir.exists():
             legacy_prefix = f"UXW-{p.id:02d}-"
             has_results = bool(list(results_dir.glob(f"{legacy_prefix}*/")))

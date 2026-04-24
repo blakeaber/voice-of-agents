@@ -22,7 +22,9 @@ class TestVoiceProfile:
         assert v.price_sensitivity == "moderate"
 
     def test_custom_values(self):
-        v = VoiceProfile(skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="high")
+        v = VoiceProfile(
+            skepticism="high", vocabulary="legal", motivation="fear", price_sensitivity="high"
+        )
         assert v.skepticism == "high"
         assert v.vocabulary == "legal"
 
@@ -49,8 +51,9 @@ class TestPersonaMetadata:
 
 class TestPersona:
     def _minimal(self, **kwargs):
-        defaults = dict(id=1, name="Test User", role="Developer", industry="Tech",
-                        segment="b2c", tier="FREE")
+        defaults = dict(
+            id=1, name="Test User", role="Developer", industry="Tech", segment="b2c", tier="FREE"
+        )
         defaults.update(kwargs)
         return Persona(**defaults)
 
@@ -85,6 +88,7 @@ class TestPersona:
     def test_theme_intensity_found(self):
         from voice_of_agents.core.pain import PainTheme
         from voice_of_agents.core.enums import ThemeCode, Intensity
+
         p = self._minimal(pain_themes=[PainTheme(theme=ThemeCode.A, intensity=Intensity.HIGH)])
         assert p.theme_intensity("A") == "HIGH"
 
@@ -95,12 +99,14 @@ class TestPersona:
     def test_is_regulated_true(self):
         from voice_of_agents.core.pain import PainTheme
         from voice_of_agents.core.enums import ThemeCode, Intensity
+
         p = self._minimal(pain_themes=[PainTheme(theme=ThemeCode.D, intensity=Intensity.HIGH)])
         assert p.is_regulated() is True
 
     def test_is_regulated_false_medium(self):
         from voice_of_agents.core.pain import PainTheme
         from voice_of_agents.core.enums import ThemeCode, Intensity
+
         p = self._minimal(pain_themes=[PainTheme(theme=ThemeCode.D, intensity=Intensity.MEDIUM)])
         assert p.is_regulated() is False
 
@@ -110,6 +116,7 @@ class TestPersona:
 
     def test_load_from_fixture(self):
         from voice_of_agents.core.io import load_persona
+
         p = load_persona(FIXTURES / "sample_persona.yaml")
         assert p.id == 1
         assert p.name == "Maria Gutierrez"

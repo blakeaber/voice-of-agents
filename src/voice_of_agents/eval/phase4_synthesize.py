@@ -61,31 +61,34 @@ def synthesize_findings(config: VoAConfig) -> None:
             avg_severity = sum(n.get("severity", 5) for n in cluster_needs) / len(cluster_needs)
             quotes = [
                 {"persona": n["_persona_id"], "quote": n.get("persona_quote", "")}
-                for n in cluster_needs if n.get("persona_quote")
+                for n in cluster_needs
+                if n.get("persona_quote")
             ][:3]
 
-            findings.append({
-                "id": f"F-{finding_id:03d}",
-                "type": "gap" if avg_severity >= 7 else "request",
-                "title": cluster_needs[0].get("need", "Unknown need"),
-                "description": f"Reported by {len(personas_affected)} persona(s). Theme: {theme}.",
-                "evidence": {
-                    "personas_affected": personas_affected,
-                    "persona_count": len(personas_affected),
-                    "coverage": round(len(personas_affected) / max(len(evaluations), 1), 2),
-                    "representative_quotes": quotes,
-                },
-                "classification": {
-                    "pain_theme": theme,
-                    "segment": _classify_segment(len(personas_affected), len(evaluations)),
-                },
-                "impact": {
-                    "severity": round(avg_severity, 1),
-                    "breadth": round(len(personas_affected) / max(len(evaluations), 1), 2),
-                },
-                "status": "open",
-                "first_reported": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-            })
+            findings.append(
+                {
+                    "id": f"F-{finding_id:03d}",
+                    "type": "gap" if avg_severity >= 7 else "request",
+                    "title": cluster_needs[0].get("need", "Unknown need"),
+                    "description": f"Reported by {len(personas_affected)} persona(s). Theme: {theme}.",
+                    "evidence": {
+                        "personas_affected": personas_affected,
+                        "persona_count": len(personas_affected),
+                        "coverage": round(len(personas_affected) / max(len(evaluations), 1), 2),
+                        "representative_quotes": quotes,
+                    },
+                    "classification": {
+                        "pain_theme": theme,
+                        "segment": _classify_segment(len(personas_affected), len(evaluations)),
+                    },
+                    "impact": {
+                        "severity": round(avg_severity, 1),
+                        "breadth": round(len(personas_affected) / max(len(evaluations), 1), 2),
+                    },
+                    "status": "open",
+                    "first_reported": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                }
+            )
             finding_id += 1
 
     # Sort by persona count descending
@@ -149,11 +152,15 @@ def _append_findings(findings: list[dict], path: Path, eval_count: int) -> None:
 
     for f in findings:
         lines.append(f"### {f['id']}: {f['title']}")
-        lines.append(f"**Type:** {f['type']} | **Theme:** {f['classification']['pain_theme']} "
-                      f"| **Severity:** {f['impact']['severity']} | **Breadth:** {f['impact']['breadth']}")
-        personas_list = [str(p) for p in f['evidence']['personas_affected']]
-        lines.append(f"**Personas:** {', '.join(personas_list)} "
-                      f"({f['evidence']['persona_count']}/{eval_count})")
+        lines.append(
+            f"**Type:** {f['type']} | **Theme:** {f['classification']['pain_theme']} "
+            f"| **Severity:** {f['impact']['severity']} | **Breadth:** {f['impact']['breadth']}"
+        )
+        personas_list = [str(p) for p in f["evidence"]["personas_affected"]]
+        lines.append(
+            f"**Personas:** {', '.join(personas_list)} "
+            f"({f['evidence']['persona_count']}/{eval_count})"
+        )
         lines.append(f"**Status:** {f['status']}")
 
         for q in f["evidence"].get("representative_quotes", []):

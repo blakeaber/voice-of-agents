@@ -11,7 +11,7 @@ import yaml
 
 from voice_of_agents.core.capability import Capability, CapabilityRegistry, TestResult
 from voice_of_agents.core.io import save_capability_registry, save_persona
-from voice_of_agents.core.persona import Persona, PersonaMetadata, VoiceProfile
+from voice_of_agents.core.persona import Persona
 
 
 def _severity_to_intensity(severity: int) -> str:
@@ -97,20 +97,22 @@ def migrate_objectives_to_workflow(persona_id: int, persona_name: str, objective
     """Wrap legacy objectives as a PersonaWorkflowMapping YAML dict."""
     goals = []
     for i, obj in enumerate(objectives, 1):
-        goals.append({
-            "id": f"G-{persona_id:02d}-{i}",
-            "title": obj.get("goal", f"Goal {i}"),
-            "category": "knowledge",
-            "priority": "primary",
-            "trigger": obj.get("trigger", ""),
-            "success_statement": obj.get("success_definition", ""),
-            "value_metrics": {
-                "time_saved": obj.get("efficiency_baseline", ""),
-                "error_reduction": "",
-                "cost_impact": "",
-            },
-            "workflows": [],
-        })
+        goals.append(
+            {
+                "id": f"G-{persona_id:02d}-{i}",
+                "title": obj.get("goal", f"Goal {i}"),
+                "category": "knowledge",
+                "priority": "primary",
+                "trigger": obj.get("trigger", ""),
+                "success_statement": obj.get("success_definition", ""),
+                "value_metrics": {
+                    "time_saved": obj.get("efficiency_baseline", ""),
+                    "error_reduction": "",
+                    "cost_impact": "",
+                },
+                "workflows": [],
+            }
+        )
     return {
         "persona_id": persona_id,
         "persona_name": persona_name,

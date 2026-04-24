@@ -17,7 +17,6 @@ from voice_of_agents.research.models import (
     ContextSegment,
     PersonaResearchInput,
     PersonaResearchOutput,
-    SamplingCell,
     SubjectRecord,
     UXWPersonaSidecar,
     UXWTaskCard,
@@ -45,11 +44,7 @@ def _segments_needing_topup(
     coverage_map: dict[str, int],
 ) -> list[str]:
     """Return segment names with fewer than MINIMUM_SUBJECTS_PER_SEGMENT subjects."""
-    return [
-        name
-        for name, count in coverage_map.items()
-        if count < _MINIMUM_SUBJECTS_PER_SEGMENT
-    ]
+    return [name for name, count in coverage_map.items() if count < _MINIMUM_SUBJECTS_PER_SEGMENT]
 
 
 async def _run_topup_interviews(
@@ -66,9 +61,7 @@ async def _run_topup_interviews(
 
     topup_cells: list[tuple[str, str, AdoptionStatus, ContextSegment]] = []
     for segment_name in segments_needing_topup:
-        segment = next(
-            (s for s in product_output.segments if s.name == segment_name), None
-        )
+        segment = next((s for s in product_output.segments if s.name == segment_name), None)
         if not segment:
             continue
         target_count = input.topup_subject_count_target - len(segment.subject_ids)
@@ -125,12 +118,10 @@ def _parse_topup_subject(
 
     quotes_raw = data.get("verbatim_quote_bank", [])
     quotes = [
-        VerbatimQuote(key=q["key"], text=q["text"])
-        for q in quotes_raw
-        if isinstance(q, dict)
+        VerbatimQuote(key=q["key"], text=q["text"]) for q in quotes_raw if isinstance(q, dict)
     ]
     while len(quotes) < 5:
-        quotes.append(VerbatimQuote(key=f"Q{len(quotes)+1}", text="[placeholder]"))
+        quotes.append(VerbatimQuote(key=f"Q{len(quotes) + 1}", text="[placeholder]"))
 
     return SubjectRecord(
         subject_id=subject_id,
@@ -157,9 +148,7 @@ async def _synthesize_persona_sidecar(
     env = get_template_env()
     template = env.get_template("personas_from_research/persona_synthesis.j2")
 
-    contributing_subjects = [
-        s for s in all_subjects if s.subject_id in segment.subject_ids
-    ]
+    contributing_subjects = [s for s in all_subjects if s.subject_id in segment.subject_ids]
     if len(contributing_subjects) < 2:
         contributing_subjects = all_subjects[:2]
 
@@ -178,9 +167,7 @@ async def _synthesize_persona_sidecar(
     return _parse_sidecar(response.content[0].text, segment, uxw_number)
 
 
-def _parse_sidecar(
-    raw: str, segment: BehavioralSegment, uxw_number: int
-) -> UXWPersonaSidecar:
+def _parse_sidecar(raw: str, segment: BehavioralSegment, uxw_number: int) -> UXWPersonaSidecar:
     block = _extract_yaml_block(raw)
     try:
         data = yaml.safe_load(block)
@@ -189,12 +176,10 @@ def _parse_sidecar(
 
     quotes_raw = data.get("verbatim_quote_bank", [])
     quotes = [
-        VerbatimQuote(key=q["key"], text=q["text"])
-        for q in quotes_raw
-        if isinstance(q, dict)
+        VerbatimQuote(key=q["key"], text=q["text"]) for q in quotes_raw if isinstance(q, dict)
     ]
     while len(quotes) < 5:
-        quotes.append(VerbatimQuote(key=f"Q{len(quotes)+1}", text="[placeholder]"))
+        quotes.append(VerbatimQuote(key=f"Q{len(quotes) + 1}", text="[placeholder]"))
 
     subject_ids = data.get("subject_ids", segment.subject_ids[:2])
     if len(subject_ids) < 2:
@@ -209,9 +194,13 @@ def _parse_sidecar(
         adoption_trajectory=data.get("adoption_trajectory", segment.adoption_trajectory_shape),
         last_concrete_episode=data.get("last_concrete_episode", ""),
         constraint_profile=data.get("constraint_profile", segment.dominant_constraint_profile),
-        failure_or_abandonment_mode=data.get("failure_or_abandonment_mode", segment.dominant_failure_mode),
+        failure_or_abandonment_mode=data.get(
+            "failure_or_abandonment_mode", segment.dominant_failure_mode
+        ),
         decision_topology=data.get("decision_topology", ""),
-        anti_model_of_success=data.get("anti_model_of_success", segment.gaps_vs_product_positioning),
+        anti_model_of_success=data.get(
+            "anti_model_of_success", segment.gaps_vs_product_positioning
+        ),
         verbatim_quote_bank=quotes[:8],
     )
 
@@ -225,14 +214,18 @@ def _derive_task_card(sidecar: UXWPersonaSidecar) -> UXWTaskCard:
         intent=sidecar.jtbd[:100],
         trigger=sidecar.last_concrete_episode[:100] if sidecar.last_concrete_episode else "",
         success_definition=f"Accomplishes JTBD without the constraint: {sidecar.constraint_profile[:80]}",
-        today_workaround=sidecar.failure_or_abandonment_mode[:120] if sidecar.failure_or_abandonment_mode else "No workaround documented",
+        today_workaround=sidecar.failure_or_abandonment_mode[:120]
+        if sidecar.failure_or_abandonment_mode
+        else "No workaround documented",
         preconditions=[sidecar.constraint_profile[:80]] if sidecar.constraint_profile else [],
         steps=[
-            f"Navigate to relevant feature",
-            f"Complete primary task",
-            f"Verify outcome meets success definition",
+            "Navigate to relevant feature",
+            "Complete primary task",
+            "Verify outcome meets success definition",
         ],
-        success_criteria=[f"Task completed without triggering failure mode: {sidecar.failure_or_abandonment_mode[:60]}"],
+        success_criteria=[
+            f"Task completed without triggering failure mode: {sidecar.failure_or_abandonment_mode[:60]}"
+        ],
         persona_evaluation_rubric=f"Rate on: speed to value, trust, absence of '{sidecar.anti_model_of_success[:60]}'",
     )
 
@@ -282,11 +275,13 @@ async def run_personas_from_research(
             all_subjects.extend(topup_subjects)
             # Rebuild coverage map
             for segment in product_output.segments:
-                new_topup_ids = [
-                    s.subject_id for s in topup_subjects
-                ]
+                new_topup_ids = [s.subject_id for s in topup_subjects]
                 coverage_map[segment.name] = len(
-                    [sid for sid in segment.subject_ids if sid in [s.subject_id for s in all_subjects]]
+                    [
+                        sid
+                        for sid in segment.subject_ids
+                        if sid in [s.subject_id for s in all_subjects]
+                    ]
                 ) + len(new_topup_ids) // max(len(product_output.segments), 1)
 
     # Synthesize sidecars in parallel (one per behavioral segment)

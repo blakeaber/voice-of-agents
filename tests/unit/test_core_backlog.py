@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import pytest
-from pathlib import Path
 from pydantic import ValidationError
 
 from voice_of_agents.core.backlog import (
@@ -18,7 +17,9 @@ from voice_of_agents.core.backlog import (
 
 
 def _item(**kwargs) -> BacklogItem:
-    defaults = dict(id="B-001", title="Fix empty state", description="Add helpful copy", source="eval")
+    defaults = dict(
+        id="B-001", title="Fix empty state", description="Add helpful copy", source="eval"
+    )
     defaults.update(kwargs)
     return BacklogItem(**defaults)
 
@@ -49,14 +50,18 @@ class TestBacklogItem:
         assert _item().status == "open"
 
     def test_design_layer_fields(self):
-        b = _item(source="design", extends_capability="CAP-LEARN-SEARCH",
-                  value_statement="I need to find past work instantly.")
+        b = _item(
+            source="design",
+            extends_capability="CAP-LEARN-SEARCH",
+            value_statement="I need to find past work instantly.",
+        )
         assert b.extends_capability == "CAP-LEARN-SEARCH"
         assert b.value_statement == "I need to find past work instantly."
 
     def test_eval_layer_fields(self):
-        b = _item(personas=[1, 2, 3], finding_id="F-001",
-                  acceptance_criteria=["Returns results in <2s"])
+        b = _item(
+            personas=[1, 2, 3], finding_id="F-001", acceptance_criteria=["Returns results in <2s"]
+        )
         assert b.personas == [1, 2, 3]
         assert b.finding_id == "F-001"
 
@@ -125,12 +130,23 @@ class TestJSONLEventSourcing:
         legacy_event = {
             "ts": "2026-01-01T00:00:00Z",
             "type": "item_added",
-            "item": {"id": "B-999", "title": "Legacy", "description": "Old item",
-                     "score": 40.0, "effort": "medium", "status": "open",
-                     "pain_themes": [], "personas": [], "persona_quotes": [],
-                     "acceptance_criteria": [], "finding_id": None,
-                     "coverage_score": 0.0, "pain_score": 0.0,
-                     "revenue_score": 0.0, "effort_score": 0.0}
+            "item": {
+                "id": "B-999",
+                "title": "Legacy",
+                "description": "Old item",
+                "score": 40.0,
+                "effort": "medium",
+                "status": "open",
+                "pain_themes": [],
+                "personas": [],
+                "persona_quotes": [],
+                "acceptance_criteria": [],
+                "finding_id": None,
+                "coverage_score": 0.0,
+                "pain_score": 0.0,
+                "revenue_score": 0.0,
+                "effort_score": 0.0,
+            },
         }
         with open(path, "w") as f:
             f.write(json.dumps(legacy_event) + "\n")
@@ -141,8 +157,16 @@ class TestJSONLEventSourcing:
     def test_render_markdown(self, tmp_path):
         path = tmp_path / "backlog.jsonl"
         add_item(path, _item(id="B-001", score=80.0, source="eval"))
-        add_item(path, _item(id="B-002", score=90.0, source="design",
-                              extends_capability="CAP-LEARN", value_statement="Need this."))
+        add_item(
+            path,
+            _item(
+                id="B-002",
+                score=90.0,
+                source="design",
+                extends_capability="CAP-LEARN",
+                value_statement="Need this.",
+            ),
+        )
         md = render_backlog_markdown(path)
         assert "# Backlog" in md
         assert "B-001" in md or "Fix empty state" in md

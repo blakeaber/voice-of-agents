@@ -28,7 +28,7 @@ from voice_of_agents.research.validation import (
 
 
 def _make_quotes(n: int = 5) -> list[VerbatimQuote]:
-    return [VerbatimQuote(key=f"Q{i+1}", text=f"q{i+1}") for i in range(n)]
+    return [VerbatimQuote(key=f"Q{i + 1}", text=f"q{i + 1}") for i in range(n)]
 
 
 def _minimal_product_output() -> ProductResearchOutput:
@@ -37,14 +37,13 @@ def _minimal_product_output() -> ProductResearchOutput:
         run_date="2026-01-01",
         run_dir="docs/research/test",
         hypotheses=[
-            Hypothesis(id=f"H{i+1}", statement="s", falsification_condition="f")
-            for i in range(4)
+            Hypothesis(id=f"H{i + 1}", statement="s", falsification_condition="f") for i in range(4)
         ],
         hypotheses_ratified=True,
         sampling_frame=[],
         subjects=[],
         hypothesis_scores=[
-            HypothesisScore(hypothesis_id=f"H{i+1}", verdict=HypothesisVerdict.REFUTES)
+            HypothesisScore(hypothesis_id=f"H{i + 1}", verdict=HypothesisVerdict.REFUTES)
             for i in range(4)
         ],
         segments=[
@@ -155,8 +154,7 @@ class TestSamplingFrameValidation:
 class TestHypothesisSetValidation:
     def _make_hypotheses(n: int) -> list[Hypothesis]:
         return [
-            Hypothesis(id=f"H{i+1}", statement="s", falsification_condition="f")
-            for i in range(n)
+            Hypothesis(id=f"H{i + 1}", statement="s", falsification_condition="f") for i in range(n)
         ]
 
     def test_fewer_than_4_raises(self):

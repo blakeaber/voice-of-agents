@@ -1,0 +1,129 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Run mode (dry-run | testpypi | pypi)"
+        required: true
+        default: "dry-run"
+        type: choice
+        options:
+          - dry-run
+          - testpypi
+          - pypi
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      target: ${{ steps.meta.outputs.target }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: pip install hatch twine
+
+      - name: Determine version and target
+        id: meta
+        env:
+          DISPATCH_MODE: ${{ inputs.mode }}
+          REF: ${{ github.ref }}
+        run: |
+          # Extract version from the tag (strip leading "v"), or from
+          # pyproject for manual dispatch.
+          if [[ "${REF}" == refs/tags/v* ]]; then
+            VERSION="${REF#refs/tags/v}"
+          else
+            VERSION="$(python -c 'import voice_of_agents; print(voice_of_agents.__version__)')"
+          fi
+
+          # Route: pre-release markers (a, b, rc, dev) → testpypi; stable → pypi.
+          # workflow_dispatch overrides via the `mode` input.
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            TARGET="${DISPATCH_MODE}"
+          elif [[ "${VERSION}" =~ (a|b|rc|dev)[0-9]+$ ]]; then
+            TARGET="testpypi"
+          else
+            TARGET="pypi"
+          fi
+
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "target=${TARGET}"   >> "${GITHUB_OUTPUT}"
+          echo "Resolved: version=${VERSION} target=${TARGET}"
+
+      - name: Build
+        run: hatch build
+
+      - name: Twine check
+        run: twine check dist/*
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+  dry-run:
+    name: dry-run report
+    needs: build
+    if: needs.build.outputs.target == 'dry-run'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize
+        run: |
+          echo "DRY RUN — would publish voice_of_agents-${{ needs.build.outputs.version }} to <nowhere>"
+          echo "No upload performed."
+
+  publish-testpypi:
+    name: publish to TestPyPI
+    needs: build
+    if: needs.build.outputs.target == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/voice-of-agents/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: publish to PyPI
+    needs: build
+    if: needs.build.outputs.target == 'pypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/voice-of-agents/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1

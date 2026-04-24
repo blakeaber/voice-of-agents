@@ -7,10 +7,8 @@ to structured template generation. Validates score-narrative consistency.
 
 from __future__ import annotations
 
-import json
 import logging
 import os
-from pathlib import Path
 
 import yaml
 
@@ -55,6 +53,7 @@ def evaluate_personas(personas: list[Persona], config: VoAConfig) -> None:
 
 # ── LLM-Backed Evaluation ─────────────────────────────────────────────
 
+
 def _llm_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     """Generate evaluation using Anthropic Claude with voice calibration."""
     try:
@@ -65,7 +64,9 @@ def _llm_generate_evaluation(persona: Persona, exploration: dict) -> dict:
 
     voice = _build_voice_profile(persona)
     journey_text = _format_journey_for_llm(exploration)
-    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier.value, 29)
+    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(
+        persona.tier.value, 29
+    )
     exp_years = persona.experience_years or 0
     income = persona.income or 0
 
@@ -77,9 +78,11 @@ def _llm_generate_evaluation(persona: Persona, exploration: dict) -> dict:
         )
         experience_context = "Based on this first-contact experience (landing page + failed signup), provide your honest evaluation."
     else:
-        experience_context = "Based on THIS SPECIFIC experience (not hypothetical), provide your honest evaluation."
+        experience_context = (
+            "Based on THIS SPECIFIC experience (not hypothetical), provide your honest evaluation."
+        )
 
-    prompt = f"""You are {persona.name}, a {persona.role} with {exp_years} years of experience in {persona.industry}. Your annual income is ${income:,}. {voice['motivation_framing']}
+    prompt = f"""You are {persona.name}, a {persona.role} with {exp_years} years of experience in {persona.industry}. Your annual income is ${income:,}. {voice["motivation_framing"]}
 
 You just tried Rooben Pro for the first time. Here's exactly what happened during your session:
 
@@ -90,12 +93,12 @@ You just tried Rooben Pro for the first time. Here's exactly what happened durin
 SCORING (1-10 each):
 - overall: Your overall impression
 - goal_achievement: How close did you get to what you came here to do?
-- efficiency: Was this faster than {voice['comparison_baseline']}?
+- efficiency: Was this faster than {voice["comparison_baseline"]}?
 - trust: Do you trust this tool enough to use it in your {persona.industry.lower()} work?
 - learnability: Could you figure it out without help?
 - value_for_price: Worth ${tier_price}/month given your ${income:,}/year income?
 
-NARRATIVE (2-3 sentences each, in YOUR voice — {voice['vocabulary_style']} vocabulary, {voice['skepticism_level']} skepticism):
+NARRATIVE (2-3 sentences each, in YOUR voice — {voice["vocabulary_style"]} vocabulary, {voice["skepticism_level"]} skepticism):
 - first_impression: Your gut reaction on first seeing the app
 - highlight_moment: The best part of the experience (reference a specific thing you saw)
 - frustration_moment: The worst part (what blocked you or confused you)
@@ -112,7 +115,7 @@ UNMET NEEDS (list what you COULDN'T do that you came here to do):
 Each with: need, pain_theme (A=retrieval failure, B=bus factor, C=context failure, D=trust deficit, E=governance vacuum, F=integration failure), severity (1-10), persona_quote (in your voice)
 
 RULES:
-- {voice['trust_bar']}
+- {voice["trust_bar"]}
 - Your scores must match your narrative. If you're frustrated, your scores should reflect it.
 - If a feature was missing, you should express genuine disappointment, not polite acceptance.
 - Reference your actual {persona.industry.lower()} work context, not generic examples.
@@ -153,6 +156,7 @@ Respond as valid YAML with keys: scores, narrative, verdict, unmet_needs"""
 
 
 # ── Template Fallback Evaluation ───────────────────────────────────────
+
 
 def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     """Generate evaluation using structured templates (no LLM required)."""
@@ -202,10 +206,14 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
 
     # Overall is average, but cannot exceed best individual + 1
     overall = round((goal_score + efficiency_score + trust_score + learn_score + value_score) / 5)
-    overall = min(overall, max(goal_score, efficiency_score, trust_score, learn_score, value_score) + 1)
+    overall = min(
+        overall, max(goal_score, efficiency_score, trust_score, learn_score, value_score) + 1
+    )
 
     # ── Voice-calibrated narrative ──
-    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(persona.tier.value, 29)
+    tier_price = {"FREE": 0, "DEVELOPER": 29, "TEAM": 99, "ENTERPRISE": 299}.get(
+        persona.tier.value, 29
+    )
     exp_years = persona.experience_years or 0
     income = persona.income or 0
 
@@ -253,8 +261,7 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
             )
     elif all_missing:
         frustration = (
-            f"I need the ability to {all_missing[0].lower()}, "
-            f"but it doesn't seem to exist yet."
+            f"I need the ability to {all_missing[0].lower()}, but it doesn't seem to exist yet."
         )
     else:
         frustration = (
@@ -285,8 +292,8 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
         )
     elif persona.voice.motivation == "compliance":
         objection = (
-            f"Can I prove to an auditor where every answer came from? "
-            f"Without source attribution and an audit trail, I can't use this professionally."
+            "Can I prove to an auditor where every answer came from? "
+            "Without source attribution and an audit trail, I can't use this professionally."
         )
     else:
         objection = (
@@ -324,19 +331,25 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
     # Unmet needs
     unmet_needs = []
     for f in all_friction:
-        unmet_needs.append({
-            "need": f.get("description", ""),
-            "pain_theme": _classify_theme(f.get("description", "")),
-            "severity": {"low": 3, "medium": 5, "high": 7, "critical": 9}.get(f.get("severity", "medium"), 5),
-            "persona_quote": f.get("persona_quote") or _generate_quote(persona, f),
-        })
+        unmet_needs.append(
+            {
+                "need": f.get("description", ""),
+                "pain_theme": _classify_theme(f.get("description", "")),
+                "severity": {"low": 3, "medium": 5, "high": 7, "critical": 9}.get(
+                    f.get("severity", "medium"), 5
+                ),
+                "persona_quote": f.get("persona_quote") or _generate_quote(persona, f),
+            }
+        )
     for m in all_missing:
-        unmet_needs.append({
-            "need": m,
-            "pain_theme": _classify_theme(m),
-            "severity": 7,
-            "persona_quote": _generate_missing_quote(persona, m),
-        })
+        unmet_needs.append(
+            {
+                "need": m,
+                "pain_theme": _classify_theme(m),
+                "severity": 7,
+                "persona_quote": _generate_missing_quote(persona, m),
+            }
+        )
 
     return {
         "persona": _persona_header(persona),
@@ -371,6 +384,7 @@ def _template_generate_evaluation(persona: Persona, exploration: dict) -> dict:
 
 # ── Voice Calibration ─────────────────────────────────────────────────
 
+
 def _build_voice_profile(persona: Persona) -> dict:
     """Build structured voice calibration parameters."""
     # Skepticism
@@ -393,17 +407,21 @@ def _build_voice_profile(persona: Persona) -> dict:
         "financial": "financial and accounting terminology",
         "technical": "technical and engineering terminology",
     }
-    vocabulary = vocab_map.get(persona.voice.vocabulary, f"{persona.industry.lower()} professional language")
+    vocabulary = vocab_map.get(
+        persona.voice.vocabulary, f"{persona.industry.lower()} professional language"
+    )
 
     # Motivation framing
     motiv_map = {
         "fear": f"You're driven by the fear of making a mistake in your {persona.industry.lower()} work. Errors have real consequences.",
-        "compliance": f"You're driven by regulatory compliance. Everything must be auditable and defensible.",
-        "efficiency": f"You're driven by efficiency. Time is money — you need tools that make you faster.",
-        "legacy": f"You're protecting institutional knowledge. When people leave, knowledge shouldn't leave with them.",
-        "ambition": f"You're building something. You want leverage — tools that multiply your output.",
+        "compliance": "You're driven by regulatory compliance. Everything must be auditable and defensible.",
+        "efficiency": "You're driven by efficiency. Time is money — you need tools that make you faster.",
+        "legacy": "You're protecting institutional knowledge. When people leave, knowledge shouldn't leave with them.",
+        "ambition": "You're building something. You want leverage — tools that multiply your output.",
     }
-    motivation = motiv_map.get(persona.voice.motivation, "You want tools that help you do better work.")
+    motivation = motiv_map.get(
+        persona.voice.motivation, "You want tools that help you do better work."
+    )
 
     comparison = "my current manual process"
 
@@ -421,11 +439,14 @@ def _build_voice_profile(persona: Persona) -> dict:
         "motivation_framing": motivation,
         "comparison_baseline": comparison,
         "trust_bar": trust_bar,
-        "price_anchor": f"${_monthly_price(persona)}/mo against ${persona.income:,}/yr income" if persona.income else f"${_monthly_price(persona)}/mo",
+        "price_anchor": f"${_monthly_price(persona)}/mo against ${persona.income:,}/yr income"
+        if persona.income
+        else f"${_monthly_price(persona)}/mo",
     }
 
 
 # ── Validation ─────────────────────────────────────────────────────────
+
 
 def _validate_evaluation(evaluation: dict) -> list[str]:
     """Validate score-narrative consistency. Returns list of issues."""
@@ -450,7 +471,9 @@ def _validate_evaluation(evaluation: dict) -> list[str]:
 
     # Trust score vs trust narrative
     frustration = (narrative.get("frustration_moment", "") + narrative.get("objection", "")).lower()
-    if trust >= 8 and any(k in frustration for k in ["trust", "worry", "concern", "certain", "liability", "audit"]):
+    if trust >= 8 and any(
+        k in frustration for k in ["trust", "worry", "concern", "certain", "liability", "audit"]
+    ):
         issues.append(f"trust={trust} but narrative expresses trust concerns")
 
     # Value vs would_pay
@@ -501,14 +524,20 @@ def _fix_consistency(evaluation: dict, issues: list[str]) -> dict:
         verdict["retention_risk"] = "medium"
 
     # Recalculate overall as average
-    all_scores = [scores["goal_achievement"], scores["efficiency"], scores["trust"],
-                  scores["learnability"], scores["value_for_price"]]
+    all_scores = [
+        scores["goal_achievement"],
+        scores["efficiency"],
+        scores["trust"],
+        scores["learnability"],
+        scores["value_for_price"],
+    ]
     scores["overall"] = round(sum(all_scores) / len(all_scores))
 
     return evaluation
 
 
 # ── Helpers ────────────────────────────────────────────────────────────
+
 
 def _persona_header(persona: Persona) -> dict:
     return {
@@ -535,7 +564,9 @@ def _format_journey_for_llm(exploration: dict) -> str:
             lines.append(f"  Observation: {step.get('observation', '')}")
 
         for fp in obj.get("friction_points", []):
-            lines.append(f"  FRICTION [{fp.get('severity', 'medium')}]: {fp.get('description', '')}")
+            lines.append(
+                f"  FRICTION [{fp.get('severity', 'medium')}]: {fp.get('description', '')}"
+            )
 
         for mc in obj.get("missing_capabilities", []):
             lines.append(f"  MISSING: {mc}")
@@ -582,7 +613,7 @@ def _generate_quote(persona: Persona, friction: dict) -> str:
     if "empty" in desc:
         return f"Everything is empty. I need my existing {persona.industry.lower()} data here before this is useful."
     if "navigation" in desc or "path" in desc:
-        return f"I couldn't find a clear way to do what I came here for. That's frustrating."
+        return "I couldn't find a clear way to do what I came here for. That's frustrating."
     return f"I ran into an issue with {desc[:50]}. In {persona.industry.lower()}, this kind of thing slows me down."
 
 
@@ -611,6 +642,7 @@ def _append_cross_persona_analysis(personas: list[Persona], config: VoAConfig) -
         return
 
     from datetime import datetime, timezone
+
     run_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     lines = [
@@ -633,12 +665,16 @@ def _append_cross_persona_analysis(personas: list[Persona], config: VoAConfig) -
 
     # Verdict summary
     would_pay = sum(1 for ev in evaluations if ev.get("verdict", {}).get("would_pay"))
-    high_risk = sum(1 for ev in evaluations if ev.get("verdict", {}).get("retention_risk") == "high")
-    lines.extend([
-        "",
-        f"**Would pay:** {would_pay}/{len(evaluations)}",
-        f"**High retention risk:** {high_risk}/{len(evaluations)}",
-    ])
+    high_risk = sum(
+        1 for ev in evaluations if ev.get("verdict", {}).get("retention_risk") == "high"
+    )
+    lines.extend(
+        [
+            "",
+            f"**Would pay:** {would_pay}/{len(evaluations)}",
+            f"**High retention risk:** {high_risk}/{len(evaluations)}",
+        ]
+    )
 
     # Unmet needs summary
     all_needs = []
@@ -648,6 +684,7 @@ def _append_cross_persona_analysis(personas: list[Persona], config: VoAConfig) -
     if all_needs:
         lines.extend(["\n### Top Unmet Needs\n"])
         from collections import Counter
+
         themes = Counter(n.get("pain_theme", "?") for n in all_needs)
         for theme, count in themes.most_common():
             theme_name = config.pain_themes.get(theme, theme)

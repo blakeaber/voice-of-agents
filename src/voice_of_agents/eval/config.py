@@ -25,14 +25,16 @@ class VoAConfig:
     weight_effort: float = 0.20
 
     # Pain themes reference
-    pain_themes: dict[str, str] = field(default_factory=lambda: {
-        "A": "Knowledge Retrieval Failure",
-        "B": "Single Point of Failure / Bus Factor",
-        "C": "Contextual Failure",
-        "D": "Trust Deficit",
-        "E": "Governance Vacuum",
-        "F": "Integration Failure",
-    })
+    pain_themes: dict[str, str] = field(
+        default_factory=lambda: {
+            "A": "Knowledge Retrieval Failure",
+            "B": "Single Point of Failure / Bus Factor",
+            "C": "Contextual Failure",
+            "D": "Trust Deficit",
+            "E": "Governance Vacuum",
+            "F": "Integration Failure",
+        }
+    )
 
     @property
     def data_path(self) -> Path:

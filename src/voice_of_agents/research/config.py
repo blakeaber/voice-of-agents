@@ -135,27 +135,17 @@ class ResearchConfig(BaseModel):
             "   NOT a target-market name like 'US SMBs')\n"
             "  Question"
         )
-        scope = click.prompt(
-            "\nPopulation scope\n"
-            "  (region, firm-size, time window)\n"
-            "  Scope"
-        )
+        scope = click.prompt("\nPopulation scope\n  (region, firm-size, time window)\n  Scope")
         slug = click.prompt(
-            "\nRun slug\n"
-            "  (≤6 kebab-case words, used in file/directory names)\n"
-            "  Slug"
+            "\nRun slug\n  (≤6 kebab-case words, used in file/directory names)\n  Slug"
         )
         product_context = click.prompt(
-            "\nProduct context\n"
-            "  (brief description — NOT a market filter)\n"
-            "  Context"
+            "\nProduct context\n  (brief description — NOT a market filter)\n  Context"
         )
 
         click.echo("\n--- Optional settings (press Enter for defaults) ---\n")
         subject_count = click.prompt("Subject count (10-16)", default=12, type=int)
-        anthropic_model = click.prompt(
-            "Anthropic model", default="claude-opus-4-7"
-        )
+        anthropic_model = click.prompt("Anthropic model", default="claude-opus-4-7")
 
         return cls(
             research_question=research_question,
@@ -249,9 +239,7 @@ class ResearchConfig(BaseModel):
 
         # Subject count range
         if not (10 <= self.subject_count <= 16):
-            problems.append(
-                f"subject_count must be 10-16; got {self.subject_count}."
-            )
+            problems.append(f"subject_count must be 10-16; got {self.subject_count}.")
 
         # Hypotheses: if pre-provided, validate them
         if self.hypotheses is not None:
@@ -265,9 +253,7 @@ class ResearchConfig(BaseModel):
                 )
             for h in self.hypotheses:
                 if not h.falsification_condition.strip():
-                    problems.append(
-                        f"Hypothesis {h.id} is missing a falsification_condition."
-                    )
+                    problems.append(f"Hypothesis {h.id} is missing a falsification_condition.")
 
         return problems
 

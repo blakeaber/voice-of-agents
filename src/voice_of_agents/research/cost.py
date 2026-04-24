@@ -18,7 +18,7 @@ COST_PER_STAGE = {
         # subject_count parallel researcher-brief calls + hypothesis scoring + segmentation
         "input_tokens_per_subject": _TOKENS_PER_SUBJECT_INPUT,
         "output_tokens_per_subject": _TOKENS_PER_SUBJECT_OUTPUT,
-        "fixed_input_tokens": 2000,   # hypothesis scoring + segmentation
+        "fixed_input_tokens": 2000,  # hypothesis scoring + segmentation
         "fixed_output_tokens": 3000,
         "time_seconds_per_subject": 15,
         "fixed_time_seconds": 30,
@@ -122,8 +122,12 @@ def estimate_run_cost(
         cfg = COST_PER_STAGE.get(stage, {})
         n = subject_count if stage == "product_research" else max(3, subject_count // 2)
         total_input += cfg.get("input_tokens_per_subject", 0) * n + cfg.get("fixed_input_tokens", 0)
-        total_output += cfg.get("output_tokens_per_subject", 0) * n + cfg.get("fixed_output_tokens", 0)
-        total_seconds += cfg.get("time_seconds_per_subject", 0) * n + cfg.get("fixed_time_seconds", 0)
+        total_output += cfg.get("output_tokens_per_subject", 0) * n + cfg.get(
+            "fixed_output_tokens", 0
+        )
+        total_seconds += cfg.get("time_seconds_per_subject", 0) * n + cfg.get(
+            "fixed_time_seconds", 0
+        )
 
     base_cost = total_input * input_rate + total_output * output_rate
     low = round(base_cost * 0.8, 2)

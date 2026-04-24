@@ -2,7 +2,6 @@
 
 from pathlib import Path
 
-import pytest
 import yaml
 
 from voice_of_agents.eval.migrate import (
@@ -45,7 +44,7 @@ class TestMigratePersonaYaml:
         assert "A" in themes
         assert "D" in themes
         assert themes["A"] == "CRITICAL"  # severity 9 → CRITICAL
-        assert themes["D"] == "HIGH"      # severity 8 → HIGH
+        assert themes["D"] == "HIGH"  # severity 8 → HIGH
 
     def test_voice_migrated(self):
         path = FIXTURES / "sample_persona_legacy.yaml"
@@ -98,7 +97,11 @@ class TestMigratePersonaYaml:
 class TestMigrateObjectivesToWorkflow:
     def test_basic_wrapping(self):
         objectives = [
-            {"goal": "Find prior case", "trigger": "New intake", "success_definition": "Found in 60s"},
+            {
+                "goal": "Find prior case",
+                "trigger": "New intake",
+                "success_definition": "Found in 60s",
+            },
         ]
         wf = migrate_objectives_to_workflow(1, "Maria Gutierrez", objectives)
 
@@ -188,7 +191,15 @@ class TestMigrateFeatureInventory:
     def test_single_part_id_gets_misc_prefix(self, tmp_path):
         inventory = {
             "product": "P",
-            "features": [{"id": "search", "name": "Search", "description": "", "status": "planned", "area": "X"}],
+            "features": [
+                {
+                    "id": "search",
+                    "name": "Search",
+                    "description": "",
+                    "status": "planned",
+                    "area": "X",
+                }
+            ],
         }
         path = tmp_path / "fi.yaml"
         path.write_text(yaml.dump(inventory))

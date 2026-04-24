@@ -3,7 +3,6 @@
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from voice_of_agents.research.models import ProductResearchInput
 from voice_of_agents.research.session import ResearchSession

@@ -103,9 +103,7 @@ def validate_workflow_against_persona(
     if persona.segment.value == "b2b":
         categories = {g.category.value for g in mapping.goals}
         if not categories & {"governance", "delegation", "collaboration"}:
-            result.warn(
-                f"Persona {persona.id} (B2B): no governance/delegation/collaboration goals"
-            )
+            result.warn(f"Persona {persona.id} (B2B): no governance/delegation/collaboration goals")
 
     return result
 

@@ -1,12 +1,9 @@
 """Tests for _template_generate_evaluation and related helpers."""
 
-import pytest
-
 from voice_of_agents.core.persona import Persona, VoiceProfile
 from voice_of_agents.eval.phase3_evaluate import (
     _generate_missing_quote,
     _generate_quote,
-    _monthly_price,
     _persona_header,
     _template_generate_evaluation,
 )
@@ -49,8 +46,11 @@ def _exploration_with_friction(friction_type="empty_state", severity="medium") -
                 "pages_visited": ["/dashboard", "/workspace"],
                 "journey": [],
                 "friction_points": [
-                    {"type": friction_type, "description": f"Issue: {friction_type}",
-                     "severity": severity},
+                    {
+                        "type": friction_type,
+                        "description": f"Issue: {friction_type}",
+                        "severity": severity,
+                    },
                 ],
                 "missing_capabilities": [],
             }
@@ -81,25 +81,36 @@ class TestTemplateGenerateEvaluation:
             "persona_name": "Test User",
             "run_timestamp": "20260402_120000",
             "objectives": [
-                {"outcome": "blocked", "pages_visited": [], "journey": [],
-                 "friction_points": [], "missing_capabilities": []},
-                {"outcome": "blocked", "pages_visited": [], "journey": [],
-                 "friction_points": [], "missing_capabilities": []},
+                {
+                    "outcome": "blocked",
+                    "pages_visited": [],
+                    "journey": [],
+                    "friction_points": [],
+                    "missing_capabilities": [],
+                },
+                {
+                    "outcome": "blocked",
+                    "pages_visited": [],
+                    "journey": [],
+                    "friction_points": [],
+                    "missing_capabilities": [],
+                },
             ],
         }
         result = _template_generate_evaluation(persona, exploration)
         scores = result["scores"]
-        best = max(scores["goal_achievement"], scores["efficiency"],
-                   scores["trust"], scores["learnability"], scores["value_for_price"])
+        best = max(
+            scores["goal_achievement"],
+            scores["efficiency"],
+            scores["trust"],
+            scores["learnability"],
+            scores["value_for_price"],
+        )
         assert scores["overall"] <= best + 1
 
     def test_high_price_sensitivity_lowers_value(self):
-        persona_sensitive = _make_persona(
-            voice=VoiceProfile(price_sensitivity="high")
-        )
-        persona_insensitive = _make_persona(
-            voice=VoiceProfile(price_sensitivity="low")
-        )
+        persona_sensitive = _make_persona(voice=VoiceProfile(price_sensitivity="high"))
+        persona_insensitive = _make_persona(voice=VoiceProfile(price_sensitivity="low"))
         r_sens = _template_generate_evaluation(persona_sensitive, _empty_exploration())
         r_insens = _template_generate_evaluation(persona_insensitive, _empty_exploration())
         assert r_sens["scores"]["value_for_price"] <= r_insens["scores"]["value_for_price"]
@@ -115,11 +126,17 @@ class TestTemplateGenerateEvaluation:
     def test_verdict_would_pay_false_when_low_goal(self):
         persona = _make_persona()
         exploration = {
-            "persona_id": 1, "persona_name": "Test User",
+            "persona_id": 1,
+            "persona_name": "Test User",
             "run_timestamp": "20260402_120000",
             "objectives": [
-                {"outcome": "blocked", "pages_visited": [], "journey": [],
-                 "friction_points": [], "missing_capabilities": []},
+                {
+                    "outcome": "blocked",
+                    "pages_visited": [],
+                    "journey": [],
+                    "friction_points": [],
+                    "missing_capabilities": [],
+                },
             ],
         }
         result = _template_generate_evaluation(persona, exploration)
@@ -129,14 +146,19 @@ class TestTemplateGenerateEvaluation:
     def test_retention_risk_high_when_low_overall(self):
         persona = _make_persona()
         exploration = {
-            "persona_id": 1, "persona_name": "Test User",
+            "persona_id": 1,
+            "persona_name": "Test User",
             "run_timestamp": "20260402_120000",
             "objectives": [
-                {"outcome": "blocked", "pages_visited": [], "journey": [],
-                 "friction_points": [
-                     {"type": "gap", "description": "Nothing works",
-                      "severity": "critical"},
-                 ], "missing_capabilities": ["everything"]},
+                {
+                    "outcome": "blocked",
+                    "pages_visited": [],
+                    "journey": [],
+                    "friction_points": [
+                        {"type": "gap", "description": "Nothing works", "severity": "critical"},
+                    ],
+                    "missing_capabilities": ["everything"],
+                },
             ],
         }
         result = _template_generate_evaluation(persona, exploration)
@@ -145,12 +167,17 @@ class TestTemplateGenerateEvaluation:
     def test_missing_capabilities_appear_in_unmet_needs(self):
         persona = _make_persona()
         exploration = {
-            "persona_id": 1, "persona_name": "Test User",
+            "persona_id": 1,
+            "persona_name": "Test User",
             "run_timestamp": "20260402_120000",
             "objectives": [
-                {"outcome": "partial", "pages_visited": [], "journey": [],
-                 "friction_points": [],
-                 "missing_capabilities": ["export to PDF"]},
+                {
+                    "outcome": "partial",
+                    "pages_visited": [],
+                    "journey": [],
+                    "friction_points": [],
+                    "missing_capabilities": ["export to PDF"],
+                },
             ],
         }
         result = _template_generate_evaluation(persona, exploration)
@@ -170,8 +197,10 @@ class TestTemplateGenerateEvaluation:
             voice=VoiceProfile(motivation="fear"),
         )
         result = _template_generate_evaluation(persona, _empty_exploration())
-        assert "liability" in result["narrative"]["objection"].lower() or \
-               "wrong" in result["narrative"]["objection"].lower()
+        assert (
+            "liability" in result["narrative"]["objection"].lower()
+            or "wrong" in result["narrative"]["objection"].lower()
+        )
 
     def test_compliance_motivation_objection_mentions_audit(self):
         persona = _make_persona(
@@ -183,16 +212,24 @@ class TestTemplateGenerateEvaluation:
     def test_multiple_pages_in_highlight(self):
         persona = _make_persona()
         exploration = {
-            "persona_id": 1, "persona_name": "Test User",
+            "persona_id": 1,
+            "persona_name": "Test User",
             "run_timestamp": "20260402_120000",
             "objectives": [
-                {"outcome": "achieved", "pages_visited": ["/a", "/b", "/c"],
-                 "journey": [], "friction_points": [], "missing_capabilities": []},
+                {
+                    "outcome": "achieved",
+                    "pages_visited": ["/a", "/b", "/c"],
+                    "journey": [],
+                    "friction_points": [],
+                    "missing_capabilities": [],
+                },
             ],
         }
         result = _template_generate_evaluation(persona, exploration)
-        assert "3" in result["narrative"]["highlight_moment"] or \
-               "navigate" in result["narrative"]["highlight_moment"].lower()
+        assert (
+            "3" in result["narrative"]["highlight_moment"]
+            or "navigate" in result["narrative"]["highlight_moment"].lower()
+        )
 
 
 class TestPersonaHeader:

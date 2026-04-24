@@ -1,7 +1,5 @@
 """Tests for research/cost.py — cost estimation and tracking."""
 
-import pytest
-
 from voice_of_agents.research.cost import (
     CostEstimate,
     CostTracker,

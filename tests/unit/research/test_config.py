@@ -7,7 +7,6 @@ import pytest
 import yaml
 
 from voice_of_agents.research.config import ResearchConfig
-from voice_of_agents.research.models import Hypothesis
 
 
 def _minimal_config_dict() -> dict:
@@ -33,6 +32,7 @@ class TestResearchConfigFromDict:
 
     def test_from_dict_missing_required_raises(self):
         import pydantic
+
         with pytest.raises(pydantic.ValidationError):
             ResearchConfig.from_dict({"research_question": "Q?", "scope": "US"})
 
@@ -85,7 +85,11 @@ class TestResearchConfigValidation:
         data = {
             **_minimal_config_dict(),
             "hypotheses": [
-                {"id": f"H{i+1}", "statement": "stmt", "falsification_condition": "f" if i < 3 else ""}
+                {
+                    "id": f"H{i + 1}",
+                    "statement": "stmt",
+                    "falsification_condition": "f" if i < 3 else "",
+                }
                 for i in range(4)
             ],
         }

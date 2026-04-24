@@ -40,9 +40,7 @@ async def run_full_pipeline(
 
     problems = config.validate_before_run()
     if problems:
-        raise ValueError(
-            "Config validation failed:\n" + "\n".join(f"  - {p}" for p in problems)
-        )
+        raise ValueError("Config validation failed:\n" + "\n".join(f"  - {p}" for p in problems))
 
     client = get_async_client(api_key=config.api_key)
     _path = session_path or (config.session_dir / f"{config.slug}.yaml")
@@ -89,7 +87,10 @@ async def run_full_pipeline(
             raise
 
     # Stage 3: Workflows from Interviews (first persona by default)
-    if not session.is_stage_complete("workflows_from_interviews") and session.persona_research_output:
+    if (
+        not session.is_stage_complete("workflows_from_interviews")
+        and session.persona_research_output
+    ):
         try:
             sidecars = session.persona_research_output.persona_sidecars
             if not sidecars:

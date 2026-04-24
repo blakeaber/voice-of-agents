@@ -37,8 +37,7 @@ async def _draft_v0_journey(
         if s.uxw_id in input.focus_panel_uxw_ids
     )
     workflow_summary = "\n".join(
-        f"- {wf.title}: {wf.intent_goal[:80]}"
-        for wf in input.workflow_research.workflow_maps
+        f"- {wf.title}: {wf.intent_goal[:80]}" for wf in input.workflow_research.workflow_maps
     )
 
     prompt = (
@@ -56,10 +55,10 @@ async def _draft_v0_journey(
         "```yaml\n"
         "journey_steps:\n"
         "  - step_number: 1\n"
-        "    screen_or_route: \"[route]\"\n"
-        "    affordance: \"[what they can do]\"\n"
-        "    copy_sample: \"[UI copy]\"\n"
-        "    principle_reference: \"[principle]\"\n"
+        '    screen_or_route: "[route]"\n'
+        '    affordance: "[what they can do]"\n'
+        '    copy_sample: "[UI copy]"\n'
+        '    principle_reference: "[principle]"\n'
         "    must_fix_numbers: []\n"
         "```\n"
     )
@@ -106,9 +105,7 @@ async def _run_focus_group(
     template = env.get_template("journey_redesign/focus_group_participant.j2")
 
     panel_sidecars = [
-        s
-        for s in input.persona_research.persona_sidecars
-        if s.uxw_id in input.focus_panel_uxw_ids
+        s for s in input.persona_research.persona_sidecars if s.uxw_id in input.focus_panel_uxw_ids
     ]
 
     async def call_one(sidecar: UXWPersonaSidecar) -> FocusGroupResponse:
@@ -137,9 +134,7 @@ async def _run_focus_group(
     return list(await asyncio.gather(*tasks))
 
 
-def _parse_focus_group_response(
-    raw: str, sidecar: UXWPersonaSidecar
-) -> FocusGroupResponse:
+def _parse_focus_group_response(raw: str, sidecar: UXWPersonaSidecar) -> FocusGroupResponse:
     block = _extract_yaml_block(raw)
     try:
         data = yaml.safe_load(block)
@@ -154,7 +149,9 @@ def _parse_focus_group_response(
     if len(quit_items) < 2:
         quit_items = quit_items + ["[not captured]"] * (2 - len(quit_items))
 
-    must_fixes = data.get("top_3_must_fixes", ["[not captured]", "[not captured]", "[not captured]"])
+    must_fixes = data.get(
+        "top_3_must_fixes", ["[not captured]", "[not captured]", "[not captured]"]
+    )
     while len(must_fixes) < 3:
         must_fixes.append("[not captured]")
 

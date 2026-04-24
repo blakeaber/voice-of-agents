@@ -5,27 +5,18 @@ from pydantic import ValidationError
 
 from voice_of_agents.research.models import (
     AdoptionStatus,
-    BehavioralSegment,
     ContextSegment,
     EpisodeRecord,
     EpisodeStep,
-    FocusGroupResponse,
-    Hypothesis,
-    HypothesisScore,
-    HypothesisVerdict,
-    JourneyRedesignInput,
-    PersonaResearchInput,
     ProductResearchInput,
-    SamplingCell,
     SubjectRecord,
     UXWPersonaSidecar,
     VerbatimQuote,
-    WorkflowResearchInput,
 )
 
 
 def _make_quotes(n: int = 5) -> list[VerbatimQuote]:
-    return [VerbatimQuote(key=f"Q{i+1}", text=f"quote {i+1}") for i in range(n)]
+    return [VerbatimQuote(key=f"Q{i + 1}", text=f"quote {i + 1}") for i in range(n)]
 
 
 def _make_subject(
@@ -186,7 +177,11 @@ class TestEpisodeRecord:
                 episode="test",
                 date="yesterday",
                 pre_state="",
-                steps=[EpisodeStep(step="s", tool="none", input="i", output="o", time="1", blocker="none")],
+                steps=[
+                    EpisodeStep(
+                        step="s", tool="none", input="i", output="o", time="1", blocker="none"
+                    )
+                ],
                 post_state="done",
                 what_i_wished_existed="x",
             )
@@ -207,7 +202,9 @@ class TestEpisodeRecord:
             episode="test",
             date="yesterday",
             pre_state="started",
-            steps=[EpisodeStep(step="s", tool="none", input="i", output="o", time="1", blocker="none")],
+            steps=[
+                EpisodeStep(step="s", tool="none", input="i", output="o", time="1", blocker="none")
+            ],
             post_state="done",
             what_i_wished_existed="better tool",
         )
