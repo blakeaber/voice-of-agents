@@ -5,7 +5,54 @@
 [![CI](https://github.com/blakeaber/voice-of-agents/actions/workflows/ci.yml/badge.svg)](https://github.com/blakeaber/voice-of-agents/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Research-grade rigor for developers who can't afford a research team.
+> [**Beta users lie.**](https://www.predicate.ventures/writing/beta-users-are-lying) Simulate them honestly, then validate the risky findings with the users you still need to talk to.
+
+<p align="center">
+  <img src="assets/demo.svg" alt="voa research demo running in a terminal" width="720">
+</p>
+
+---
+
+## Why this exists
+
+- **The problem:** Pre-PMF user research is too slow and expensive, so founders ship by vibe and learn why users churn only *after* they've churned.
+- **The approach:** A 4-stage synthetic research pipeline (subjects → personas → workflows → journey) with mandatory epistemic framing — synthetic data is marked as hypothesis, not finding.
+- **The twist:** Synthetic personas feed directly into a live browser-based eval harness that navigates your actual product. The loop goes from *"I don't know my users"* to *"here are typed personas failing to adopt my product"* in under 15 minutes.
+
+---
+
+## Quick start
+
+```bash
+pip install voice-of-agents
+cp .env.example .env          # then paste your key into .env
+voa doctor                    # pre-flight check — recommended first command
+```
+
+### 60-second demo — zero API key required
+
+```bash
+voa research demo --offline
+```
+
+Uses a bundled cassette of a real pipeline run. Prints findings to your terminal in under 10 seconds. No Anthropic account needed.
+
+### Live demo (requires `ANTHROPIC_API_KEY`)
+
+```bash
+voa research demo
+```
+
+Runs a preset research question with 10 subjects. ~$0.30 with Opus, ~$0.02 with Haiku.
+
+### Plain-English setup
+
+```bash
+voa research quickstart        # 3 plain-English questions; no methodology vocabulary
+voa research run --model-haiku # low-cost exploration run
+```
+
+### One-liner Python API
 
 ```python
 from voice_of_agents.research import quick_research_sync
@@ -16,14 +63,30 @@ result = quick_research_sync(
     understand="why developers abandon AI coding tools after the first week",
 )
 
-print(result.build_this_first)   # "Ship a 'first win in 5 minutes' onboarding flow..."
-print(result.validate_with)      # ["Walk me through the last time...", ...]
-print(result.personas[0].would_pay_if)  # "It catches one bug I would have shipped..."
+print(result.build_this_first)            # "Ship a 'first win in 5 minutes' onboarding flow..."
+print(result.validate_with)               # ["Walk me through the last time...", ...]
+print(result.personas[0].would_pay_if)    # "It catches one bug I would have shipped..."
 ```
 
 ---
 
-## What this is
+## Who is this for?
+
+- **Pre-PMF solo founders** — you need decisions, not just findings. Start with [`examples/solo-founder/`](examples/solo-founder/).
+- **Product engineers owning a roadmap** — you want a one-liner Python API to seed user-archetype hypotheses. Start with [`examples/product-engineer/`](examples/product-engineer/).
+- **DX practitioners / platform leads** — you want the full research → eval bridge: synthetic personas navigating your actual product. Start with [`examples/dx-practitioner/`](examples/dx-practitioner/).
+
+---
+
+## Proof, not claims
+
+[`demo/multi-agent-adoption/`](demo/multi-agent-adoption/00-DEMO-INDEX.md) is a complete end-to-end run of the pipeline against a real product: research config → decision report → 4 seeded eval personas → browser exploration logs → per-persona evaluations → focus-group analysis → prioritized backlog.
+
+Read it top-to-bottom before running your own. It shows what "good" output looks like, so you can calibrate your expectations before spending API budget.
+
+---
+
+## What this is (and is not)
 
 Voice of Agents is a Python library that simulates user research using the Claude API. It runs a synthetic sampling frame — including adopters, abandoners, skeptics, and critics — and returns decision-oriented output: what to build first, what to validate with real users, and what would make each user type leave.
 
@@ -35,50 +98,9 @@ Read the [Manifesto](docs/MANIFESTO.md) for the full worldview.
 
 ---
 
-## Quick start
-
-```bash
-pip install voice-of-agents  # or: git clone + pip install -e ".[dev]"
-cp .env.example .env          # then paste your key into .env
-```
-
-### 60-second demo (no config required)
-
-```bash
-voa research demo
-```
-
-This runs a preset research question about developer tool adoption with 10 subjects and displays findings in your terminal. ~$0.30 with Opus, ~$0.02 with Haiku.
-
-### Plain-English setup (3 questions, no methodology vocabulary)
-
-```bash
-voa research quickstart
-```
-
-Asks you 3 plain-English questions. Uses Claude to translate your answers into a valid research config. Then run:
-
-```bash
-voa research run --model-haiku  # low cost
-```
-
-### One-liner API (Python)
-
-```python
-from voice_of_agents.research import quick_research_sync
-
-result = quick_research_sync(
-    what="YOUR PRODUCT",
-    who="YOUR USERS",
-    understand="THE #1 THING YOU WANT TO UNDERSTAND",
-)
-```
-
----
-
 ## The research → eval bridge
 
-The most unique workflow: use synthetic research personas to seed your LLM evaluation pipeline.
+The workflow that differentiates this library: use synthetic research personas to seed your LLM evaluation pipeline.
 
 ```bash
 # Run research through Stage 2 (personas)
@@ -116,7 +138,7 @@ voa research run research-config.yaml --dry-run --model-haiku
 ### Research pipeline
 
 ```
-voa research demo                          # 60-second preset demo, no config
+voa research demo [--offline]              # preset demo; --offline uses bundled cassette (no API key)
 voa research quickstart                    # 3-question plain-English setup
 voa research init [slug]                   # create research-config.yaml interactively
 voa research validate-config [config]      # pre-flight check, no API calls
@@ -156,6 +178,12 @@ voa design analyze gaps|coverage
 ```
 voa bridge status
 voa bridge sync-gaps
+```
+
+### Diagnostic
+
+```
+voa doctor [--offline]                     # pre-flight check of Python, API key, Playwright, disk
 ```
 
 ---
@@ -198,30 +226,16 @@ print(estimate.display())
 
 ---
 
-## Examples
-
-| Example | For | What it shows |
-|---------|-----|---------------|
-| [Solo founder](examples/solo-founder/) | Pre-PMF solo founders | quickstart → run → decision-report |
-| [Product engineer](examples/product-engineer/) | Product engineers and PMs | `quick_research()` one-liner, output parsing |
-| [DX practitioner](examples/dx-practitioner/) | Platform engineers, developer advocates | Full research → eval bridge |
-
-### Worked example: full pipeline output
-
-[`demo/multi-agent-adoption/`](demo/multi-agent-adoption/) captures a complete end-to-end run of the pipeline against a real product — research config, decision report, 4 seeded eval personas, browser exploration logs, per-persona evaluations, focus-group analysis, and prioritized backlog. Read it top-to-bottom before running your own.
-
----
-
 ## Data model
 
 Everything is file-based and git-friendly:
 
 - `research-sessions/*.yaml` — ResearchSession state (resumable after any stage)
-- `research-sessions/SYNTHETIC-DATA-NOTICE.md` — Honest framing + validation questions
-- `research-sessions/DECISION-REPORT.md` — What to build, kill, and validate
-- `data/personas/P-*.yaml` — Canonical persona definitions (Pydantic-validated)
-- `data/results/{id}-{name}/{timestamp}/` — Per-persona, timestamped eval results
-- `data/backlog.jsonl` — Append-only backlog event log
+- `research-sessions/SYNTHETIC-DATA-NOTICE.md` — honest framing + validation questions
+- `research-sessions/DECISION-REPORT.md` — what to build, kill, and validate
+- `data/personas/P-*.yaml` — canonical persona definitions (Pydantic-validated)
+- `data/results/{id}-{name}/{timestamp}/` — per-persona, timestamped eval results
+- `data/backlog.jsonl` — append-only backlog event log
 
 ---
 
@@ -240,7 +254,16 @@ Everything is file-based and git-friendly:
 Read the [Manifesto](docs/MANIFESTO.md) to understand the worldview. Fork it, argue with it, open a PR.
 
 ```bash
-git clone https://github.com/blakeaber/voice-of-agents
+git clone https://github.com/blakeaber/voice-of-agents.git
 pip install -e ".[dev]"
+pre-commit install
 pytest
 ```
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for branch conventions and PR guidelines. Security issues go to [`SECURITY.md`](SECURITY.md) (not public GitHub issues).
+
+---
+
+## License
+
+MIT © 2026 Blake Aber. See [`LICENSE`](LICENSE).
