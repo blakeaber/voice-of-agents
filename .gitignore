@@ -34,6 +34,13 @@ demo-output/
 # macOS
 .DS_Store
 
+# IDE / editor
+.idea/
+.vscode/settings.json
+
+# Claude Code runtime artifacts (not project config)
+.claude/*.lock
+
 # pro-package build artifacts
 pro-package/**/__pycache__/
 pro-package/**/*.egg-info/
