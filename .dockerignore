@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.github
+.gitleaks.toml
+
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+.pytest_cache
+.ruff_cache
+.mypy_cache
+.coverage
+.coverage.*
+htmlcov
+
+# Virtual envs
+.venv
+venv
+env
+
+# Tests and dev-only content (not useful inside the image)
+tests
+examples
+demo
+docs/plans
+
+# Runtime output
+data
+research-sessions
+demo-output
+
+# Environment / secrets
+.env
+.env.*
+
+# Build output (generated inside the image via pip install)
+dist
+build
+
+# OS
+.DS_Store
+
+# IDE
+.idea
+.vscode
+
+# Claude Code artifacts (irrelevant to the image)
+.claude
