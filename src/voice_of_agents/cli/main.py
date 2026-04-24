@@ -18,6 +18,7 @@ if _home_env.exists():
 # may read env vars at import time.
 from voice_of_agents.cli.bridge_cli import bridge_cli  # noqa: E402
 from voice_of_agents.cli.design_cli import design_cli  # noqa: E402
+from voice_of_agents.cli.doctor_cli import doctor  # noqa: E402
 from voice_of_agents.cli.eval_cli import eval_cli  # noqa: E402
 from voice_of_agents.cli.research_cli import research_cli  # noqa: E402
 
@@ -33,3 +34,4 @@ cli.add_command(design_cli, name="design")
 cli.add_command(eval_cli, name="eval")
 cli.add_command(bridge_cli, name="bridge")
 cli.add_command(research_cli, name="research")
+cli.add_command(doctor, name="doctor")
