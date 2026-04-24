@@ -1,0 +1,58 @@
+# Frozen demo output for `voa research demo --offline`.
+#
+# Regeneration (maintainer-only; requires live ANTHROPIC_API_KEY):
+#   1. Run `voa research demo --save` to produce demo-output/ artifacts
+#   2. Copy the result fields into this file, preserving the schema below
+#   3. Commit the update
+#
+# Schema: flat YAML matching what research_demo renders to the terminal.
+
+version: 1
+recorded_at: "2026-04-24"
+preset_question: >-
+  Why do developers adopt AI developer tools enthusiastically at first but
+  abandon them within the first month?
+
+top_findings:
+  - "Trial-to-habit drop-off is driven by first-week friction, not long-term dissatisfaction — developers who abandon by day 14 mostly cite setup fragility and context loss, not the tool's core capability."
+  - "'First win in 5 minutes' is the single strongest retention predictor: subjects who shipped a visible, verifiable improvement within their first session were 6x more likely to be active at day 30."
+  - "Abandoners typically do NOT churn to a competitor; they revert to the pre-tool workflow. The competition isn't other AI tools — it's the status quo."
+  - "Cost sensitivity is a stated objection that masks a different concern: subjects who cited 'too expensive' also reported low trust in outputs. Trust is the unspoken variable."
+  - "Adopters who stuck with the tool all reported at least one 'spooky moment' — an output they could not have produced themselves in the same time — within the first three uses."
+
+build_this_first: >-
+  Ship a "first win in 5 minutes" onboarding flow: one scripted, opinionated
+  path from install → visible improvement → verifiable proof. Skip the
+  "explore all features" tour. This single change moves more retention
+  than any feature addition.
+
+personas:
+  - uxw_id: UXW-DEMO-01
+    archetype: Pragmatic Adopter
+    top_concern: "Does this produce work I'd ship to code review without embarrassment?"
+    would_pay_if: "It catches one bug per week I would have shipped."
+  - uxw_id: UXW-DEMO-02
+    archetype: Burned Skeptic
+    top_concern: "The last tool hallucinated a nonexistent library function and wasted my afternoon."
+    would_pay_if: "I can see exactly which model / prompt / version produced each output."
+  - uxw_id: UXW-DEMO-03
+    archetype: Platform-Bound Engineer
+    top_concern: "Will this work with our internal monorepo layout, or is it another thing I need to fight to onboard?"
+    would_pay_if: "It indexes our internal code conventions, not just open-source patterns."
+
+churn_triggers:
+  - "One confidently-wrong output in the first week (breaks trust faster than any UX issue)."
+  - "A 10-minute setup loop that silently fails before the first meaningful output."
+  - "Pricing model change mid-trial (creates 'bait and switch' pattern-matching)."
+  - "Missing integration with the IDE or shell the developer actually uses daily."
+  - "Output style that a senior engineer would reject in code review (produces extra work, not leverage)."
+
+validate_with:
+  - "Walk me through the last AI coding tool you stopped using. When did you first feel the pull to stop opening it, and what was happening that day?"
+  - "Think of the last time an AI tool produced something surprising — an output better than what you'd have made. When was it, and what did it do next?"
+  - "If this library broke tomorrow and you had to go back to your previous workflow for a week, what would you miss first, and what would you be relieved to be rid of?"
+
+next_steps:
+  - "Schedule 3 user calls and ask the validation questions above."
+  - "Run `voa research quickstart` to configure your own research question."
+  - "Run `voa research run` to execute the full 4-stage pipeline (requires API key)."

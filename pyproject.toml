@@ -68,6 +68,9 @@ path = "src/voice_of_agents/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/voice_of_agents"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"src/voice_of_agents/fixtures/demo_result.yaml" = "voice_of_agents/fixtures/demo_result.yaml"
+
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]

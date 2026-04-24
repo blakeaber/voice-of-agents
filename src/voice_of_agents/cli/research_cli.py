@@ -312,14 +312,38 @@ def research_list_sessions(sessions_dir: str) -> None:
 @click.option(
     "--model", default="claude-opus-4-7", show_default=True, help="Anthropic model to use."
 )
-def research_demo(save: bool, model: str) -> None:
+@click.option(
+    "--offline",
+    is_flag=True,
+    default=False,
+    help="Render a bundled fixture instead of running the live pipeline. "
+    "No API key required; deterministic output.",
+)
+def research_demo(save: bool, model: str, offline: bool) -> None:
     """Run the 60-second preset demo — no config required.
 
     Runs a preset research question about developer tool adoption.
     Uses a small subject count (~$0.30 with claude-opus-4-7).
+
+    Pass --offline to render a bundled fixture instead (no API key required).
     """
+    # Offline mode: render the bundled fixture and exit. Does not run the
+    # pipeline, does not require an API key, and is deterministic.
+    if offline:
+        from voice_of_agents.research.replay import load_demo_fixture, render_offline_demo
+
+        try:
+            data = load_demo_fixture()
+        except FileNotFoundError as exc:
+            console.print(f"[red]{exc}[/red]")
+            sys.exit(1)
+        render_offline_demo(console, data)
+        return
+
     import asyncio
+
     from rich.progress import Progress, SpinnerColumn, TextColumn
+
     from voice_of_agents.research.quick import run_demo
 
     console.print("\n[bold]Voice of Agents — Research Demo[/bold]")
