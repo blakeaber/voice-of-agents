@@ -34,7 +34,7 @@ Read the [Manifesto](docs/MANIFESTO.md) for the full worldview.
 
 ```bash
 pip install voice-of-agents  # or: git clone + pip install -e ".[dev]"
-export ANTHROPIC_API_KEY=sk-...
+cp .env.example .env          # then paste your key into .env
 ```
 
 ### 60-second demo (no config required)

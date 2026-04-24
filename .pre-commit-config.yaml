@@ -1,0 +1,7 @@
+# Local dev-time guard against committing secrets.
+# Install once: `brew install pre-commit gitleaks && pre-commit install`
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
