@@ -10,12 +10,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- `voa research demo` preset bumps `subject_count` from 10 to 12. The
+  sampling-frame methodology guard requires 9 minimums across 6
+  adoption-status rows; 10 left only 1 slot of LLM allocation
+  flexibility, causing intermittent first-stage validation failures.
+  12 gives 3 free slots and dramatically improves demo reliability.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+- `subject_schema.j2` prompt: clarify that `failure_or_abandonment_mode`
+  is REQUIRED (not just "for non-adopters") for `partial-adopter`,
+  `abandoner`, `evaluated-and-rejected`, and `actively-anti` statuses.
+  Previous wording was ambiguous about partial-adopters; less robust
+  models (e.g., Haiku) intermittently left the field blank, tripping
+  the Pydantic validator. Now includes concrete examples per status.
 
 ### Security
 

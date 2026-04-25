@@ -20,7 +20,15 @@ constraint_profile: |
   [What constraints bind their choices: time, budget, approval, compliance, tooling, team size.]
 
 failure_or_abandonment_mode: |
-  [For non-adopters: the specific moment and reason they stopped or refused. For adopters: leave blank.]
+  [REQUIRED, NON-EMPTY whenever adoption_status is one of:
+     "partial-adopter", "abandoner", "evaluated-and-rejected", "actively-anti".
+   In those cases write a 1-3 sentence behavioral description of the specific moment
+   and reason they stopped, refused, restricted use, or rejected.
+   Example for abandoner: "Stopped using after the third week when the tool generated
+     a confidently-wrong API call that got flagged in code review."
+   Example for partial-adopter: "Uses for one-off scripts but refuses for production
+     code; says output style is too verbose and creates code-review friction."
+   Only write "" (empty string) when adoption_status is "adopter" or "never-tried-aware".]
 
 decision_topology: |
   [How they make tool decisions: solo vs. committee, top-down vs. bottom-up, trial vs. budget cycle.]

@@ -206,7 +206,7 @@ async def run_demo(
             "scope": "solo founders and product engineers at early-stage startups, 2024-2026",
             "slug": "dev-tool-abandonment-demo",
             "product_context": DEMO_PRESET["what"],
-            "subject_count": 10,
+            "subject_count": 12,  # 9 required minimums + 3 free slots for LLM flexibility
             "anthropic_model": model,
         }
     )
