@@ -10,36 +10,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
-- `voa research demo` preset bumps `subject_count` from 10 to 12. The
-  sampling-frame methodology guard requires 9 minimums across 6
-  adoption-status rows; 10 left only 1 slot of LLM allocation
-  flexibility, causing intermittent first-stage validation failures.
-  12 gives 3 free slots and dramatically improves demo reliability.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
-- `subject_schema.j2` prompt: clarify that `failure_or_abandonment_mode`
-  is REQUIRED (not just "for non-adopters") for `partial-adopter`,
-  `abandoner`, `evaluated-and-rejected`, and `actively-anti` statuses.
-  Previous wording was ambiguous about partial-adopters; less robust
-  models (e.g., Haiku) intermittently left the field blank, tripping
-  the Pydantic validator. Now includes concrete examples per status.
 
 ### Security
 
 ## [0.1.0] - 2026-04-25
 
 Initial stable release on PyPI. Promoted from `0.1.0a1` (which validated
-the trusted-publisher pipeline on TestPyPI). No behavioral changes from
-`0.1.0a1`; the alpha designation was a publishing-target choice, not a
-quality signal. See `[0.1.0a1]` below for the full feature list.
+the trusted-publisher pipeline on TestPyPI). See `[0.1.0a1]` below for
+the full feature list.
 
 Versioning policy: follows SemVer. The `0.x` major signals an evolving
 public API — minor bumps may include breaking changes. Stable
 guarantees begin at `1.0.0`.
+
+### Changed (vs. 0.1.0a1)
+- `voa research demo` preset bumps `subject_count` from 10 to 12. The
+  sampling-frame methodology guard requires 9 minimums across 6
+  adoption-status rows; 10 left only 1 slot of LLM allocation
+  flexibility, causing intermittent first-stage validation failures.
+  12 gives 3 free slots and dramatically improves demo reliability.
+
+### Fixed (vs. 0.1.0a1)
+- `subject_schema.j2` prompt: clarify that `failure_or_abandonment_mode`
+  is REQUIRED (not just "for non-adopters") for `partial-adopter`,
+  `abandoner`, `evaluated-and-rejected`, and `actively-anti` statuses.
+  Previous wording was ambiguous about partial-adopters; less robust
+  models (e.g., Haiku) intermittently left the field blank, tripping
+  the Pydantic validator. Now includes concrete examples per status.
 
 ## [0.1.0a1] - 2026-04-25
 
