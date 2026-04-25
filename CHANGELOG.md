@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.1.0] - 2026-04-25
+
+Initial stable release on PyPI. Promoted from `0.1.0a1` (which validated
+the trusted-publisher pipeline on TestPyPI). No behavioral changes from
+`0.1.0a1`; the alpha designation was a publishing-target choice, not a
+quality signal. See `[0.1.0a1]` below for the full feature list.
+
+Versioning policy: follows SemVer. The `0.x` major signals an evolving
+public API — minor bumps may include breaking changes. Stable
+guarantees begin at `1.0.0`.
+
 ## [0.1.0a1] - 2026-04-25
 
 Initial alpha release on TestPyPI. Establishes the public OSS shell around the
