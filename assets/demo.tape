@@ -10,7 +10,7 @@ Output assets/demo.gif
 
 Set FontSize 13
 Set Width 1000
-Set Height 720
+Set Height 240
 Set Theme "Dracula"
 Set TypingSpeed 60ms
 Set PlaybackSpeed 2.0
