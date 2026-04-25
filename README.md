@@ -8,7 +8,7 @@
 > [**Beta users lie.**](https://www.predicate.ventures/writing/beta-users-are-lying) Simulate them honestly, then validate the risky findings with the users you still need to talk to.
 
 <p align="center">
-  <img src="assets/demo.svg" alt="voa research demo running in a terminal" width="720">
+  <img src="assets/demo.gif" alt="voa research demo running in a terminal" width="720">
 </p>
 
 ---
